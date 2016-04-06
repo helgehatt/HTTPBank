@@ -1,0 +1,189 @@
+/*************
+      ALL
+*************/
+
+body {
+  left: 0;
+  margin: 0;
+  position: relative;
+}
+
+.btn-submit {
+	display: block;
+	margin-left: auto;
+}
+
+/* NAVBAR */
+#nav {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background-color: #FFF;
+}
+
+#nav .navbar-header {
+  margin-left: 0;
+}
+
+#nav .navbar-header img {
+  height: 50px;
+  margin-right: 10px;
+}
+
+#navbar {
+  border-top: 0;
+}
+
+#navbar li {
+  padding: 5px;
+}
+
+#navbar li a {
+  padding: 9px;
+}
+
+#navbar li a:focus,
+#navbar li a:hover {
+  border-color: #ccc;
+}
+
+#navbar ul {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/**************
+     USER
+**************/
+
+/* CONTENT TAB */
+#main-content {
+  padding: 10px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ACCOUNTS */
+#accounts .panel-title p {
+  display: inline;
+  float: right;
+}
+
+#accounts .table {
+  margin: 0;
+}
+
+#form-group-submit {
+  margin-bottom: 0;
+}
+
+/* TRANSFER */
+#transfer .tab-content {
+  padding: 20px;
+}
+
+/* TRANSACTIONS */
+
+
+/******************
+       ADMIN 
+******************/
+
+.account-glyphicon {
+	margin-left: 10px;
+	font-size: 16px;
+}
+
+.account-glyphicon,
+.account-glyphicon:focus,
+.account-glyphicon:hover {
+  color: #333;
+  text-decoration: none;
+}
+
+.tab-header {
+	padding: 9px 15px 9px 15px;
+}
+
+.tab-header p {
+	display: inline;
+	font-weight: bold;
+	margin-right: -10px;
+}
+
+.tab-header a {
+	float: right;
+}
+
+#user-list {
+  padding: 0;
+}
+
+@media (max-width: 767px) {
+	#left-tab {
+		padding: 0;
+	}
+}
+
+#left-tab .panel-title p {
+  display: inline;
+  float: right;
+}
+
+#left-tab .table {
+	margin: 0;
+}
+
+#left-tab .table .account-glyphicon {
+	font-size: 14px;
+}
+
+#right-tab {
+  padding: 0;
+}
+
+#right-tab .tab-content {
+	padding: 0;
+}
+
+#right-tab .form-horizontal {
+	padding: 15px;
+}
+
+#right-tab .text-right {
+	padding-right: 15px;
+}
+
+#right-tab #deposit a,
+#right-tab #withdrawal a {
+	font-size: 18px;
+}
+
+
+/******************
+       LOGIN 
+******************/
+
+#login-container {
+  margin-top: 40px;
+  max-width: 360px;
+  padding: 0;
+}
+
+#login-container img {
+  margin-bottom: 40px;
+}
+
+#login-container .panel-heading {
+  font-size: 16pt;
+  background-color: #408F8F;
+  color: #FFF;
+}
+
+#login-container button {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 6px 12px 6px 12px;
+  background-color: #489DAE;
+  color: #FFF;
+}
