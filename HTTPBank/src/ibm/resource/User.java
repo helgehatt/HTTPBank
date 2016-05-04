@@ -6,21 +6,37 @@ import java.util.ArrayList;
 public class User implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
-	private String name;
+	private long userId;
+	private String username;
 	
-	private ArrayList<Account> accounts;
+	private ArrayList<Account> accounts = null;
 	
-	public User(String name, ArrayList<Account> accounts) {
-		this.name = name;
+	public User(long userId, String username) {
+		this.userId = userId;
+		this.username = username;
+	}
+	
+	public User(long userId, String username, ArrayList<Account> accounts) {
+		this.userId = userId;
+		this.username = username;
+		this.accounts = accounts;
+	}
+	
+	public User(String username, ArrayList<Account> accounts) {
+		this.username = username;
 		this.accounts = accounts;
 	}
 
-	public String getName() {
-		return name;
+	public long getUserId(){
+		return userId;
+	}
+	
+	public String getUsername() {
+		return username;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	public ArrayList<Account> getAccounts() {

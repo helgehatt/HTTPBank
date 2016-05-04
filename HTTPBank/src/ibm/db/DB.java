@@ -6,7 +6,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Properties;
@@ -18,7 +17,7 @@ import java.util.Properties;
  * TODO: Is a connection pool more efficient vs preparedstatements with single connection? Best practice?
  * 
  * Method TODO list:
- * What methods do we need in here?
+ * What methods do we need in here? Inserts, Updates, Selects, Procedures, stuff?
  */
 public class DB {
 	//Fields
@@ -27,19 +26,47 @@ public class DB {
 	
 	//Methods
 	/**
+	 * Queries the database and returns a list of transactions related to a specific account-id.
+	 * TODO: Should return transaction objects in a list, but this is not currently possible as a new constructor and structure for the current resource.transaction object needs to be created.
+	 * @return ArrayList containing all current database transactions related to the given account. Returns null if database query fails.
+	 * @throws SQLException {@link #checkConnection() CheckConnection()}
+	 */
+	public static ArrayList<String> getTransactions(long accountid) throws SQLException {
+		checkConnection();
+		
+		PreparedStatement statement = connection.prepareStatement("SELECT TRANSACTION_ID, SENDER_ID, RECEIVER_ID, AMOUNT "
+				+ "FROM DTUGRP07.TRANSACTIONS "
+				+ "WHERE SENDER_ID = ? OR RECEIVER_ID = ?;"
+				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+		statement.setLong(1, accountid); //Sets the first '?' parameter to the integer 'accountid'.
+		statement.setLong(2, accountid); //Sets the second.
+		
+		ArrayList<String> resultList = null;
+		if (statement.execute()){ //If query is successful, create list of transactions.
+			resultList = new ArrayList<String>();
+			ResultSet results = statement.getResultSet();
+			while (results.next()){ //Fetch transaction-id from results and add to resultlist.
+				resultList.add(results.getString(1));
+			}
+		}
+		statement.close();
+		return resultList;
+	}
+	
+	/**
 	 * Queries the database and returns a list of accounts related to a specific user-id.
 	 * TODO: Should return account objects in a list, but this is not currently possible as a new constructor and structure for the current resource.account object needs to be created.
 	 * @return ArrayList containing all current database accounts related to the given user. Returns null if database query fails.
 	 * @throws SQLException {@link #checkConnection() CheckConnection()}
 	 */
-	public static ArrayList<String> getAccounts(int userid) throws SQLException{
+	public static ArrayList<String> getAccounts(long userid) throws SQLException {
 		checkConnection();
 		
-		PreparedStatement statement = connection.prepareStatement("SELECT ACCOUNTNAME " //TODO: Should fetch everything.
+		PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, ACCOUNT_ID, NAME, BALANCE "
 				+ "FROM DTUGRP07.ACCOUNTS "
-				+ "WHERE OWNER = ?;"
+				+ "WHERE USER_ID = ?;"
 				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		statement.setInt(1, userid); //Sets the '?' parameter to the integer 'userid'.
+		statement.setLong(1, userid); //Sets the '?' parameter to the integer 'userid'.
 		
 		ArrayList<String> resultList = null;
 		if (statement.execute()){ //If query is successful, create list of accounts.
@@ -48,7 +75,6 @@ public class DB {
 			while (results.next()){ //Fetch accountnames from results and add to resultlist.
 				resultList.add(results.getString(1));
 			}
-			results.close();
 		}
 		statement.close();
 		return resultList;
@@ -56,25 +82,23 @@ public class DB {
 	
 	/**
 	 * Queries the database and returns a list of users.
-	 * TODO: Should return user objects in a list, but this is not currently possible as a new constructor and structure for the current resource.user object needs to be created.
 	 * @return ArrayList containing all current database users. Returns null if database query fails.
 	 * @throws SQLException {@link #checkConnection() CheckConnection()}
 	 */
-	public static ArrayList<String> getUsers() throws SQLException{
+	public static ArrayList<User> getUsers() throws SQLException {
 		checkConnection();
 		
-		PreparedStatement statement = connection.prepareStatement("SELECT USERID, USERNAME, PASSWORD "
+		PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, USERNAME "
 				+ "FROM DTUGRP07.USERS;"
 				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
 		
-		ArrayList<String> resultList = null;
+		ArrayList<User> resultList = null;
 		if (statement.execute()){ //If query is successful, create list of users.
-			resultList = new ArrayList<String>();
+			resultList = new ArrayList<User>();
 			ResultSet results = statement.getResultSet();
 			while (results.next()){ //Fetch usernames from results and add to resultlist.
-				resultList.add(results.getString(2));
+				resultList.add(new User(results.getLong(1), results.getString(2)));
 			}
-			results.close();
 		}
 		statement.close();
 		return resultList;
@@ -85,11 +109,11 @@ public class DB {
 	 * Uses a PreparedStatement to query.
 	 * @throws SQLException 
 	 */
-	public static boolean checkLogin(String username, String password) throws SQLException{
+	public static boolean checkLogin(String username, String password) throws SQLException {
 		checkConnection();
 		
 		if (username.matches("\\s")) return false; //Checks for white space. TODO: Should throw exception?
-		PreparedStatement statement = connection.prepareStatement("SELECT USERID, USERNAME, PASSWORD "
+		PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, USERNAME, PASSWORD "
 				+ "FROM DTUGRP07.USERS "
 				+ "WHERE USERNAME = ? "
 				+ "FETCH FIRST 1 ROWS ONLY;"
@@ -100,12 +124,11 @@ public class DB {
 		if (statement.execute()){ //Executes the SQL statement, returns false if failed for any reason.
 			ResultSet result = statement.getResultSet();
 			if (result.next()){ //Moves the cursor to first row, returns false if cursor is moved past the last row. Note: There should be 0 or 1 row.
-				String correctPassword = result.getString("PASSWORD");
+				String correctPassword = result.getString("PASSWORD").trim();
 				
 				passwordIsCorrect = password.equals(correctPassword); //Checks if password is correct.
 				//TODO: Remember user-id for later queries if correct, since we have it here?
 			}
-			result.close();
 		}
 		statement.close();
 		return passwordIsCorrect; //Returns false if any of the above if statements returns false.
@@ -125,7 +148,7 @@ public class DB {
 	 * Checks if there is a current connection to the database and if not attempts to connect to it.
 	 * Temporary solution to creating connections and allow troubleshooting till a connection pool is integrated that can be handled reliably.
 	 * Note: Should check of the application server has integrated connection pool that can be used, else create our own.
-	 * @throws SQLException If connection fails, driver is missing or connection is found to not be valid for a database.
+	 * @throws SQLException If connection fails or driver is missing.
 	 */
 	private static void checkConnection() throws SQLException {
 		if (connection == null){
@@ -135,10 +158,16 @@ public class DB {
 	            throw new SQLException(e);
 	        }
 			connection = DriverManager.getConnection(url, getProperties());
-			if (!connection.isValid(5000)){
-				connection = null;
-				throw new SQLException("Connection is not valid.");
-			}
+			Runtime.getRuntime().addShutdownHook(new Thread(){ //ShutdownHook for closing resources used by the connection.
+				@Override
+				public void run(){
+					if (connection != null){
+						try {
+							connection.close();
+						} catch (SQLException e) {}
+					}
+				}
+			});
 		}
 	}
 	
