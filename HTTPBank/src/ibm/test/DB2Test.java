@@ -1,4 +1,4 @@
-package test.ibm.db2;
+package ibm.test;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
