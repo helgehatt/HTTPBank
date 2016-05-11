@@ -13,11 +13,109 @@ body {
 	margin-left: auto;
 }
 
+@media (min-width: 768px) {
+	.alignleft {
+		float: left;
+		text-align: left;
+		width: 40%;
+	}
+	
+	.aligncenter {
+		display: inline-block;
+		text-align: center;
+		width: 20%;
+	}
+	
+	.alignright {
+		float: right;
+		text-align: right;
+		width: 40%;
+	}
+}
+
+/* BUTTON-PANEL */
+
+.button-panel {
+	margin: 0;
+	border: none;
+}
+
+.button-panel .panel-body {
+	padding: 0;
+}
+
+.button-panel ul {
+	margin: 0;
+}
+
+.button-panel li {
+	border-radius: 0;
+	padding: 0;
+}
+
+.button-panel button {
+	border: none;
+	border-radius: 0;
+	padding: 10px;
+	width: 100%;
+}
+
+.button-panel a {
+	border: none;
+	border-radius: 0;
+	width: 100%;
+	font-weight: 500;
+	color: #555;
+}
+
+.button-panel h4 {
+	color: #555;
+}
+
+.button-panel .btn-default:focus {
+	outline: none;
+}
+
+/* SIDE-MENU */
+@media (min-width: 768px) {
+	#side-menu {
+		max-width: 200px;
+	}
+	
+	.side-menu-item {
+		font-size: 18px;
+		padding: 17px 0 17px 30px;
+		text-align: left;
+	}
+}
+
+.side-menu-sub-item {
+	font-size: 16px;
+	padding: 10px;
+}
+
+/* CONTAINERS */
+.container-fluid {
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+.container {
+	padding: 5px;
+}
+
 /* NAVBAR */
 #nav {
   padding-top: 10px;
   padding-bottom: 10px;
+  margin-bottom: 10px;
   background-color: #FFF;
+}
+
+#nav h4 {
+	margin: 0;
+	padding: 10px;
+	color: #777;
 }
 
 #nav .navbar-header {
@@ -31,6 +129,10 @@ body {
 
 #navbar {
   border-top: 0;
+}
+
+#navbar ul {
+	margin: 0;
 }
 
 #navbar li {
@@ -49,141 +151,4 @@ body {
 #navbar ul {
   margin-top: 0;
   margin-bottom: 0;
-}
-
-/**************
-     USER
-**************/
-
-/* CONTENT TAB */
-#main-content {
-  padding: 10px;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-/* ACCOUNTS */
-#accounts .panel-title p {
-  display: inline;
-  float: right;
-}
-
-#accounts .table {
-  margin: 0;
-}
-
-#form-group-submit {
-  margin-bottom: 0;
-}
-
-/* TRANSFER */
-#transfer .tab-content {
-  padding: 20px;
-}
-
-/* TRANSACTIONS */
-
-
-/******************
-       ADMIN 
-******************/
-
-.account-glyphicon {
-	margin-left: 10px;
-	font-size: 16px;
-}
-
-.account-glyphicon,
-.account-glyphicon:focus,
-.account-glyphicon:hover {
-  color: #333;
-  text-decoration: none;
-}
-
-.tab-header {
-	padding: 9px 15px 9px 15px;
-}
-
-.tab-header p {
-	display: inline;
-	font-weight: bold;
-	margin-right: -10px;
-}
-
-.tab-header a {
-	float: right;
-}
-
-#user-list {
-  padding: 0;
-}
-
-@media (max-width: 767px) {
-	#left-tab {
-		padding: 0;
-	}
-}
-
-#left-tab .panel-title p {
-  display: inline;
-  float: right;
-}
-
-#left-tab .table {
-	margin: 0;
-}
-
-#left-tab .table .account-glyphicon {
-	font-size: 14px;
-}
-
-#right-tab {
-  padding: 0;
-}
-
-#right-tab .tab-content {
-	padding: 0;
-}
-
-#right-tab .form-horizontal {
-	padding: 15px;
-}
-
-#right-tab .text-right {
-	padding-right: 15px;
-}
-
-#right-tab #deposit a,
-#right-tab #withdrawal a {
-	font-size: 18px;
-}
-
-
-/******************
-       LOGIN 
-******************/
-
-#login-container {
-  margin-top: 40px;
-  max-width: 360px;
-  padding: 0;
-}
-
-#login-container img {
-  margin-bottom: 40px;
-}
-
-#login-container .panel-heading {
-  font-size: 16pt;
-  background-color: #408F8F;
-  color: #FFF;
-}
-
-#login-container button {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 6px 12px 6px 12px;
-  background-color: #489DAE;
-  color: #FFF;
 }
