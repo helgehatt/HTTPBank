@@ -7,11 +7,15 @@ import java.util.Date;
 
 public class Transaction implements Serializable {
 	private static final long serialVersionUID = 1L;
+	
+	/* FIELDS */
 
 	private String date; // Default: Today
 	private String description; // Required
 	private double amount; // Required
 	
+	/* CONSTRUCTORS */
+
 	public Transaction(String description, double amount) {
 		this.date = new SimpleDateFormat("dd.MM.yyyy").format(new Date());
 		this.description = description;
@@ -24,6 +28,8 @@ public class Transaction implements Serializable {
 		this.amount = amount;
 	}
 	
+	/* GETTERS AND SETTERS */
+
 	public String getDate() {
 		return date;
 	}
