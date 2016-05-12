@@ -31,7 +31,7 @@ public class DB {
 	 * @return ArrayList containing all current database transactions related to the given account. Returns null if database query fails.
 	 * @throws SQLException {@link #checkConnection() CheckConnection()}
 	 */
-	public static ArrayList<String> getTransactions(long accountid) throws SQLException {
+	public static ArrayList<String> getTransactions(int accountid) throws SQLException {
 		checkConnection();
 		
 		PreparedStatement statement = connection.prepareStatement("SELECT TRANSACTION_ID, SENDER_ID, RECEIVER_ID, AMOUNT "
@@ -59,7 +59,7 @@ public class DB {
 	 * @return ArrayList containing all current database accounts related to the given user. Returns null if database query fails.
 	 * @throws SQLException {@link #checkConnection() CheckConnection()}
 	 */
-	public static ArrayList<String> getAccounts(long userid) throws SQLException {
+	public static ArrayList<String> getAccounts(int userid) throws SQLException {
 		checkConnection();
 		
 		PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, ACCOUNT_ID, NAME, BALANCE "
@@ -82,6 +82,7 @@ public class DB {
 	
 	/**
 	 * Queries the database and returns a list of users.
+	 * Note: For now the user objects returned by this method only return the 'user_id' and 'username'. No other information is received.
 	 * @return ArrayList containing all current database users. Returns null if database query fails.
 	 * @throws SQLException {@link #checkConnection() CheckConnection()}
 	 */
@@ -97,7 +98,7 @@ public class DB {
 			resultList = new ArrayList<User>();
 			ResultSet results = statement.getResultSet();
 			while (results.next()){ //Fetch usernames from results and add to resultlist.
-				resultList.add(new User(results.getLong(1), results.getString(2)));
+				resultList.add(new User(results.getInt(1), results.getString(2)));
 			}
 		}
 		statement.close();
@@ -107,6 +108,7 @@ public class DB {
 	/**
 	 * Queries a request for user information and checks for correct password. Returns true only if user exists and correct password is given as argument.
 	 * Uses a PreparedStatement to query.
+	 * TODO: This would be better to have as a stored procedure on the database.
 	 * @throws SQLException 
 	 */
 	public static boolean checkLogin(String username, String password) throws SQLException {
@@ -124,7 +126,7 @@ public class DB {
 		if (statement.execute()){ //Executes the SQL statement, returns false if failed for any reason.
 			ResultSet result = statement.getResultSet();
 			if (result.next()){ //Moves the cursor to first row, returns false if cursor is moved past the last row. Note: There should be 0 or 1 row.
-				String correctPassword = result.getString("PASSWORD").trim();
+				String correctPassword = result.getString("PASSWORD");
 				
 				passwordIsCorrect = password.equals(correctPassword); //Checks if password is correct.
 				//TODO: Remember user-id for later queries if correct, since we have it here?

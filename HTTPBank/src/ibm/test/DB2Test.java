@@ -1,24 +1,28 @@
 package ibm.test;
 
+import ibm.db.DB;
+import ibm.resource.User;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class DB2Test {
 	//Main
 	public static void main(String[] args) throws SQLException, ClassNotFoundException {
-		DB2Test db2 = new DB2Test();
-		PreparedStatement statement = db2.prepareStatement("SELECT * FROM DTUGRP07.SAMPLE");
-		ResultSet results = db2.executeQuery(statement);
-		ResultSetMetaData metadata = results.getMetaData();
-		int numOfColumns = metadata.getColumnCount();
-		while (results.next()){
-			for (int i = 1; i <= numOfColumns; i++)
-				System.out.println(metadata.getColumnName(i)+": "+results.getString(i));
-		}
+		long start = System.currentTimeMillis();
+		System.out.println("Checklogin as Thomas: " + DB.checkLogin("Thomas", "1234"));
+		System.out.println("Query Time: " + (System.currentTimeMillis()-start) +System.lineSeparator());
+		
+		start = System.currentTimeMillis();
+		ArrayList<User> users = DB.getUsers();
+		System.out.println("Got Users, Query Time: " + (System.currentTimeMillis()-start));
+		for (User user : users)
+			System.out.println(user.getId()+" : "+user.getUsername());
 	}
 
 	//Fields
@@ -39,10 +43,12 @@ public class DB2Test {
 	}
 	
 	//Methods
+	@SuppressWarnings("unused")
 	private PreparedStatement prepareStatement(String string) throws SQLException {
 		return connection.prepareStatement(string);
 	}
 	
+	@SuppressWarnings("unused")
 	private ResultSet executeQuery(PreparedStatement statement) throws SQLException {
 		return statement.executeQuery();
 	}

@@ -1,6 +1,7 @@
 package ibm.test;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import ibm.resource.Account;
 import ibm.resource.Transaction;
@@ -16,7 +17,8 @@ public final class TestData {
 	}
 	
 	private static void init() {
-		String date = "16.03.2016";
+		@SuppressWarnings("deprecation")
+		long date = new Date(2016, 03, 16).getTime();
 		String description = "Dogn Ghetto";
 		double amount = 65.239;
 		
@@ -31,7 +33,7 @@ public final class TestData {
 		double balance = 1500.00;
 		
 		String cpr = "010192-123";
-		String name = "User ";
+		String name = "User";
 		
 		users = new ArrayList<User>();
 		
@@ -56,14 +58,14 @@ public final class TestData {
 				
 				transactions = new ArrayList<Transaction>();
 				for (int k = 1; k <= 10; k++) {
-					transactions.add(new Transaction(date, description, amount + k));
+					transactions.add(new Transaction(i*10+k, i, date, description, amount + k));
 				}
 				
-				accounts.add(new Account(type, number + i + j, iban + i + j, currency, interest, balance + j * 100, transactions));
+				accounts.add(new Account(1, i, "Account"+i, type, number + i + j, iban + i + j, currency, interest, balance + j * 100, transactions));
 			
 			}
 			
-			users.add(new User(cpr + i, name + i, accounts));
+			users.add(new User(1, name + i, cpr + i, name +" "+ i, "HTTPBank", accounts));
 		}
 	}
 
