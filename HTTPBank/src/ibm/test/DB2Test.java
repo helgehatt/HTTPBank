@@ -1,7 +1,4 @@
-package test.ibm.db2;
-
-import ibm.db.DB;
-import ibm.resource.User;
+package ibm.test;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -9,30 +6,19 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
-/**
- * Class made for testing the database integration.
- * @author Tengux
- */
 public class DB2Test {
 	//Main
 	public static void main(String[] args) throws SQLException, ClassNotFoundException {
-		ArrayList<User> login = DB.getUsers();
-		System.out.println(login.isEmpty());
-		/*DB2Test db2 = new DB2Test();
+		DB2Test db2 = new DB2Test();
 		PreparedStatement statement = db2.prepareStatement("SELECT * FROM DTUGRP07.SAMPLE");
 		ResultSet results = db2.executeQuery(statement);
 		ResultSetMetaData metadata = results.getMetaData();
 		int numOfColumns = metadata.getColumnCount();
-		for (int i = 1; i <= numOfColumns; i++)
-			System.out.print(metadata.getColumnName(i)+" ");
-		System.out.println();
 		while (results.next()){
 			for (int i = 1; i <= numOfColumns; i++)
-				System.out.print(results.getString(i)+" ");
-			System.out.println();
-		}*/
+				System.out.println(metadata.getColumnName(i)+": "+results.getString(i));
+		}
 	}
 
 	//Fields

@@ -5,38 +5,65 @@ import java.util.ArrayList;
 
 public class User implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
-	private long userId;
-	private String username;
-	
-	private ArrayList<Account> accounts = null;
-	
-	public User(long userId, String username) {
-		this.userId = userId;
-		this.username = username;
+
+	/* FIELDS */
+
+	private String cpr; // Required
+	private String name; // Required
+	private String institute; // Required?
+	private String consultant; // Required?
+	private ArrayList<Account> accounts; // Default: None
+
+	/* CONSTRUCTORS */
+
+	public User(String cpr, String name) {
+		this.cpr = cpr;
+		this.name = name;
 	}
-	
-	public User(long userId, String username, ArrayList<Account> accounts) {
-		this.userId = userId;
-		this.username = username;
+
+	public User(String cpr, String name, ArrayList<Account> accounts) {
+		this(cpr, name);
 		this.accounts = accounts;
 	}
 	
-	public User(String username, ArrayList<Account> accounts) {
-		this.username = username;
-		this.accounts = accounts;
+	public User(String cpr, String name, String institute, String consultant) {
+		this(cpr, name);
+		this.institute = institute;
+		this.consultant = consultant;
 	}
 
-	public long getUserId(){
-		return userId;
-	}
-	
-	public String getUsername() {
-		return username;
+	/* GETTERS AND SETTERS */
+
+	public String getCpr() {
+		return cpr;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
+	public void setCpr(String cpr) {
+		this.cpr = cpr;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getInstitute() {
+		return institute;
+	}
+
+	public void setInstitute(String institute) {
+		this.institute = institute;
+	}
+
+	public String getConsultant() {
+		return consultant;
+	}
+
+	public void setConsultant(String consultant) {
+		this.consultant = consultant;
 	}
 
 	public ArrayList<Account> getAccounts() {
