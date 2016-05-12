@@ -26,38 +26,38 @@
 	<div id="transfer-dom" class="container col-sm-9">
 		<div class="panel panel-default">
 			<div class="panel-body">
-	      <form class="form-horizontal" role="form" action="transfer" method="post">
+	      <form class="form-horizontal" role="form" action="doTransfer" method="post">
 	        <div class="form-group">
-	          <label class="control-label col-sm-4" for="d-from">From:</label>
-	          <div class="col-sm-8">
-	            <input name="from" type="text" class="form-control" id="d-from">
+	          <label class="control-label col-sm-3" for="from">From:</label>
+	          <div class="col-sm-9">
+	            <input name="from" type="text" class="form-control" id="from">
 	          </div>
 	        </div>
 	        <div class="form-group">
-	          <label class="control-label col-sm-4" for="d-to">To:</label>
-	          <div class="col-sm-8">          
-	            <input name="to" type="text" class="form-control" id="d-to">
+	          <label class="control-label col-sm-3" for="to">To:</label>
+	          <div class="col-sm-9">          
+	            <input name="to" type="text" class="form-control" id="to">
 	          </div>
 	        </div>
 	        <div class="form-group">
-	          <label class="control-label col-sm-4" for="d-amount">Amount:</label>
-	          <div class="col-sm-8">          
-	            <input name="amount" type="text" class="form-control" id="d-amount">
+	          <label class="control-label col-sm-3" for="amount">Amount:</label>
+	          <div class="col-sm-9">          
+	            <input name="amount" type="text" class="form-control" id="amount">
 	          </div>
 	        </div>
 	        <div class="form-group">
-	          <label class="control-label col-sm-4" for="d-currency">Currency:</label>
-	          <div class="col-sm-8">          
-	            <input name="currency" type="text" class="form-control" id="d-currency" disabled>
+	          <label class="control-label col-sm-3" for="currency">Currency:</label>
+	          <div class="col-sm-9">          
+	            <input name="currency" type="text" class="form-control" id="currency" disabled>
 	          </div>
 	        </div>
 	        <div class="form-group">
-	          <label class="control-label col-sm-4" for="d-message">Message:</label>
-	          <div class="col-sm-8">
-	            <textarea name="message" class="form-control" rows="5" id="d-message" placeholder="Optional"></textarea>
+	          <label class="control-label col-sm-3" for="message">Message:</label>
+	          <div class="col-sm-9">
+	            <textarea name="message" class="form-control" rows="5" id="message" placeholder="Optional"></textarea>
 	          </div>
 	        </div>
-	         <button class="btn btn-default btn-submit">Submit</button>
+	         <button name="transfer" class="btn btn-default btn-submit" value="admin-dom">Submit</button>
 	      </form>
 			</div>
 		</div>

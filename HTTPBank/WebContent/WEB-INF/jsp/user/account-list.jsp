@@ -30,7 +30,7 @@
          <div class="panel-body">
            <table class="table">
              <thead>
-               <tr><th>Account information</th><th></th></tr>
+               <tr><th colspan="2">Account information</th></tr>
              </thead>
              <tbody>
                <tr><td>Account number</td><td>${account.number}</td></tr>

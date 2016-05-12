@@ -51,7 +51,7 @@
             <textarea name="message" class="form-control" rows="5" id="d-message" placeholder="Optional"></textarea>
           </div>
         </div>
-        <button type="submit" class="btn btn-default btn-submit">Submit</button>
+        <button name="transfer" class="btn btn-default btn-submit" value="user-dom">Submit</button>
       </form>
     </div>
     <div id="international" class="tab-pane fade">
@@ -89,7 +89,7 @@
             <textarea name="message" class="form-control" rows="5" id="i-message" placeholder="Optional"></textarea>
           </div>
         </div>
-        <button type="submit" class="btn btn-default btn-submit">Submit</button>
+        <button name="transfer" class="btn btn-default btn-submit" value="user-int">Submit</button>
       </form>
     </div>
   </div>

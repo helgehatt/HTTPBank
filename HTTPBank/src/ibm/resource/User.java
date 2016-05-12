@@ -12,7 +12,7 @@ public class User implements Serializable {
 	private String name; // Required
 	private String institute; // Required?
 	private String consultant; // Required?
-	private ArrayList<Account> accounts; // Default: None
+	private ArrayList<Account> accounts = new ArrayList<Account>(); // Default: None
 
 	/* CONSTRUCTORS */
 

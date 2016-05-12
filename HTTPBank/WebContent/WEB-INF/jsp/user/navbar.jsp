@@ -14,13 +14,13 @@
     </div>
     <div id="navbar" class="collapse navbar-collapse">
       <ul class="nav navbar-nav">
-        <li><a role="button" class="btn btn-default" href="accounts">Accounts</a></li>
-        <li><a role="button" class="btn btn-default" href="transfer">Transfer</a></li>
-        <li><a role="button" class="btn btn-default" href="transactions">Transactions</a></li>
+        <li><a class="btn btn-default" href="accounts">Accounts</a></li>
+        <li><a class="btn btn-default" href="transfer">Transfer</a></li>
+        <li><a class="btn btn-default" href="transactions">Transactions</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <li><a role="button" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Inbox</a></li>
-        <li><a role="button" class="btn btn-default" href="../"><span class="glyphicon glyphicon-log-out"></span> Log out</a></li>
+        <li><a class="btn btn-default" href="inbox"><span class="glyphicon glyphicon-envelope"></span> Inbox</a></li>
+        <li><a class="btn btn-default" href="../"><span class="glyphicon glyphicon-log-out"></span> Log out</a></li>
       </ul>
     </div>
   </div>
