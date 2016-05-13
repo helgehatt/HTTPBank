@@ -9,8 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import ibm.test.TestData;
-
 @WebServlet("/checkLogin")
 public class LoginController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -23,18 +21,17 @@ public class LoginController extends HttpServlet {
         // TODO: DB Authentication: Set login status.
         
         if (username.equals("user") && password.equals("")) {
-			HttpSession session = request.getSession();
-			session.setAttribute("user", TestData.getUser());
 			response.sendRedirect("user/accounts");
 			
         } else if (username.equals("admin") && password.equals("")) {
 			HttpSession session = request.getSession();
-			session.setAttribute("user", null);
-			session.setAttribute("users", TestData.getUsers());
+			session.removeAttribute("user");
+			session.removeAttribute("account");
+			
 			response.sendRedirect("admin/users");
 			
         } else {
-        	response.sendRedirect("/login");
+        	response.sendRedirect(" ");
         }
 	}
 

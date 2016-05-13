@@ -51,6 +51,17 @@ public class Account implements Serializable {
 		this.transactions = transactions;
 	}
 	
+	// Keep until DB is fully operational
+	public Account(String type, String number, String iban, String currency, double interest, double balance) {
+		this.type = type;
+		this.number = number;
+		this.iban = iban;
+		this.currency = currency;
+		this.interest = interest;
+		this.balance = balance;
+		this.transactions = new ArrayList<Transaction>();
+	}
+
 	/* GETTERS */
 	public int getUserId() {
 		return user_id;

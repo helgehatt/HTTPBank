@@ -53,6 +53,13 @@ public class Transaction implements Serializable {
 		this.amount = amount;
 	}
 	
+	// Keep until DB is fully operational
+	public Transaction(String description, double amount) {
+		this.date = new java.util.Date().getTime();
+		this.description = description;
+		this.amount = amount;
+	}
+	
 	/* GETTERS */
 	public long getId(){
 		return transaction_id;
