@@ -40,7 +40,7 @@
       <form role="form" action="checkLogin" method="post">
         <div class="form-group">
           <label for="username">User name:</label>
-          <input name="username" type="text" class="form-control">
+          <input name="username" type="text" class="form-control" autofocus>
         </div>
         <div class="form-group">
           <label for="password">Password:</label>

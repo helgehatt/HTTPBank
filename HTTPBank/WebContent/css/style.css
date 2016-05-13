@@ -13,23 +13,15 @@ body {
 	margin-left: auto;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 300px) {
 	.alignleft {
 		float: left;
 		text-align: left;
-		width: 40%;
-	}
-	
-	.aligncenter {
-		display: inline-block;
-		text-align: center;
-		width: 20%;
 	}
 	
 	.alignright {
 		float: right;
 		text-align: right;
-		width: 40%;
 	}
 }
 
@@ -87,11 +79,11 @@ body {
 		padding: 17px 0 17px 30px;
 		text-align: left;
 	}
-}
 
-.side-menu-sub-item {
-	font-size: 16px;
-	padding: 10px;
+	.side-menu-sub-item {
+		font-size: 16px;
+		padding: 10px;
+	}
 }
 
 /* CONTAINERS */

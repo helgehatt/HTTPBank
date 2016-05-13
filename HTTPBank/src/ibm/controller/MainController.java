@@ -7,9 +7,12 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import ibm.test.TestData;
 
-@WebServlet(urlPatterns = { "/user/accounts", "/user/transfer", "/user/transactions", 
-		"/admin/users", "/admin/accounts", "/admin/transactions", "/admin/info", "/admin/transfer", "/admin/international" })
+@WebServlet(urlPatterns = { "/user/accounts", "/user/transfer", "/user/transactions", "/user/inbox", 
+		"/admin/users", "/admin/search", "/admin/newuser", "/admin/accounts", "/admin/newaccount", 
+		"/admin/transactions", "/admin/accountinfo", "/admin/deposit", "/admin/withdrawal", "/admin/editaccount",
+		"/admin/transfer", "/admin/international", "/admin/userinfo" })
 public class MainController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
@@ -21,6 +24,7 @@ public class MainController extends HttpServlet {
 		
 		switch (path) {
 		case "/user/accounts":
+			request.getSession().setAttribute("user", TestData.getUser());
 			request.getRequestDispatcher("../WEB-INF/jsp/user/account-list.jsp").forward(request, response);
 			break;
 		case "/user/transfer":
@@ -30,22 +34,41 @@ public class MainController extends HttpServlet {
 			request.getRequestDispatcher("../WEB-INF/jsp/user/transaction-list.jsp").forward(request, response);
 			break;
 		case "/admin/users":
+			request.getSession().setAttribute("users", TestData.getUsers());
 			request.getRequestDispatcher("../WEB-INF/jsp/admin/user-list.jsp").forward(request, response);
+			break;
+		case "/admin/newuser":
+			request.getRequestDispatcher("../WEB-INF/jsp/admin/new-user.jsp").forward(request, response);
 			break;
 		case "/admin/accounts":
 			request.getRequestDispatcher("../WEB-INF/jsp/admin/account-list.jsp").forward(request, response);
 			break;
+		case "/admin/newaccount":
+			request.getRequestDispatcher("../WEB-INF/jsp/admin/new-account.jsp").forward(request, response);
+			break;
 		case "/admin/transactions":
 			request.getRequestDispatcher("../WEB-INF/jsp/admin/transaction-list.jsp").forward(request, response);
 			break;
-		case "/admin/info":
+		case "/admin/accountinfo":
 			request.getRequestDispatcher("../WEB-INF/jsp/admin/account-info.jsp").forward(request, response);
+			break;
+		case "/admin/deposit":
+			request.getRequestDispatcher("../WEB-INF/jsp/admin/deposit.jsp").forward(request, response);
+			break;
+		case "/admin/withdrawal":
+			request.getRequestDispatcher("../WEB-INF/jsp/admin/withdrawal.jsp").forward(request, response);
+			break;
+		case "/admin/editaccount":
+			request.getRequestDispatcher("../WEB-INF/jsp/admin/edit-account.jsp").forward(request, response);
 			break;
 		case "/admin/transfer":
 			request.getRequestDispatcher("../WEB-INF/jsp/admin/transfer-dom.jsp").forward(request, response);
 			break;
 		case "/admin/international":
 			request.getRequestDispatcher("../WEB-INF/jsp/admin/transfer-int.jsp").forward(request, response);
+			break;
+		case "/admin/userinfo":
+			request.getRequestDispatcher("../WEB-INF/jsp/admin/user-info.jsp").forward(request, response);
 			break;
 		}
 	}

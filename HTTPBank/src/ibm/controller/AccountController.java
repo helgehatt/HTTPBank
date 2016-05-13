@@ -22,6 +22,6 @@ public class AccountController extends HttpServlet {
 		HttpSession session = request.getSession();
 		session.setAttribute("account", TestData.getAccountByIban(iban));
 		
-		response.sendRedirect("transactions");
+		response.sendRedirect("accountinfo");
     }
 }

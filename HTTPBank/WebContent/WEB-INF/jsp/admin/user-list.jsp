@@ -26,6 +26,13 @@
 	     			</form>
 	     		</li>
 	    	</c:forEach>
+   			<li class="list-group-item">
+     			<form action="newuser" method="get">
+     				<button class="btn btn-default" name="cpr" value="${user.cpr}">
+	    				<h4>New user</h4>
+     				</button>
+     			</form>
+     		</li>
 	   	</ul>
 	  </div>
 	</div>

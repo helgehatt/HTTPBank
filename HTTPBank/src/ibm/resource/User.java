@@ -15,6 +15,7 @@ public class User implements Serializable {
 	private String name; // Required
 	private String institute; // Required?
 	private String consultant; // Required?
+	
 	private ArrayList<Account> accounts = null; // Default: None
 
 	/* CONSTRUCTORS */
@@ -48,6 +49,15 @@ public class User implements Serializable {
 		this(user_id, username, cpr, name, institute);
 		this.consultant = consultant;
 		this.accounts = accounts;
+	}
+	
+	// Keep until DB is fully operational
+	public User(String cpr, String name, String institute, String consultant) {
+		this.cpr = cpr;
+		this.name = name;
+		this.institute = institute;
+		this.consultant = consultant;
+		this.accounts = new ArrayList<Account>();
 	}
 
 	/* GETTERS */
