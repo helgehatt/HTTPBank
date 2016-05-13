@@ -75,7 +75,7 @@ public class AccountEditor extends HttpServlet {
 	        account.setCurrency(currency);
 	        account.setInterest(Double.parseDouble(interest));
 	        account.setBalance(Double.parseDouble(balance));
-			response.sendRedirect("accounts");
+			response.sendRedirect("accountinfo");
         } else {
         	session.setAttribute("errors", errors);
         	response.sendRedirect("editaccount");
