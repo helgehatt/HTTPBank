@@ -78,6 +78,7 @@ public class AccountCreator extends HttpServlet {
     }
 
     // TODO: Implement as thread safe static methods?
+    // Not needed to make thread-safe, this is completely thread-safe as static or not. Only reason it would not be thread-safe is if threads had to share data, in this case the scope prevents threads from using the same variable even as static.
     private void checkType(String type) throws InputException {
     	if (type.length() < 5)
     		throw new InputException();

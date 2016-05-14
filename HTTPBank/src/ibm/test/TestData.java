@@ -58,7 +58,7 @@ public final class TestData {
 				
 				transactions = new ArrayList<Transaction>();
 				for (int k = 1; k <= 10; k++) {
-					transactions.add(new Transaction(i*10+k, i, date, description, amount + k));
+					transactions.add(new Transaction(new Long(i*10+k), i, date, description, amount + k));
 				}
 				
 				accounts.add(new Account(1, i, "Account"+i, type, number + i + j, iban + i + j, currency, interest, balance + j * 100, transactions));
