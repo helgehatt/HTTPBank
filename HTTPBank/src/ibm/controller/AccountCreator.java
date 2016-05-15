@@ -30,37 +30,37 @@ public class AccountCreator extends HttpServlet {
         String balance = request.getParameter("balance");
         
         try {
-        	checkType(type);
+        	AttributeChecks.checkType(type);
         } catch (InputException e) {
         	errors.put("type", e.getMessage());
         }
         
         try {
-        	checkNumber(number);
+        	AttributeChecks.checkNumber(number);
         } catch (InputException e) {
         	errors.put("number", e.getMessage());
         }
         
         try {
-        	checkIban(iban);
+        	AttributeChecks.checkIban(iban);
         } catch (InputException e) {
         	errors.put("iban", e.getMessage());
         }
         
         try {
-        	checkCurrency(currency);
+        	AttributeChecks.checkCurrency(currency);
         } catch (InputException e) {
         	errors.put("currency", e.getMessage());
         }
         
         try {
-        	checkInterest(interest);
+        	AttributeChecks.checkInterest(interest);
         } catch (InputException e) {
         	errors.put("interest", e.getMessage());
         }
         
         try {
-        	checkBalance(balance);
+        	AttributeChecks.checkBalance(balance);
         } catch (InputException e) {
         	errors.put("balance", e.getMessage());
         }
@@ -76,43 +76,4 @@ public class AccountCreator extends HttpServlet {
         	response.sendRedirect("newaccount");
         }
     }
-
-    // TODO: Implement as thread safe static methods?
-    // Not needed to make thread-safe, this is completely thread-safe as static or not. Only reason it would not be thread-safe is if threads had to share data, in this case the scope prevents threads from using the same variable even as static.
-    private void checkType(String type) throws InputException {
-    	if (type.length() < 5)
-    		throw new InputException();
-    }
-    
-    private void checkNumber(String number) throws InputException {
-    	if (number.length() < 5)
-    		throw new InputException();
-    }
-    
-    private void checkIban(String iban) throws InputException {
-    	if (iban.length() < 5)
-    		throw new InputException();
-    }
-    
-    private void checkCurrency(String currency) throws InputException {
-    	if (currency.length() != 3)
-    		throw new InputException();
-    }
-    
-    private void checkInterest(String interest) throws InputException {
-    	try {
-    		Double.parseDouble(interest);
-    	} catch (NumberFormatException e) {
-    		throw new InputException();
-    	}
-    }
-    
-    private void checkBalance(String balance) throws InputException {
-    	try {
-    		Double.parseDouble(balance);
-    	} catch (NumberFormatException e) {
-    		throw new InputException();
-    	}
-    }
-    
 }
