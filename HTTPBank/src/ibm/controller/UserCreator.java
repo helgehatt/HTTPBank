@@ -27,25 +27,25 @@ public class UserCreator extends HttpServlet {
         String consultant = request.getParameter("consultant");
         
         try {
-        	checkCpr(cpr);
+        	AttributeChecks.checkCpr(cpr);
         } catch (InputException e) {
         	errors.put("cpr", e.getMessage());
         }
         
         try {
-        	checkName(name);
+        	AttributeChecks.checkName(name);
         } catch (InputException e) {
         	errors.put("name", e.getMessage());
         }
         
         try {
-        	checkConsultant(consultant);
+        	AttributeChecks.checkConsultant(consultant);
         } catch (InputException e) {
         	errors.put("institute", e.getMessage());
         }
         
         try {
-        	checkInstitute(institute);
+        	AttributeChecks.checkInstitute(institute);
         } catch (InputException e) {
         	errors.put("consultant", e.getMessage());
         }
@@ -57,26 +57,5 @@ public class UserCreator extends HttpServlet {
         	request.getSession().setAttribute("errors", errors);
         	response.sendRedirect("newuser");
         }
-    }
-
-    // TODO: Implement as thread safe static methods?
-    private void checkCpr(String cpr) throws InputException {
-    	if (cpr.length() < 5)
-    		throw new InputException();
-    }
-    
-    private void checkName(String name) throws InputException {
-    	if (name.length() < 5) 
-    		throw new InputException();    	
-    }
-    
-    private void checkInstitute(String institute) throws InputException {
-    	if (institute.length() < 5)
-    		throw new InputException();
-    }
-    
-    private void checkConsultant(String consultant) throws InputException {
-    	if (consultant.length() < 5)
-    		throw new InputException();
     }
 }

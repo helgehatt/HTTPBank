@@ -26,6 +26,7 @@ public class Account implements Serializable {
 	public Account(int user_id, int account_id, String name, String type, String number, String iban, String currency, double interest) {
 		this.user_id = user_id;
 		this.account_id = account_id;
+		this.name = name;
 		this.type = type;
 		this.number = number;
 		this.iban = iban;
@@ -52,6 +53,7 @@ public class Account implements Serializable {
 	}
 	
 	// Keep until DB is fully operational
+	// Method made in class DB to replace this for creating new accounts in the database.
 	public Account(String type, String number, String iban, String currency, double interest, double balance) {
 		this.type = type;
 		this.number = number;

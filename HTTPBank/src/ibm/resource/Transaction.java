@@ -10,7 +10,7 @@ public class Transaction implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	/* FIELDS */
-	private long transaction_id; //Only for identification.
+	private Long transaction_id; //Only for identification. Not really required here.
 	private int account_id; //Required
 
 	private long date; // Required
@@ -21,7 +21,7 @@ public class Transaction implements Serializable {
 	
 	/* CONSTRUCTORS */
 
-	public Transaction(long transaction_id, int account_id, String description, double amount) {
+	public Transaction(Long transaction_id, int account_id, String description, double amount) {
 		this.transaction_id = transaction_id;
 		this.account_id = account_id;
 		this.date = new java.util.Date().getTime();
@@ -29,7 +29,7 @@ public class Transaction implements Serializable {
 		this.amount = amount;
 	}
 	
-	public Transaction(long transaction_id, int account_id, long date, String description, double amount) {
+	public Transaction(Long transaction_id, int account_id, long date, String description, double amount) {
 		this.transaction_id = transaction_id;
 		this.account_id = account_id;
 		this.date = date;
@@ -37,7 +37,7 @@ public class Transaction implements Serializable {
 		this.amount = amount;
 	}
 	
-	public Transaction(long transaction_id, int account_id, Date date, String description, double amount) {
+	public Transaction(Long transaction_id, int account_id, Date date, String description, double amount) {
 		this.transaction_id = transaction_id;
 		this.account_id = account_id;
 		this.date = date.getTime();
@@ -45,7 +45,7 @@ public class Transaction implements Serializable {
 		this.amount = amount;
 	}
 	
-	public Transaction(long transaction_id, int account_id, String date, String description, double amount) throws ParseException {
+	public Transaction(Long transaction_id, int account_id, String date, String description, double amount) throws ParseException {
 		this.transaction_id = transaction_id;
 		this.account_id = account_id;
 		this.date = FORMAT.parse(date).getTime();
@@ -54,6 +54,7 @@ public class Transaction implements Serializable {
 	}
 	
 	// Keep until DB is fully operational
+	// Method made in class DB to replace this for creating new transactions in the database.
 	public Transaction(String description, double amount) {
 		this.date = new java.util.Date().getTime();
 		this.description = description;
@@ -61,7 +62,7 @@ public class Transaction implements Serializable {
 	}
 	
 	/* GETTERS */
-	public long getId(){
+	public Long getId(){
 		return transaction_id;
 	}
 	

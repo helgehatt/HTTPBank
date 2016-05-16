@@ -52,6 +52,7 @@ public class User implements Serializable {
 	}
 	
 	// Keep until DB is fully operational
+	// Method made in class DB to replace this for creating new users in the database.
 	public User(String cpr, String name, String institute, String consultant) {
 		this.cpr = cpr;
 		this.name = name;
