@@ -17,10 +17,10 @@ public class UserController extends HttpServlet {
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int user_id = Integer.parseInt(request.getParameter("user_id"));
+        int userId = Integer.parseInt(request.getParameter("userId"));
         
 		try {
-			request.getSession().setAttribute("user", DB.getUser(user_id));
+			request.getSession().setAttribute("user", DB.getUser(userId));
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

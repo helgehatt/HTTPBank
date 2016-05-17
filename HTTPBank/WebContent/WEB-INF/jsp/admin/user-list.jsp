@@ -19,7 +19,7 @@
 	    	<c:forEach var="user" items="${sessionScope.users}">
 	   			<li class="list-group-item">
 	     			<form action="getUser" method="post">
-	     				<button class="btn btn-default" name="user_id" value="${user.id}">
+	     				<button class="btn btn-default" name="userId" value="${user.id}">
 		    				<h4 class="alignleft">${user.name}</h4>
 		    				<h4 class="alignright">${user.cpr}</h4>
 	     				</button>
