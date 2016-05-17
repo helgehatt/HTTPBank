@@ -1,13 +1,16 @@
 package ibm.resource;
 
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.ArrayList;
+
+import ibm.db.DB;
 
 public class User implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/* FIELDS */
-	private int user_id; //Required
+	private int userId; //Required
 	private String username; //Required
 	//Password is required in database, but is never made a variable here.
 	
@@ -19,34 +22,34 @@ public class User implements Serializable {
 	private ArrayList<Account> accounts = null; // Default: None
 
 	/* CONSTRUCTORS */
-	public User(int user_id, String username){
-		this.user_id = user_id;
+	public User(int userId, String username){
+		this.userId = userId;
 		this.username = username;
 	}
 
-	public User(int user_id, String username, String cpr, String name) {
-		this(user_id, username);
+	public User(int userId, String username, String cpr, String name) {
+		this(userId, username);
 		this.cpr = cpr;
 		this.name = name;
 	}
 	
-	public User(int user_id, String username, String cpr, String name, String institute) {
-		this(user_id, username, cpr, name);
+	public User(int userId, String username, String cpr, String name, String institute) {
+		this(userId, username, cpr, name);
 		this.institute = institute;
 	}
 	
-	public User(int user_id, String username, String cpr, String name, String institute, String consultant) {
-		this(user_id, username, cpr, name, institute);
+	public User(int userId, String username, String cpr, String name, String institute, String consultant) {
+		this(userId, username, cpr, name, institute);
 		this.consultant = consultant;
 	}
 
-	public User(int user_id, String username, String cpr, String name, String institute, ArrayList<Account> accounts) {
-		this(user_id, username, cpr, name);
+	public User(int userId, String username, String cpr, String name, String institute, ArrayList<Account> accounts) {
+		this(userId, username, cpr, name);
 		this.accounts = accounts;
 	}
 	
-	public User(int user_id, String username, String cpr, String name, String institute, String consultant, ArrayList<Account> accounts) {
-		this(user_id, username, cpr, name, institute);
+	public User(int userId, String username, String cpr, String name, String institute, String consultant, ArrayList<Account> accounts) {
+		this(userId, username, cpr, name, institute);
 		this.consultant = consultant;
 		this.accounts = accounts;
 	}
@@ -63,7 +66,7 @@ public class User implements Serializable {
 
 	/* GETTERS */
 	public int getId() {
-		return user_id;
+		return userId;
 	}
 	
 	public String getUsername() {
@@ -89,8 +92,14 @@ public class User implements Serializable {
 	/*
 	 * Get Accounts related to this User.
 	 * TODO: Attempt to query database for accounts if requested when null?
+	 * Should query whenever accounts are updated.
 	 */
 	public ArrayList<Account> getAccounts() {
+		try {
+			accounts = DB.getAccounts(userId);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		return accounts;
 	}
 	

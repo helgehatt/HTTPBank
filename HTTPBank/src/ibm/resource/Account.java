@@ -1,15 +1,19 @@
 package ibm.resource;
 
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+import ibm.db.DB;
+
 public class Account implements Serializable {
 	private static final long serialVersionUID = 1L;
+	private static final DecimalFormat FORMAT = new DecimalFormat("#0.00");
 	
 	/* FIELDS */
-	private int user_id; //Required
-	private int account_id; //Required
+	private int userId; //Required
+	private int accountId; //Required
 	private String name; //Required
 	
 	private String type; // Required
@@ -23,9 +27,9 @@ public class Account implements Serializable {
 	/* CONSTRUCTORS */
 	
 	// Required
-	public Account(int user_id, int account_id, String name, String type, String number, String iban, String currency, double interest) {
-		this.user_id = user_id;
-		this.account_id = account_id;
+	public Account(int userId, int accountId, String name, String type, String number, String iban, String currency, double interest) {
+		this.userId = userId;
+		this.accountId = accountId;
 		this.name = name;
 		this.type = type;
 		this.number = number;
@@ -35,20 +39,20 @@ public class Account implements Serializable {
 	}
 	
 	// Required and balance
-	public Account(int user_id, int account_id, String name, String type, String number, String iban, String currency, double interest, double balance) {
-		this(user_id, account_id, name, type, number, iban, currency, interest);
+	public Account(int userId, int accountId, String name, String type, String number, String iban, String currency, double interest, double balance) {
+		this(userId, accountId, name, type, number, iban, currency, interest);
 		this.balance = balance;
 	}
 	
 	// Required and transactions
-	public Account(int user_id, int account_id, String name, String type, String number, String iban, String currency, double interest, ArrayList<Transaction> transactions) {
-		this(user_id, account_id, name, type, number, iban, currency, interest);
+	public Account(int userId, int accountId, String name, String type, String number, String iban, String currency, double interest, ArrayList<Transaction> transactions) {
+		this(userId, accountId, name, type, number, iban, currency, interest);
 		this.transactions = transactions;
 	}
 	
 	// Required, balance and transactions
-	public Account(int user_id, int account_id, String name, String type, String number, String iban, String currency, double interest, double balance, ArrayList<Transaction> transactions) {
-		this(user_id, account_id, name, type, number, iban, currency, interest, balance);
+	public Account(int userId, int accountId, String name, String type, String number, String iban, String currency, double interest, double balance, ArrayList<Transaction> transactions) {
+		this(userId, accountId, name, type, number, iban, currency, interest, balance);
 		this.transactions = transactions;
 	}
 	
@@ -66,11 +70,11 @@ public class Account implements Serializable {
 
 	/* GETTERS */
 	public int getUserId() {
-		return user_id;
+		return userId;
 	}
 	
 	public int getId() {
-		return account_id;
+		return accountId;
 	}
 	
 	public String getName() {
@@ -94,18 +98,25 @@ public class Account implements Serializable {
 	}
 	
 	public String getInterest() {
-		return Double.toString(interest) + "%";
+		return FORMAT.format(interest) + "%";
 	}
 	
 	public String getBalance() {
-		return new DecimalFormat("#0.00").format(balance);
+		return FORMAT.format(balance);
 	}
 	
 	/*
 	 * Returns a list of Transactions related to this Account.
 	 * TODO: Should query database for transactions if called when null?
+	 * Should query whenever transactions are updated.
 	 */
 	public ArrayList<Transaction> getTransactions() {
+		try {
+			transactions = DB.getTransactions(accountId);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return transactions;
 	}
 	

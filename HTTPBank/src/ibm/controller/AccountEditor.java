@@ -1,6 +1,7 @@
 package ibm.controller;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
 
 import javax.servlet.ServletException;
@@ -10,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import ibm.db.DB;
 import ibm.resource.Account;
 import ibm.resource.InputException;
 
@@ -25,8 +27,11 @@ public class AccountEditor extends HttpServlet {
         String number = request.getParameter("number");
         String iban = request.getParameter("iban");
         String currency = request.getParameter("currency");
-        String interest = request.getParameter("interest");
-        String balance = request.getParameter("balance");
+        String interestString = request.getParameter("interest");
+        String balanceString = request.getParameter("balance");
+        
+        double interest = 0;
+        double balance = 0;
         
         try {
         	AttributeChecks.checkType(type);
@@ -53,13 +58,13 @@ public class AccountEditor extends HttpServlet {
         }
         
         try {
-        	AttributeChecks.checkInterest(interest);
+        	interest = AttributeChecks.checkInterest(interestString);
         } catch (InputException e) {
         	errors.put("interest", e.getMessage());
         }
         
         try {
-        	AttributeChecks.checkBalance(balance);
+        	balance = AttributeChecks.checkBalance(balanceString);
         } catch (InputException e) {
         	errors.put("balance", e.getMessage());
         }
@@ -69,13 +74,20 @@ public class AccountEditor extends HttpServlet {
         if (errors.isEmpty()) {
         	// TODO: Not thread safe!
 	        Account account = (Account) session.getAttribute("account");
-	        account.setType(type);
-	        account.setNumber(number);
-	        account.setIban(iban);
-	        account.setCurrency(currency);
-	        account.setInterest(Double.parseDouble(interest));
-	        account.setBalance(Double.parseDouble(balance));
-			response.sendRedirect("accountinfo");
+	        int id = account.getId();
+	        try {
+				DB.updateAccount(id, type, DB.ACCOUNT.TYPE);
+				DB.updateAccount(id, number, DB.ACCOUNT.NUMBER);
+				DB.updateAccount(id, iban, DB.ACCOUNT.IBAN);
+				DB.updateAccount(id, currency, DB.ACCOUNT.CURRENCY);
+				DB.updateAccount(id, Double.toString(interest), DB.ACCOUNT.INTEREST);
+				DB.updateAccount(id, Double.toString(balance), DB.ACCOUNT.BALANCE);
+				
+				request.getSession().setAttribute("account", DB.getAccountByNumber(number));
+				response.sendRedirect("accountinfo");
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
         } else {
         	session.setAttribute("errors", errors);
         	response.sendRedirect("editaccount");

@@ -1,6 +1,7 @@
 package ibm.controller;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
 
 import javax.servlet.ServletException;
@@ -9,9 +10,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import ibm.db.DB;
 import ibm.resource.InputException;
-import ibm.resource.User;
-import ibm.test.TestData;
 
 @WebServlet("/admin/newUser")
 public class UserCreator extends HttpServlet {
@@ -51,8 +51,14 @@ public class UserCreator extends HttpServlet {
         }
 
         if (errors.isEmpty()) {
-            TestData.getUsers().add(new User(cpr, name, institute, consultant));
-    		response.sendRedirect("users");
+        	try {
+				DB.createUser("Username", "", cpr, name, institute, consultant);
+	        	request.getSession().setAttribute("users", DB.getUsers());
+	    		response.sendRedirect("users");
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         } else {
         	request.getSession().setAttribute("errors", errors);
         	response.sendRedirect("newuser");

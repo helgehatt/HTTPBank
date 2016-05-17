@@ -71,23 +71,32 @@ public class AttributeChecks {
     
 	/**
 	 * Checks if the given string is a valid interest.
+	 * @return The string parsed to double.
 	 */
-	public static void checkInterest(String interest) throws InputException {
+	public static double checkInterest(String interest) throws InputException {
+		double value;
     	try {
-    		Double.parseDouble(interest);
+    		interest = interest.replace("%", "");
+    		interest = interest.replace(",", ".");
+    		value = Double.parseDouble(interest);
     	} catch (NumberFormatException e) {
     		throw new InputException();
     	}
+    	return value;
     }
     
 	/**
 	 * Checks if the given string is a valid balance.
+	 * @return The string parsed to double.
 	 */
-	public static void checkBalance(String balance) throws InputException {
+	public static double checkBalance(String balance) throws InputException {
+		double value;
     	try {
-    		Double.parseDouble(balance);
+    		balance = balance.replace(",", ".");
+    		value = Double.parseDouble(balance);
     	} catch (NumberFormatException e) {
     		throw new InputException();
     	}
+    	return value;
     }
 }

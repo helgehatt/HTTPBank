@@ -83,7 +83,7 @@ public class DB {
 	
 	/**
 	 * Queries the database and returns a list of users.
-	 * Note: For now the user objects returned by this method only return the 'user_id' and 'username'. No other information is received.
+	 * Note: For now the user objects returned by this method only return the 'userId' and 'username'. No other information is received.
 	 * @return ArrayList containing all current database users. Returns null if database query fails.
 	 * @throws SQLException {@link #checkConnection() CheckConnection()}
 	 */
@@ -107,11 +107,11 @@ public class DB {
 	}
 	
 	/**
-	 * Returns the user with the given user_id and all information related to them.
+	 * Returns the user with the given userId and all information related to them.
 	 * @return User object containing all fields except for 'accounts'. Returns null if database query fails or returns no rows.
 	 * @throws SQLException {@link #checkConnection() CheckConnection()}
 	 */
-	public static User getUser(int user_id) throws SQLException{
+	public static User getUser(int userId) throws SQLException{
 		checkConnection();
 		
 		PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, USERNAME, CPR, NAME, INSTITUTE, CONSULTANT "
@@ -119,7 +119,7 @@ public class DB {
 				+ "WHERE USER_ID = ? "
 				+ "FETCH FIRST 1 ROWS ONLY;"
 				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		statement.setInt(1, user_id);
+		statement.setInt(1, userId);
 		
 		User user = null;
 		if (statement.execute()){ //If query is successful, attempt to create user.
@@ -192,14 +192,14 @@ public class DB {
 	 * @return The new transaction as a Transaction object with all fields, excluding 'transaction_id', if successfully created.
 	 * @throws SQLException 
 	 */
-	public static Transaction createTransaction(int account_id, String description, double amount) throws SQLException{
+	public static Transaction createTransaction(int accountId, String description, double amount) throws SQLException{
 		checkConnection();
 		
 		PreparedStatement statement = connection.prepareStatement("INSERT INTO DTUGRP07.TRANSACTIONS "
 				+ "(ACCOUNT_ID, \"DATE\", DESCRIPTION, AMOUNT) VALUES "
 				+ "(?, ?, ?, ?);"
 				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		statement.setInt(1, account_id);
+		statement.setInt(1, accountId);
 		Date date = new Date(Calendar.getInstance().getTime().getTime());
 		statement.setDate(2, date);
 		statement.setString(3, description);
@@ -208,7 +208,7 @@ public class DB {
 		statement.execute(); //Attempt to insert new row.
 		statement.close();
 		
-		return new Transaction(null, account_id, date, description, amount);
+		return new Transaction(null, accountId, date, description, amount);
 	}
 	
 	/**
@@ -216,14 +216,14 @@ public class DB {
 	 * @return The new account as an Account object with all fields, if successfully created.
 	 * @throws SQLException 
 	 */
-	public static Account createAccount(int user_id, String name, String type, String number, String iban, String currency, double interest, double balance) throws SQLException{
+	public static Account createAccount(int userId, String name, String type, String number, String iban, String currency, double interest, double balance) throws SQLException{
 		checkConnection();
 		
 		PreparedStatement statement = connection.prepareStatement("INSERT INTO DTUGRP07.ACCOUNTS "
 				+ "(USER_ID, \"TYPE\", NAME, NUMBER, IBAN, INTEREST, BALANCE, CURRENCY) VALUES "
 				+ "(?, ?, ?, ?, ?, ?, ?, ?);"
 				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		statement.setInt(1, user_id);
+		statement.setInt(1, userId);
 		statement.setString(2, type);
 		statement.setString(3, name);
 		statement.setString(4, number);
@@ -296,7 +296,7 @@ public class DB {
 	 * @return True if operation was successful.
 	 * @throws SQLException 
 	 */
-	public static boolean updateUser(int user_id, String value, USER attribute) throws SQLException{
+	public static boolean updateUser(int userId, String value, USER attribute) throws SQLException{
 		checkConnection();
 		
 		PreparedStatement statement = connection.prepareStatement("UPDATE DTUGRP07.USERS "
@@ -304,7 +304,7 @@ public class DB {
 				+ "WHERE USER_ID = ?;"
 				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
 		statement.setString(1, value);
-		statement.setInt(2, user_id);
+		statement.setInt(2, userId);
 		
 		statement.execute(); //Attempt to insert new row.
 		statement.close();
@@ -339,7 +339,7 @@ public class DB {
 	 * @return True if operation was successful.
 	 * @throws SQLException 
 	 */
-	public static boolean updateAccount(int account_id, String value, ACCOUNT attribute) throws SQLException{
+	public static boolean updateAccount(int accountId, String value, ACCOUNT attribute) throws SQLException{
 		checkConnection();
 		
 		PreparedStatement statement = connection.prepareStatement("UPDATE DTUGRP07.ACCOUNTS "
@@ -361,7 +361,7 @@ public class DB {
 			break;
 		}
 		
-		statement.setInt(2, account_id);
+		statement.setInt(2, accountId);
 		
 		statement.execute(); //Attempt to insert new row.
 		statement.close();
@@ -374,13 +374,13 @@ public class DB {
 	 * Queries the database to delete the account and any transaction associated with this account with the given account-id.
 	 * @return True if operation was successful.
 	 */
-	public static boolean deleteAccount(int account_id) throws SQLException{
+	public static boolean deleteAccount(int accountId) throws SQLException{
 		checkConnection();
 		
 		PreparedStatement statement = connection.prepareStatement("DELETE FROM DTUGRP07.ACCOUNTS "
 				+ "WHERE ACCOUNT_ID = ?;"
 				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		statement.setInt(1, account_id);
+		statement.setInt(1, accountId);
 		
 		statement.execute(); //Attempt to delete row.
 		statement.close();
@@ -441,7 +441,7 @@ public class DB {
 	
 	// GENERAL Methods
 	/**
-	 * Queries a request for user information and checks for correct password. Returns the 'user_id' of the user only if user exists and correct password is given as argument, else returns -1.
+	 * Queries a request for user information and checks for correct password. Returns the 'userId' of the user only if user exists and correct password is given as argument, else returns -1.
 	 * Uses a PreparedStatement to query.
 	 * TODO: This would be better to have as a stored procedure on the database.
 	 * @throws SQLException 
