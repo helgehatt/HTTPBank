@@ -1,13 +1,15 @@
 package ibm.controller;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import ibm.test.TestData;
+
+import ibm.db.DB;
 
 @WebServlet(urlPatterns = { "/user/accounts", "/user/transfer", "/user/transactions", "/user/inbox", 
 		"/admin/users", "/admin/search", "/admin/newuser", "/admin/accounts", "/admin/newaccount", 
@@ -24,7 +26,11 @@ public class MainController extends HttpServlet {
 		
 		switch (path) {
 		case "/user/accounts":
-			request.getSession().setAttribute("user", TestData.getUser());
+			try {
+				request.getSession().setAttribute("user", DB.getUser(0));
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 			request.getRequestDispatcher("../WEB-INF/jsp/user/account-list.jsp").forward(request, response);
 			break;
 		case "/user/transfer":
@@ -34,7 +40,11 @@ public class MainController extends HttpServlet {
 			request.getRequestDispatcher("../WEB-INF/jsp/user/transaction-list.jsp").forward(request, response);
 			break;
 		case "/admin/users":
-			request.getSession().setAttribute("users", TestData.getUsers());
+			try {
+				request.getSession().setAttribute("users", DB.getUsers());
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 			request.getRequestDispatcher("../WEB-INF/jsp/admin/user-list.jsp").forward(request, response);
 			break;
 		case "/admin/newuser":

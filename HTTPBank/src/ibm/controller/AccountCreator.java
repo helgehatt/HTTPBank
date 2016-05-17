@@ -1,6 +1,7 @@
 package ibm.controller;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
 
 import javax.servlet.ServletException;
@@ -10,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import ibm.resource.Account;
+import ibm.db.DB;
 import ibm.resource.InputException;
 import ibm.resource.User;
 
@@ -26,8 +27,11 @@ public class AccountCreator extends HttpServlet {
         String number = request.getParameter("number");
         String iban = request.getParameter("iban");
         String currency = request.getParameter("currency");
-        String interest = request.getParameter("interest");
-        String balance = request.getParameter("balance");
+        String interestString = request.getParameter("interest");
+        String balanceString = request.getParameter("balance");
+        
+        double interest = 0;
+        double balance = 0;
         
         try {
         	AttributeChecks.checkType(type);
@@ -54,13 +58,13 @@ public class AccountCreator extends HttpServlet {
         }
         
         try {
-        	AttributeChecks.checkInterest(interest);
+        	interest = AttributeChecks.checkInterest(interestString);
         } catch (InputException e) {
         	errors.put("interest", e.getMessage());
         }
         
         try {
-        	AttributeChecks.checkBalance(balance);
+        	balance = AttributeChecks.checkBalance(balanceString);
         } catch (InputException e) {
         	errors.put("balance", e.getMessage());
         }
@@ -69,7 +73,11 @@ public class AccountCreator extends HttpServlet {
         
         if (errors.isEmpty()) {
 	        User user = (User) session.getAttribute("user");
-	    	user.getAccounts().add(new Account(type, number, iban, currency, Double.parseDouble(interest), Double.parseDouble(balance)));
+	    	try {
+				DB.createAccount(user.getId(), "WHY?", type, number, iban, currency, interest, balance);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 			response.sendRedirect("accounts");
         } else {
         	session.setAttribute("errors", errors);

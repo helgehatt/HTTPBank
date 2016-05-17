@@ -1,15 +1,15 @@
 package ibm.controller;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
-import ibm.test.TestData;
+import ibm.db.DB;
 
 @WebServlet("/admin/getUser")
 public class UserController extends HttpServlet {
@@ -17,10 +17,14 @@ public class UserController extends HttpServlet {
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String cpr = request.getParameter("cpr");
+        int user_id = Integer.parseInt(request.getParameter("user_id"));
         
-		HttpSession session = request.getSession();
-		session.setAttribute("user", TestData.getUserByCpr(cpr));
+		try {
+			request.getSession().setAttribute("user", DB.getUser(user_id));
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		response.sendRedirect("accounts");
 	

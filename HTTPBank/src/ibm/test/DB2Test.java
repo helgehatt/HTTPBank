@@ -30,20 +30,20 @@ public class DB2Test {
 		testGetTransactions(1);
 		System.out.println();
 		
-		int user_id = testCreateUser("NewUser", "user", "123456-7890", "User", "NewInstitute", null).getId();
+		int userId = testCreateUser("NewUser", "user", "123456-7890", "User", "NewInstitute", null).getId();
 		System.out.println();
-		int account_id = testCreateAccount(user_id, "New Account", "New Type", "000111222", "000111222", "DKK", 0.50, 0).getId();
+		int accountId = testCreateAccount(userId, "New Account", "New Type", "000111222", "000111222", "DKK", 0.50, 0).getId();
 		System.out.println();
-		testCreateTransaction(account_id, "New Transaction", 100);
+		testCreateTransaction(accountId, "New Transaction", 100);
 		System.out.println();
-		testUpdateUser(user_id, "New Consultant", USER.CONSULTANT);
+		testUpdateUser(userId, "New Consultant", USER.CONSULTANT);
 		printUser(DB.getUserByCpr("123456-7890"));
 		System.out.println();
-		testUpdateAccount(account_id, "New-New Type", ACCOUNT.TYPE);
-		testUpdateAccount(account_id, "0.2", ACCOUNT.INTEREST);
+		testUpdateAccount(accountId, "New-New Type", ACCOUNT.TYPE);
+		testUpdateAccount(accountId, "0.2", ACCOUNT.INTEREST);
 		printAccount(DB.getAccountByNumber("000111222"));
 		System.out.println();
-		testDeleteAccount(account_id);
+		testDeleteAccount(accountId);
 		System.out.println();
 		testDeleteAccountByNumber("000111222");
 		System.out.println();
@@ -60,9 +60,9 @@ public class DB2Test {
 		System.out.println("Query Time: " + (System.currentTimeMillis()-start));
 	}
 
-	private static void testDeleteUser(String user_id) throws SQLException {
+	private static void testDeleteUser(String userId) throws SQLException {
 		long start = System.currentTimeMillis();
-		boolean success = DB.deleteUser(user_id);
+		boolean success = DB.deleteUser(userId);
 		System.out.println("Delete New User: " + success);
 		System.out.println("Query Time: " + (System.currentTimeMillis()-start));
 	}
@@ -74,38 +74,38 @@ public class DB2Test {
 		System.out.println("Query Time: " + (System.currentTimeMillis()-start));
 	}
 
-	private static void testDeleteAccount(int account_id) throws SQLException {
+	private static void testDeleteAccount(int accountId) throws SQLException {
 		long start = System.currentTimeMillis();
-		boolean success = DB.deleteAccount(account_id);
+		boolean success = DB.deleteAccount(accountId);
 		System.out.println("Delete New Account: " + success);
 		System.out.println("Query Time: " + (System.currentTimeMillis()-start));
 	}
 
-	private static void testUpdateAccount(int account_id, String value, ACCOUNT attribute) throws SQLException {
+	private static void testUpdateAccount(int accountId, String value, ACCOUNT attribute) throws SQLException {
 		long start = System.currentTimeMillis();
-		boolean success = DB.updateAccount(account_id, value, attribute);
+		boolean success = DB.updateAccount(accountId, value, attribute);
 		System.out.println("Updated New Account: " + success);
 		System.out.println("Query Time: " + (System.currentTimeMillis()-start));
 	}
 
-	private static void testUpdateUser(int user_id, String value, USER attribute) throws SQLException {
+	private static void testUpdateUser(int userId, String value, USER attribute) throws SQLException {
 		long start = System.currentTimeMillis();
-		boolean success = DB.updateUser(user_id, value, attribute);
+		boolean success = DB.updateUser(userId, value, attribute);
 		System.out.println("Updated New User: " + success);
 		System.out.println("Query Time: " + (System.currentTimeMillis()-start));
 	}
 
-	private static Transaction testCreateTransaction(int account_id, String description, double amount) throws SQLException {
+	private static Transaction testCreateTransaction(int accountId, String description, double amount) throws SQLException {
 		long start = System.currentTimeMillis();
-		Transaction transaction = DB.createTransaction(account_id, description, amount);
+		Transaction transaction = DB.createTransaction(accountId, description, amount);
 		System.out.println("Created Transaction, Query Time: " + (System.currentTimeMillis()-start));
 		printTransaction(transaction);
 		return transaction;
 	}
 
-	private static Account testCreateAccount(int user_id, String name, String type, String number, String iban, String currency, double interest, double balance) throws SQLException {
+	private static Account testCreateAccount(int userId, String name, String type, String number, String iban, String currency, double interest, double balance) throws SQLException {
 		long start = System.currentTimeMillis();
-		Account account = DB.createAccount(user_id, name, type, number, iban, currency, interest, balance);
+		Account account = DB.createAccount(userId, name, type, number, iban, currency, interest, balance);
 		System.out.println("Created Account, Query Time: " + (System.currentTimeMillis()-start));
 		printAccount(account);
 		return account;
@@ -137,9 +137,9 @@ public class DB2Test {
 		return accounts;
 	}
 	
-	public static User testGetUser(int user_id) throws SQLException{
+	public static User testGetUser(int userId) throws SQLException{
 		long start = System.currentTimeMillis();
-		User user = DB.getUser(user_id);
+		User user = DB.getUser(userId);
 		System.out.println("Got Users, Query Time: " + (System.currentTimeMillis()-start));
 		printUser(user);
 		return user;
