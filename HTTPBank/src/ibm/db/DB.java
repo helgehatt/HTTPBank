@@ -90,7 +90,8 @@ public class DB {
 		
 		PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, ACCOUNT_ID, NAME, TYPE, NUMBER, IBAN, CURRENCY, INTEREST, BALANCE "
 				+ "FROM DTUGRP07.ACCOUNTS "
-				+ "WHERE ACCOUNT_ID = ?;"
+				+ "WHERE ACCOUNT_ID = ? "
+				+ "FETCH FIRST 1 ROWS ONLY;"
 				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
 		statement.setInt(1, accountId);
 		
@@ -194,7 +195,8 @@ public class DB {
 		
 		PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, ACCOUNT_ID, NAME, TYPE, NUMBER, IBAN, CURRENCY, INTEREST, BALANCE "
 				+ "FROM DTUGRP07.ACCOUNTS "
-				+ "WHERE NUMBER = ?;"
+				+ "WHERE NUMBER = ? "
+				+ "FETCH FIRST 1 ROWS ONLY;"
 				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
 		statement.setString(1, number);
 		
@@ -317,7 +319,7 @@ public class DB {
 	}
 	
 	/**
-	 * Queries the database to update a user's information.
+	 * Queries the database to update a user's information for the user with the given user id.
 	 * @return True if operation was successful.
 	 * @throws SQLException 
 	 */
@@ -330,6 +332,30 @@ public class DB {
 				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
 		statement.setString(1, value);
 		statement.setInt(2, userId);
+		
+		statement.execute(); //Attempt to insert new row.
+		statement.close();
+		return true;
+	}
+	
+	/**
+	 * Queries the database to update a user's information for the user with the given user id.
+	 * @return True if operation was successful.
+	 * @throws SQLException 
+	 */
+	public static boolean updateUser(int userId, String username, String cpr, String name, String institute, String consultant) throws SQLException{
+		checkConnection();
+		
+		PreparedStatement statement = connection.prepareStatement("UPDATE DTUGRP07.USERS "
+				+ "SET USERNAME = ?, CPR = ?, NAME = ?, INSTITUTE = ?, CONSULTANT = ? "
+				+ "WHERE USER_ID = ?;"
+				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+		statement.setString(1, username);
+		statement.setString(2, cpr);
+		statement.setString(3, name);
+		statement.setString(4, institute);
+		statement.setString(5, consultant);
+		statement.setInt(6, userId);
 		
 		statement.execute(); //Attempt to insert new row.
 		statement.close();
@@ -360,7 +386,7 @@ public class DB {
 	}
 	
 	/**
-	 * Queries the database to update account information.
+	 * Queries the database to update account information for the account with the given account id.
 	 * @return True if operation was successful.
 	 * @throws SQLException 
 	 */
@@ -387,6 +413,33 @@ public class DB {
 		}
 		
 		statement.setInt(2, accountId);
+		
+		statement.execute(); //Attempt to insert new row.
+		statement.close();
+		return true;
+	}
+	
+	/**
+	 * Queries the database to update account information for the account with the given account id.
+	 * @return True if operation was successful.
+	 * @throws SQLException 
+	 */
+	public static boolean updateAccount(int accountId, String name, String type, String number, String iban, String currency, double interest, double balance) throws SQLException{
+		checkConnection();
+		
+		PreparedStatement statement = connection.prepareStatement("UPDATE DTUGRP07.ACCOUNTS "
+				+ "SET NAME = ?, TYPE = ?, NUMBER = ?, IBAN = ?, CURRENCY = ?, INTEREST = ?, BALANCE = ? "
+				+ "WHERE ACCOUNT_ID = ?;"
+				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+		
+		statement.setString(1, name);
+		statement.setString(2, type);
+		statement.setString(3, number);
+		statement.setString(4, iban);
+		statement.setString(5, currency);
+		statement.setDouble(6, interest);
+		statement.setDouble(7, balance);
+		statement.setInt(8, accountId);
 		
 		statement.execute(); //Attempt to insert new row.
 		statement.close();
