@@ -82,6 +82,31 @@ public class DB {
 	}
 	
 	/**
+	 * Queries the database and returns the account with the given account id and data associated with it.
+	 * @throws SQLException 
+	 */
+	public static Account getAccount(int accountId) throws SQLException{
+		checkConnection();
+		
+		PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, ACCOUNT_ID, NAME, TYPE, NUMBER, IBAN, CURRENCY, INTEREST, BALANCE "
+				+ "FROM DTUGRP07.ACCOUNTS "
+				+ "WHERE ACCOUNT_ID = ?;"
+				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+		statement.setInt(1, accountId);
+		
+		Account account = null;
+		if (statement.execute()){ //If query is successful, attempt to create account object.
+			ResultSet results = statement.getResultSet();
+			if (results.next()){ //Fetch row if able.
+				account = new Account(results.getInt(1), results.getInt(2), results.getString(3), results.getString(4), results.getString(5), results.getString(6), results.getString(7), results.getDouble(8), results.getDouble(9));
+			}
+		}
+		statement.close();
+		
+		return account;
+	}
+	
+	/**
 	 * Queries the database and returns a list of users.
 	 * Note: For now the user objects returned by this method only return the 'userId' and 'username'. No other information is received.
 	 * @return ArrayList containing all current database users. Returns null if database query fails.
@@ -90,7 +115,7 @@ public class DB {
 	public static ArrayList<User> getUsers() throws SQLException {
 		checkConnection();
 		
-		PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, USERNAME "
+		PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, USERNAME, CPR, NAME "
 				+ "FROM DTUGRP07.USERS;"
 				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
 		
@@ -99,7 +124,7 @@ public class DB {
 			resultList = new ArrayList<User>();
 			ResultSet results = statement.getResultSet();
 			while (results.next()){ //Fetch usernames from results and add to resultlist.
-				resultList.add(new User(results.getInt(1), results.getString(2)));
+				resultList.add(new User(results.getInt(1), results.getString(2), results.getString(3), results.getString(4)));
 			}
 		}
 		statement.close();

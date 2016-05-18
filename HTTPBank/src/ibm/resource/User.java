@@ -22,46 +22,17 @@ public class User implements Serializable {
 	private ArrayList<Account> accounts = null; // Default: None
 
 	/* CONSTRUCTORS */
-	public User(int userId, String username){
+	public User(int userId, String username, String cpr, String name) {
 		this.userId = userId;
 		this.username = username;
-	}
-
-	public User(int userId, String username, String cpr, String name) {
-		this(userId, username);
 		this.cpr = cpr;
 		this.name = name;
-	}
-	
-	public User(int userId, String username, String cpr, String name, String institute) {
-		this(userId, username, cpr, name);
-		this.institute = institute;
 	}
 	
 	public User(int userId, String username, String cpr, String name, String institute, String consultant) {
-		this(userId, username, cpr, name, institute);
-		this.consultant = consultant;
-	}
-
-	public User(int userId, String username, String cpr, String name, String institute, ArrayList<Account> accounts) {
 		this(userId, username, cpr, name);
-		this.accounts = accounts;
-	}
-	
-	public User(int userId, String username, String cpr, String name, String institute, String consultant, ArrayList<Account> accounts) {
-		this(userId, username, cpr, name, institute);
-		this.consultant = consultant;
-		this.accounts = accounts;
-	}
-	
-	// Keep until DB is fully operational
-	// Method made in class DB to replace this for creating new users in the database.
-	public User(String cpr, String name, String institute, String consultant) {
-		this.cpr = cpr;
-		this.name = name;
 		this.institute = institute;
 		this.consultant = consultant;
-		this.accounts = new ArrayList<Account>();
 	}
 
 	/* GETTERS */

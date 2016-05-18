@@ -25,9 +25,8 @@ public class Account implements Serializable {
 	private ArrayList<Transaction> transactions = null; // Default: None
 	
 	/* CONSTRUCTORS */
-	
-	// Required
-	public Account(int userId, int accountId, String name, String type, String number, String iban, String currency, double interest) {
+	// Required and balance
+	public Account(int userId, int accountId, String name, String type, String number, String iban, String currency, double interest, double balance) {
 		this.userId = userId;
 		this.accountId = accountId;
 		this.name = name;
@@ -36,36 +35,7 @@ public class Account implements Serializable {
 		this.iban = iban;
 		this.currency = currency;
 		this.interest = interest;
-	}
-	
-	// Required and balance
-	public Account(int userId, int accountId, String name, String type, String number, String iban, String currency, double interest, double balance) {
-		this(userId, accountId, name, type, number, iban, currency, interest);
 		this.balance = balance;
-	}
-	
-	// Required and transactions
-	public Account(int userId, int accountId, String name, String type, String number, String iban, String currency, double interest, ArrayList<Transaction> transactions) {
-		this(userId, accountId, name, type, number, iban, currency, interest);
-		this.transactions = transactions;
-	}
-	
-	// Required, balance and transactions
-	public Account(int userId, int accountId, String name, String type, String number, String iban, String currency, double interest, double balance, ArrayList<Transaction> transactions) {
-		this(userId, accountId, name, type, number, iban, currency, interest, balance);
-		this.transactions = transactions;
-	}
-	
-	// Keep until DB is fully operational
-	// Method made in class DB to replace this for creating new accounts in the database.
-	public Account(String type, String number, String iban, String currency, double interest, double balance) {
-		this.type = type;
-		this.number = number;
-		this.iban = iban;
-		this.currency = currency;
-		this.interest = interest;
-		this.balance = balance;
-		this.transactions = new ArrayList<Transaction>();
 	}
 
 	/* GETTERS */
@@ -107,14 +77,12 @@ public class Account implements Serializable {
 	
 	/*
 	 * Returns a list of Transactions related to this Account.
-	 * TODO: Should query database for transactions if called when null?
 	 * Should query whenever transactions are updated.
 	 */
 	public ArrayList<Transaction> getTransactions() {
 		try {
 			transactions = DB.getTransactions(accountId);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return transactions;

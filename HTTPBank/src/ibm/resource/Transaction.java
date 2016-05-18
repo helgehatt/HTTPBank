@@ -20,35 +20,10 @@ public class Transaction implements Serializable {
 	private static final transient SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 	
 	/* CONSTRUCTORS */
-
-	public Transaction(Long transaction_id, int account_id, String description, double amount) {
-		this.transaction_id = transaction_id;
-		this.account_id = account_id;
-		this.date = new java.util.Date().getTime();
-		this.description = description;
-		this.amount = amount;
-	}
-	
-	public Transaction(Long transaction_id, int account_id, long date, String description, double amount) {
-		this.transaction_id = transaction_id;
-		this.account_id = account_id;
-		this.date = date;
-		this.description = description;
-		this.amount = amount;
-	}
-	
 	public Transaction(Long transaction_id, int account_id, Date date, String description, double amount) {
 		this.transaction_id = transaction_id;
 		this.account_id = account_id;
 		this.date = date.getTime();
-		this.description = description;
-		this.amount = amount;
-	}
-	
-	public Transaction(Long transaction_id, int account_id, String date, String description, double amount) throws ParseException {
-		this.transaction_id = transaction_id;
-		this.account_id = account_id;
-		this.date = FORMAT.parse(date).getTime();
 		this.description = description;
 		this.amount = amount;
 	}
