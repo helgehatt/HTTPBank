@@ -32,18 +32,19 @@ public class DB2Test {
 		
 		int userId = testCreateUser("NewUser", "user", "123456-7890", "User", "NewInstitute", null).getId();
 		System.out.println();
-		int accountId = testCreateAccount(userId, "New Account", "New Type", "000111222", "000111222", "DKK", 0.50, 0).getId();
+		int senderId = testCreateAccount(userId, "New Account", "New Type", "000111222", "000111222", "DKK", 0.50, 0).getId();
+		int receiverId = testCreateAccount(userId, "Moo Account", "New Type", "000111333", "000111333", "DKK", 0.55, 0).getId();
 		System.out.println();
-		testCreateTransaction(accountId, "New Transaction", 100);
+		testCreateTransaction(senderId, receiverId, "New Transaction", 100);
 		System.out.println();
 		testUpdateUser(userId, "New Consultant", USER.CONSULTANT);
 		printUser(DB.getUserByCpr("123456-7890"));
 		System.out.println();
-		testUpdateAccount(accountId, "New-New Type", ACCOUNT.TYPE);
-		testUpdateAccount(accountId, "0.2", ACCOUNT.INTEREST);
+		testUpdateAccount(receiverId, "New-New Type", ACCOUNT.TYPE);
+		testUpdateAccount(receiverId, "0.2", ACCOUNT.INTEREST);
 		printAccount(DB.getAccountByNumber("000111222"));
 		System.out.println();
-		testDeleteAccount(accountId);
+		testDeleteAccount(receiverId);
 		System.out.println();
 		testDeleteAccountByNumber("000111222");
 		System.out.println();
@@ -95,9 +96,9 @@ public class DB2Test {
 		System.out.println("Query Time: " + (System.currentTimeMillis()-start));
 	}
 
-	private static Transaction testCreateTransaction(int accountId, String description, double amount) throws SQLException {
+	private static Transaction testCreateTransaction(int senderId, int receiverId, String description, double amount) throws SQLException {
 		long start = System.currentTimeMillis();
-		Transaction transaction = DB.createTransaction(accountId, description, amount);
+		Transaction transaction = DB.createTransaction(senderId, receiverId, description, description, amount);
 		System.out.println("Created Transaction, Query Time: " + (System.currentTimeMillis()-start));
 		printTransaction(transaction);
 		return transaction;
