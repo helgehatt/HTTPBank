@@ -267,11 +267,15 @@ public class DB {
 		Date date = new Date(Calendar.getInstance().getTime().getTime());
 		
 		Transaction senderTransaction = null;
+		@SuppressWarnings("unused")
+		Transaction receiverTransaction = null;
 		try {
 			connection.setAutoCommit(false);
 			
 			senderTransaction = createTransaction(transBy, date, ""+senderId, senderDescription, senderAmount);
-			createTransaction(transBy, date, receiverId, receiverDescription, receiverAmount);
+			receiverTransaction = createTransaction(transBy, date, receiverId, receiverDescription, receiverAmount);
+			
+			//if (receiverTransaction == null) ; //The receiver was not an account we know about.
 			
 			connection.commit();
 		} catch (Exception e){
@@ -329,11 +333,9 @@ public class DB {
 			getBalanceStatement.setString(1, identity);
 			break;
 		case ID:
+		default:
 			getBalanceStatement.setInt(1, Integer.parseInt(identity));
 			break;
-		default:
-			//TODO New exception.
-			throw new SQLException("No transfer type given.");
 		}
 		getBalanceStatement.execute();
 		double balance = 0;
@@ -344,7 +346,8 @@ public class DB {
 			balance = results.getDouble(2);
 		} else {
 			//TODO No account found!
-			throw new SQLException();
+			return null;
+			//throw new SQLException();
 		}
 		getBalanceStatement.close();
 		
@@ -355,7 +358,7 @@ public class DB {
 				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
 		if ((balance+amount) < 0){
 			//TODO Updated balance will be negative.
-			throw new SQLException();
+			//throw new SQLException();
 		}
 		updateBalanceStatement.setDouble(1, (balance+amount));
 		updateBalanceStatement.setInt(2, id);
@@ -381,6 +384,8 @@ public class DB {
 	 * Queries the database to insert a new transaction into the TRANSACTIONS table.
 	 * Note that no change is made to any accounts with this method.
 	 * 
+	 * @deprecated Use createTransaction(int accountId, String description, double amount).
+	 * 
 	 * @param accountId The accountId for the account receiving this deposit.
 	 * @param description The string with the description of the deposit.
 	 * @param amount The amount to enter into this transaction.
@@ -388,7 +393,8 @@ public class DB {
 	 * @return The new transaction as a Transaction object with all fields, excluding 'transaction_id', if successfully created.
 	 * @throws SQLException 
 	 */
-	/*public static Transaction createDeposit(int accountId, String description, double amount) throws SQLException{
+	@Deprecated
+	public static Transaction createDeposit(int accountId, String description, double amount) throws SQLException{
 		checkConnection();
 		
 		Date date = new Date(Calendar.getInstance().getTime().getTime());
@@ -405,11 +411,13 @@ public class DB {
 		statement.close();
 		
 		return new Transaction(null, accountId, date, description, amount);
-	}*/
+	}
 	
 	/**
 	 * Queries the database to insert a new transaction into the TRANSACTIONS table.
 	 * Note that no change is made to any accounts with this method.
+	 * 
+	 * @deprecated Use createTransaction(int accountId, String description, double amount).
 	 * 
 	 * @param accountId The accountId for the account receiving this withdrawal.
 	 * @param description The string with the description of the withdrawal.
@@ -418,7 +426,8 @@ public class DB {
 	 * @return The new transaction as a Transaction object with all fields, excluding 'transaction_id', if successfully created.
 	 * @throws SQLException 
 	 */
-	/*public static Transaction createWithdrawal(int accountId, String description, double amount) throws SQLException{
+	@Deprecated
+	public static Transaction createWithdrawal(int accountId, String description, double amount) throws SQLException{
 		checkConnection();
 		
 		Date date = new Date(Calendar.getInstance().getTime().getTime());
@@ -435,7 +444,7 @@ public class DB {
 		statement.close();
 		
 		return new Transaction(null, accountId, date, description, -amount);
-	}*/
+	}
 	
 	/**
 	 * Queries the database to insert a new account into the ACCOUNTS table, then queries the database to return the newly created row.
