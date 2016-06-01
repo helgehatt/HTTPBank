@@ -17,20 +17,29 @@ import java.util.Comparator;
 import java.util.Properties;
 
 /**
- * A class for handling all Database queires required by the HTTPBank.
+ * A class for handling all Database queries required by the HTTPBank.
  * Class uses PreparedStatements for easy implementation and efficiency.
  */
 public class DB {
+	//Static Constructor
+	static {
+		try {
+			getConnection();
+		} catch (SQLException e) {
+			// A Database access error occurred. Can't really do anything about it at this point.
+		}
+	}
+	
 	//Fields
 	private static Connection connection;
 	private static final String url = "jdbc:db2://192.86.32.54:5040/DALLASB";
 	
 	/*
-	 * Transaction for account number and iban (senderAmount, receiverAmount),
-	 * update accounts, no currency conversion.
+	 * DONE: Transaction for account number and iban (senderAmount, receiverAmount),
+	 * DONE: update accounts, no currency conversion.
 	 * Procedures, trigger and events.
-	 * SQL-exception handling.
-	 * Sort transactions by date.
+	 * TODO: SQL-exception handling.
+	 * DONE: Sort transactions by date.
 	 */
 	
 	//Methods
@@ -41,8 +50,6 @@ public class DB {
 	 * @throws SQLException {@link #checkConnection() CheckConnection()}
 	 */
 	public static ArrayList<Transaction> getTransactions(int accountid) throws SQLException {
-		checkConnection();
-		
 		PreparedStatement statement = connection.prepareStatement("SELECT TRANSACTION_ID, ACCOUNT_ID, DATE, DESCRIPTION, AMOUNT "
 				+ "FROM DTUGRP07.TRANSACTIONS "
 				+ "WHERE ACCOUNT_ID = ?;"
@@ -76,8 +83,6 @@ public class DB {
 	 * @throws SQLException {@link #checkConnection() CheckConnection()}
 	 */
 	public static ArrayList<Account> getAccounts(int userid) throws SQLException {
-		checkConnection();
-		
 		PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, ACCOUNT_ID, NAME, TYPE, NUMBER, IBAN, CURRENCY, INTEREST, BALANCE "
 				+ "FROM DTUGRP07.ACCOUNTS "
 				+ "WHERE USER_ID = ?;"
@@ -101,8 +106,6 @@ public class DB {
 	 * @throws SQLException 
 	 */
 	public static Account getAccount(int accountId) throws SQLException{
-		checkConnection();
-		
 		PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, ACCOUNT_ID, NAME, TYPE, NUMBER, IBAN, CURRENCY, INTEREST, BALANCE "
 				+ "FROM DTUGRP07.ACCOUNTS "
 				+ "WHERE ACCOUNT_ID = ? "
@@ -129,8 +132,6 @@ public class DB {
 	 * @throws SQLException {@link #checkConnection() CheckConnection()}
 	 */
 	public static ArrayList<User> getUsers() throws SQLException {
-		checkConnection();
-		
 		PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, USERNAME, CPR, NAME "
 				+ "FROM DTUGRP07.USERS;"
 				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
@@ -153,8 +154,6 @@ public class DB {
 	 * @throws SQLException {@link #checkConnection() CheckConnection()}
 	 */
 	public static User getUser(int userId) throws SQLException{
-		checkConnection();
-		
 		PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, USERNAME, CPR, NAME, INSTITUTE, CONSULTANT "
 				+ "FROM DTUGRP07.USERS "
 				+ "WHERE USER_ID = ? "
@@ -180,8 +179,6 @@ public class DB {
 	 * @throws SQLException {@link #checkConnection() CheckConnection()}
 	 */
 	public static User getUserByCpr(String cpr) throws SQLException{
-		checkConnection();
-		
 		PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, USERNAME, CPR, NAME, INSTITUTE, CONSULTANT "
 				+ "FROM DTUGRP07.USERS "
 				+ "WHERE CPR = ? "
@@ -206,8 +203,6 @@ public class DB {
 	 * @throws SQLException 
 	 */
 	public static Account getAccountByNumber(String number) throws SQLException {
-		checkConnection();
-		
 		PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, ACCOUNT_ID, NAME, TYPE, NUMBER, IBAN, CURRENCY, INTEREST, BALANCE "
 				+ "FROM DTUGRP07.ACCOUNTS "
 				+ "WHERE NUMBER = ? "
@@ -262,8 +257,6 @@ public class DB {
 	 * @throws SQLException 
 	 */
 	public static Transaction createTransaction(TransBy transBy, int senderId, String receiverId, String senderDescription, String receiverDescription, double senderAmount, double receiverAmount) throws SQLException{
-		checkConnection();
-		
 		Date date = new Date(Calendar.getInstance().getTime().getTime());
 		
 		Transaction senderTransaction = null;
@@ -300,7 +293,6 @@ public class DB {
 	 * @throws SQLException 
 	 */
 	public static Transaction createTransaction(int accountId, String description, double amount) throws SQLException{
-		checkConnection();
 		Date date = new Date(Calendar.getInstance().getTime().getTime());
 		Transaction transaction = null;
 		try {
@@ -395,8 +387,6 @@ public class DB {
 	 */
 	@Deprecated
 	public static Transaction createDeposit(int accountId, String description, double amount) throws SQLException{
-		checkConnection();
-		
 		Date date = new Date(Calendar.getInstance().getTime().getTime());
 		
 		PreparedStatement statement = connection.prepareStatement("INSERT INTO DTUGRP07.TRANSACTIONS "
@@ -428,8 +418,6 @@ public class DB {
 	 */
 	@Deprecated
 	public static Transaction createWithdrawal(int accountId, String description, double amount) throws SQLException{
-		checkConnection();
-		
 		Date date = new Date(Calendar.getInstance().getTime().getTime());
 		
 		PreparedStatement statement = connection.prepareStatement("INSERT INTO DTUGRP07.TRANSACTIONS "
@@ -452,8 +440,6 @@ public class DB {
 	 * @throws SQLException 
 	 */
 	public static Account createAccount(int userId, String name, String type, String number, String iban, String currency, double interest, double balance) throws SQLException{
-		checkConnection();
-		
 		PreparedStatement statement = connection.prepareStatement("INSERT INTO DTUGRP07.ACCOUNTS "
 				+ "(USER_ID, \"TYPE\", NAME, NUMBER, IBAN, INTEREST, BALANCE, CURRENCY) VALUES "
 				+ "(?, ?, ?, ?, ?, ?, ?, ?);"
@@ -481,8 +467,6 @@ public class DB {
 	 * @throws SQLException 
 	 */
 	public static User createUser(String username, String password, String cpr, String name, String institute, String consultant) throws SQLException{
-		checkConnection();
-		
 		PreparedStatement statement = connection.prepareStatement("INSERT INTO DTUGRP07.USERS "
 				+ "(USERNAME, PASSWORD, CPR, NAME, INSTITUTE, CONSULTANT) VALUES "
 				+ "(?, ?, ?, ?, ?, ?);"
@@ -532,8 +516,6 @@ public class DB {
 	 * @throws SQLException 
 	 */
 	public static boolean updateUser(int userId, String value, USER attribute) throws SQLException{
-		checkConnection();
-		
 		PreparedStatement statement = connection.prepareStatement("UPDATE DTUGRP07.USERS "
 				+ "SET "+ attribute.toString() +" = ? "
 				+ "WHERE USER_ID = ?;"
@@ -552,8 +534,6 @@ public class DB {
 	 * @throws SQLException 
 	 */
 	public static boolean updateUser(int userId, String username, String password, String cpr, String name, String institute, String consultant) throws SQLException{
-		checkConnection();
-		
 		PreparedStatement statement = connection.prepareStatement("UPDATE DTUGRP07.USERS "
 				+ "SET USERNAME = ?, PASSWORD =?, CPR = ?, NAME = ?, INSTITUTE = ?, CONSULTANT = ? "
 				+ "WHERE USER_ID = ?;"
@@ -600,8 +580,6 @@ public class DB {
 	 * @throws SQLException 
 	 */
 	public static boolean updateAccount(int accountId, String value, ACCOUNT attribute) throws SQLException{
-		checkConnection();
-		
 		PreparedStatement statement = connection.prepareStatement("UPDATE DTUGRP07.ACCOUNTS "
 				+ "SET "+ attribute.toString() +" = ? "
 				+ "WHERE ACCOUNT_ID = ?;"
@@ -634,8 +612,6 @@ public class DB {
 	 * @throws SQLException 
 	 */
 	public static boolean updateAccount(int accountId, String name, String type, String number, String iban, String currency, double interest, double balance) throws SQLException{
-		checkConnection();
-		
 		PreparedStatement statement = connection.prepareStatement("UPDATE DTUGRP07.ACCOUNTS "
 				+ "SET NAME = ?, TYPE = ?, NUMBER = ?, IBAN = ?, CURRENCY = ?, INTEREST = ?, BALANCE = ? "
 				+ "WHERE ACCOUNT_ID = ?;"
@@ -662,8 +638,6 @@ public class DB {
 	 * @return True if operation was successful.
 	 */
 	public static boolean deleteAccount(int accountId) throws SQLException{
-		checkConnection();
-		
 		PreparedStatement statement = connection.prepareStatement("DELETE FROM DTUGRP07.ACCOUNTS "
 				+ "WHERE ACCOUNT_ID = ?;"
 				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
@@ -679,8 +653,6 @@ public class DB {
 	 * @return True if operation was successful.
 	 */
 	public static boolean deleteAccountByNumber(String number) throws SQLException{
-		checkConnection();
-		
 		PreparedStatement statement = connection.prepareStatement("DELETE FROM DTUGRP07.ACCOUNTS "
 				+ "WHERE NUMBER = ?;"
 				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
@@ -696,8 +668,6 @@ public class DB {
 	 * @return True if operation was successful.
 	 */
 	public static boolean deleteUser(String username) throws SQLException{
-		checkConnection();
-		
 		PreparedStatement statement = connection.prepareStatement("DELETE FROM DTUGRP07.USERS "
 				+ "WHERE USERNAME = ?;"
 				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
@@ -713,8 +683,6 @@ public class DB {
 	 * @return True if operation was successful.
 	 */
 	public static boolean deleteUserByCpr(String cpr) throws SQLException{
-		checkConnection();
-		
 		PreparedStatement statement = connection.prepareStatement("DELETE FROM DTUGRP07.USERS "
 				+ "WHERE CPR = ?;"
 				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
@@ -735,8 +703,6 @@ public class DB {
 	 * @throws InputException If invalid input is given.
 	 */
 	public static int checkLogin(String username, String password) throws SQLException, InputException {
-		checkConnection();
-		
 		if (username.matches("\\s")) throw new InputException("Invalid username."); //Checks for white space.
 		PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, USERNAME, PASSWORD "
 				+ "FROM DTUGRP07.USERS "
@@ -765,7 +731,6 @@ public class DB {
 	 * @throws SQLException From {@link #checkConnection() checkConnection()}
 	 */
 	public static ResultSet getQuery(String query) throws SQLException {
-		checkConnection();
 		return connection.createStatement().executeQuery(query);
 	}
 	
@@ -775,24 +740,36 @@ public class DB {
 	 * Note: Should check of the application server has integrated connection pool that can be used, else create our own.
 	 * @throws SQLException If connection fails or driver is missing.
 	 */
-	public static void checkConnection() throws SQLException {
-		if (connection == null){
+	public static void getConnection() throws SQLException {
+		getConnection(false);
+	}
+	
+	/**
+	 * Checks if there is a current connection to the database and if not attempts to connect to it.
+	 * Temporary solution to creating connections and allow troubleshooting till a connection pool is integrated that can be handled reliably.
+	 * Note: Should check of the application server has integrated connection pool that can be used, else create our own.
+	 * @throws SQLException If connection fails or driver is missing.
+	 */
+	public static void getConnection(boolean forceNew) throws SQLException {
+		if (forceNew || connection == null){
 			try {
 	            Class.forName("com.ibm.db2.jcc.DB2Driver");
 	        } catch (ClassNotFoundException e) {
 	            throw new SQLException(e);
 	        }
-			connection = DriverManager.getConnection(url, getProperties());
-			Runtime.getRuntime().addShutdownHook(new Thread(){ //ShutdownHook for closing resources used by the connection.
-				@Override
-				public void run(){
-					if (connection != null){
-						try {
-							connection.close();
-						} catch (SQLException e) {}
+			if (connection == null){
+				Runtime.getRuntime().addShutdownHook(new Thread(){ //ShutdownHook for closing resources used by the connection.
+					@Override
+					public void run(){
+						if (connection != null){
+							try {
+								connection.close();
+							} catch (SQLException e) {}
+						}
 					}
-				}
-			});
+				});
+			}
+			connection = DriverManager.getConnection(url, getProperties());
 		}
 	}
 	
@@ -807,5 +784,15 @@ public class DB {
 		properties.put("retreiveMessagesFromServerOnGetMessage", "true");
 		properties.put("emulateParameterMetaDataForZCalls", "1");
 		return properties;
+	}
+	
+	/**
+	 * Handle SQLException, possibly try to fix the problem or if not possible, throw exception.
+	 * @return Returns true if a fix was deployed and a retry could possibly be successful (Not necessarily, beware infinite loop!), false if no fix was deployed.
+	 */
+	private static boolean handleSQLException(SQLException e){
+		//TODO Handle Exception.
+		
+		return true;
 	}
 }

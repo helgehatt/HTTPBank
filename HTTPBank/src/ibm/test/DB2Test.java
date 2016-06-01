@@ -18,7 +18,6 @@ import java.util.ArrayList;
 public class DB2Test {
 	//Main
 	public static void main(String[] args) throws SQLException, ClassNotFoundException, InputException {
-		DB.checkConnection();
 		testCheckLogin("Thomas", "1234");
 		System.out.println();
 		testGetUsers();
