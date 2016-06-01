@@ -14,7 +14,7 @@ import ibm.db.DB;
 @WebServlet(urlPatterns = { "/user/accounts", "/user/transfer", "/user/transactions", "/user/inbox", 
 		"/admin/users", "/admin/search", "/admin/newuser", "/admin/accounts", "/admin/newaccount", 
 		"/admin/transactions", "/admin/accountinfo", "/admin/deposit", "/admin/withdrawal", "/admin/editaccount",
-		"/admin/transfer", "/admin/international", "/admin/userinfo" })
+		"/admin/transfer", "/admin/international", "/admin/userinfo", "/admin/edituser" })
 public class MainController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
@@ -79,6 +79,9 @@ public class MainController extends HttpServlet {
 			break;
 		case "/admin/userinfo":
 			request.getRequestDispatcher("../WEB-INF/jsp/admin/user-info.jsp").forward(request, response);
+			break;
+		case "/admin/edituser":
+			request.getRequestDispatcher("../WEB-INF/jsp/admin/edit-user.jsp").forward(request, response);
 			break;
 		}
 	}

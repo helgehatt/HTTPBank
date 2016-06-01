@@ -72,18 +72,14 @@ public class AccountEditor extends HttpServlet {
         HttpSession session = request.getSession();
         
         if (errors.isEmpty()) {
-        	// TODO: Not thread safe!
-	        Account account = (Account) session.getAttribute("account");
-	        int id = account.getId();
+	        int id = ((Account) session.getAttribute("account")).getId();
+	        
 	        try {
-				DB.updateAccount(id, type, DB.ACCOUNT.TYPE);
-				DB.updateAccount(id, number, DB.ACCOUNT.NUMBER);
-				DB.updateAccount(id, iban, DB.ACCOUNT.IBAN);
-				DB.updateAccount(id, currency, DB.ACCOUNT.CURRENCY);
-				DB.updateAccount(id, Double.toString(interest), DB.ACCOUNT.INTEREST);
-				DB.updateAccount(id, Double.toString(balance), DB.ACCOUNT.BALANCE);
+				// TODO: updateAccount without name param.
+				String name = "account";
+				DB.updateAccount(id, name, type, number, iban, currency, interest, balance);
 				
-				request.getSession().setAttribute("account", DB.getAccountByNumber(number));
+				session.setAttribute("account", DB.getAccountByNumber(number));
 				response.sendRedirect("accountinfo");
 			} catch (SQLException e) {
 				e.printStackTrace();
