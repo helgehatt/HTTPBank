@@ -20,6 +20,7 @@
 
 <div class="container-fluid">
 
+	<c:set var="menu" scope="page" value="user"/>
 	<%@ include file="side-menu.jsp" %>
 	
 	<div id="user-info" class="container col-sm-9">

@@ -33,6 +33,11 @@
 				<li class="list-group-item" id="user-info-item">
 					<a class="btn btn-default side-menu-item" href="userinfo">User info</a>
 				</li>
+				<c:if test="${pageScope.menu == 'user'}">
+					<li class="list-group-item" id="edit-user-item">
+						<a class="btn btn-default side-menu-sub-item" href="edituser">Edit</a>
+					</li>
+				</c:if>
 			</ul>
 		</div>
 	</div>	
