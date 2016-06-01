@@ -32,7 +32,7 @@ public class DB2Test {
 		
 		int userId = testCreateUser("NewUser", "user", "123456-7890", "User", "NewInstitute", null).getId();
 		System.out.println();
-		int senderId = testCreateAccount(userId, "New Account", "New Type", "000111222", "000111222", "DKK", 0.50, 0).getId();
+		int senderId = testCreateAccount(userId, "New Account", "New Type", "000111222", "000111222", "DKK", 0.50, 100).getId();
 		int receiverId = testCreateAccount(userId, "Moo Account", "New Type", "000111333", "000111333", "DKK", 0.55, 0).getId();
 		System.out.println();
 		testCreateTransaction(senderId, receiverId, "New Transaction", 100);
@@ -98,7 +98,7 @@ public class DB2Test {
 
 	private static Transaction testCreateTransaction(int senderId, int receiverId, String description, double amount) throws SQLException {
 		long start = System.currentTimeMillis();
-		Transaction transaction = DB.createTransaction(senderId, receiverId, description, description, amount);
+		Transaction transaction = DB.createTransaction(DB.TransBy.ID, senderId, ""+receiverId, description, description, -amount, amount);
 		System.out.println("Created Transaction, Query Time: " + (System.currentTimeMillis()-start));
 		printTransaction(transaction);
 		return transaction;
