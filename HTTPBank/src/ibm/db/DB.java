@@ -216,26 +216,103 @@ public class DB {
 	// CREATE Methods
 	/**
 	 * Queries the database to insert a new transaction into the TRANSACTIONS table.
+	 * Note that no change or checks are made to any accounts with this method.
+	 * @param senderId The accountId for the account sending this transfer.
+	 * @param receiverId The accountId for the account receiving this transfer.
+	 * @param senderDescription The string with the description of the transfer for the sender.
+	 * @param receiverDescription The string with the description of the transfer for the receiver.
+	 * @param amount The amount to enter into the transactions.
+	 * @return The new transaction for the sender as a Transaction object with all fields, excluding 'transaction_id', if successfully created.
+	 * @throws SQLException 
+	 */
+	public static Transaction createTransaction(int senderId, int receiverId, String senderDescription, String receiverDescription, double amount) throws SQLException{
+		checkConnection();
+		
+		Date date = new Date(Calendar.getInstance().getTime().getTime());
+		
+		PreparedStatement senderStatement = connection.prepareStatement("INSERT INTO DTUGRP07.TRANSACTIONS "
+				+ "(ACCOUNT_ID, \"DATE\", DESCRIPTION, AMOUNT) VALUES "
+				+ "(?, ?, ?, ?);"
+				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+		senderStatement.setInt(1, senderId);
+		senderStatement.setDate(2, date);
+		senderStatement.setString(3, senderDescription);
+		senderStatement.setDouble(4, -amount);
+		senderStatement.execute(); //Attempt to insert new row.
+		senderStatement.close();
+		
+		PreparedStatement receiverStatement = connection.prepareStatement("INSERT INTO DTUGRP07.TRANSACTIONS "
+				+ "(ACCOUNT_ID, \"DATE\", DESCRIPTION, AMOUNT) VALUES "
+				+ "(?, ?, ?, ?);"
+				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+		receiverStatement.setInt(1, receiverId);
+		receiverStatement.setDate(2, date);
+		receiverStatement.setString(3, receiverDescription);
+		receiverStatement.setDouble(4, amount);
+		receiverStatement.execute(); //Attempt to insert new row.
+		receiverStatement.close();
+		
+		return new Transaction(null, senderId, date, senderDescription, -amount);
+	}
+	
+	/**
+	 * Queries the database to insert a new transaction into the TRANSACTIONS table.
+	 * Note that no change is made to any accounts with this method.
+	 * 
+	 * @param accountId The accountId for the account receiving this deposit.
+	 * @param description The string with the description of the deposit.
+	 * @param amount The amount to enter into this transaction.
+	 * 
 	 * @return The new transaction as a Transaction object with all fields, excluding 'transaction_id', if successfully created.
 	 * @throws SQLException 
 	 */
-	public static Transaction createTransaction(int accountId, String description, double amount) throws SQLException{
+	public static Transaction createDeposit(int accountId, String description, double amount) throws SQLException{
 		checkConnection();
+		
+		Date date = new Date(Calendar.getInstance().getTime().getTime());
 		
 		PreparedStatement statement = connection.prepareStatement("INSERT INTO DTUGRP07.TRANSACTIONS "
 				+ "(ACCOUNT_ID, \"DATE\", DESCRIPTION, AMOUNT) VALUES "
 				+ "(?, ?, ?, ?);"
 				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
 		statement.setInt(1, accountId);
-		Date date = new Date(Calendar.getInstance().getTime().getTime());
 		statement.setDate(2, date);
 		statement.setString(3, description);
 		statement.setDouble(4, amount);
-		
 		statement.execute(); //Attempt to insert new row.
 		statement.close();
 		
 		return new Transaction(null, accountId, date, description, amount);
+	}
+	
+	/**
+	 * Queries the database to insert a new transaction into the TRANSACTIONS table.
+	 * Note that no change is made to any accounts with this method.
+	 * 
+	 * @param accountId The accountId for the account receiving this withdrawal.
+	 * @param description The string with the description of the withdrawal.
+	 * @param amount The amount to subtract in this transaction.
+	 * 
+	 * @return The new transaction as a Transaction object with all fields, excluding 'transaction_id', if successfully created.
+	 * @throws SQLException 
+	 */
+	public static Transaction createWithdrawal(int accountId, String description, double amount) throws SQLException{
+		checkConnection();
+		
+		Date date = new Date(Calendar.getInstance().getTime().getTime());
+		
+		PreparedStatement statement = connection.prepareStatement("INSERT INTO DTUGRP07.TRANSACTIONS "
+				+ "(ACCOUNT_ID, \"DATE\", DESCRIPTION, AMOUNT) VALUES "
+				+ "(?, ?, ?, ?);"
+				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+		statement.setInt(1, accountId);
+		statement.setDate(2, date);
+		statement.setString(3, description);
+		statement.setDouble(4, -amount);
+		statement.execute(); //Attempt to insert new row.
+		statement.close();
+		
+		return new Transaction(null, accountId, date, description, -amount);
 	}
 	
 	/**
