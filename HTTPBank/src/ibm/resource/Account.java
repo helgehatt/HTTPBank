@@ -1,7 +1,6 @@
 package ibm.resource;
 
 import java.io.Serializable;
-import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
@@ -80,11 +79,7 @@ public class Account implements Serializable {
 	 * Should query whenever transactions are updated.
 	 */
 	public ArrayList<Transaction> getTransactions() {
-		try {
-			transactions = DB.getTransactions(accountId);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		transactions = DB.getTransactions(accountId);
 		return transactions;
 	}
 	
