@@ -296,6 +296,7 @@ public class DB {
 	/**
 	 * Queries the database to insert a new transaction into the TRANSACTIONS table.
 	 * No manipulation of the 'amount' parameters is done, meaning the 'amount' should precisely reflect how the account's balance should be changed, negative if subtracting.
+	 * If the 'TransBy.ACCOUNTNUMBER' or 'TransBy.IBAN' method is used, then it is possible that the receiver doesn't exist in the database, if the receiver isn't found, then no transaction is created for the receiver, but the transaction is still completed for the sender.
 	 * @param transBy TransBy, defines the method the create the transaction, defines what 'receiverId' contains.
 	 * @param senderId The accountId for the account sending this transfer.
 	 * @param receiverId The accountId, account-number or IBAN for the account receiving this transfer. Should match the 'transBy' parameter.
@@ -317,7 +318,7 @@ public class DB {
 				try {
 					connection.setAutoCommit(false);
 					
-					senderTransaction = createTransaction(transBy, date, ""+senderId, senderDescription, senderAmount);
+					senderTransaction = createTransaction(TransBy.ID, date, ""+senderId, senderDescription, senderAmount);
 					receiverTransaction = createTransaction(transBy, date, receiverId, receiverDescription, receiverAmount);
 					
 					//if (receiverTransaction == null) ; //The receiver was not an account we know about.
