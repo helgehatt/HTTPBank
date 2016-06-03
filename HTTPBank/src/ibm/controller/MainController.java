@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import ibm.db.DB;
 
-@WebServlet(urlPatterns = { "/user/accounts", "/user/transfer", "/user/transactions", "/user/inbox", 
+@WebServlet(urlPatterns = { "/user/accounts", "/user/transfer", "/user/international", "/user/transactions", "/user/inbox", 
 		"/admin/users", "/admin/search", "/admin/newuser", "/admin/accounts", "/admin/newaccount", 
 		"/admin/transactions", "/admin/accountinfo", "/admin/deposit", "/admin/withdrawal", "/admin/editaccount",
 		"/admin/transfer", "/admin/international", "/admin/userinfo", "/admin/edituser" })
@@ -27,14 +27,17 @@ public class MainController extends HttpServlet {
 		switch (path) {
 		case "/user/accounts":
 			try {
-				request.getSession().setAttribute("user", DB.getUser(0));
+				request.getSession().setAttribute("user", DB.getUser(1));
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 			request.getRequestDispatcher("../WEB-INF/jsp/user/account-list.jsp").forward(request, response);
 			break;
 		case "/user/transfer":
-			request.getRequestDispatcher("../WEB-INF/jsp/user/transfer.jsp").forward(request, response);
+			request.getRequestDispatcher("../WEB-INF/jsp/user/transfer-dom.jsp").forward(request, response);
+			break;
+		case "/user/international":
+			request.getRequestDispatcher("../WEB-INF/jsp/user/transfer-int.jsp").forward(request, response);
 			break;
 		case "/user/transactions":
 			request.getRequestDispatcher("../WEB-INF/jsp/user/transaction-list.jsp").forward(request, response);

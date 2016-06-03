@@ -89,4 +89,9 @@ public class AccountEditor extends HttpServlet {
         	response.sendRedirect("editaccount");
         }
     }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    	response.sendRedirect(request.getContextPath());
+    }
 }

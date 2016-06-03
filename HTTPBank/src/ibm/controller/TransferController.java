@@ -2,6 +2,7 @@ package ibm.controller;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -11,71 +12,91 @@ import javax.servlet.http.HttpServletResponse;
 
 import ibm.db.DB;
 import ibm.resource.Account;
-import ibm.resource.Transaction;
+import ibm.resource.InputException;
 
-@WebServlet("/admin/doTransfer")
+@WebServlet(urlPatterns = { "/user/doTransfer", "/admin/doTransfer" } )
 public class TransferController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        
-		String transfer = request.getParameter("transfer");
-		
-		switch(transfer) {
-		case "user-dom":
-	        newTransfer(request, response, false);
-	        response.sendRedirect("transfer");
-			break;
-		case "user-int":
-	        newTransfer(request, response, true);
-	        response.sendRedirect("transfer");
-			break;
-		case "admin-dom":
-	        newTransfer(request, response, false);
-	        response.sendRedirect("transfer");
-			break;
-		case "admin-int":
-	        newTransfer(request, response, true);
-	        response.sendRedirect("international");
-			break;
-		}
-	}
-
-	private void newTransfer(HttpServletRequest request, HttpServletResponse response, boolean international) {
+    	HashMap<String, String> errors = new HashMap<String, String>();
+    	
+		boolean international = request.getParameter("international") != null;
         String from = request.getParameter("from");
         String to = request.getParameter("to");
-        double amount = Double.parseDouble(request.getParameter("amount"));
-
-		// TODO: "from" should be a dropdown
-        Account fromAccount = null;
-        Account toAccount = null;
-        
+        String bic = request.getParameter("bic");
+        String currency = request.getParameter("currency");
+		String amountString = request.getParameter("amount");
+		
+		int fromId = 0;
+		double amount = 0;
+		
 		try {
-			fromAccount = DB.getAccountByNumber(from);
-		} catch (SQLException e) {
-			e.printStackTrace();
+			fromId = Integer.parseInt(from);
+		} catch (NumberFormatException e) {
+			// TODO: Throw new "Something went wrong, try refreshing the page" exception.
 		}
-        
-        if (international) {
-//            String bic = request.getParameter("bic");
-//        	toAccount = getInternationalAccount(to, bic);
-//            String currency = request.getParameter("currency");
-//        	amount = amount * getConversionRate(currency);
-        	return;
-        } else {
-            try {
-				toAccount = DB.getAccountByNumber(to);
+		
+		if (international) {
+			try {
+				AttributeChecks.checkIban(to);
+			} catch (InputException e) {
+	        	errors.put("to", e.getMessage());
+			}
+			
+			try {
+				AttributeChecks.checkBic(bic);
+			} catch (InputException e) {
+	        	errors.put("bic", e.getMessage());
+			}
+			
+			try {
+				AttributeChecks.checkCurrency(currency);
+			} catch (InputException e) {
+	        	errors.put("currency", e.getMessage());
+			}
+			
+		} else {
+			try {
+				AttributeChecks.checkNumber(to);
+			} catch (InputException e) {
+	        	errors.put("to", e.getMessage());
+			}
+		}
+		
+		try {
+			amount = AttributeChecks.checkAmount(amountString);
+		} catch (InputException e) {
+        	errors.put("amount", e.getMessage());
+		}
+		
+		if (errors.isEmpty()) {
+			try {
+				Account toAcc = (Account) DB.getAccountByNumber(to);
+				if (toAcc != null)
+					DB.createTransaction(fromId, toAcc.getId(), "Transfer to " + to, "Transfer from " + from, amount);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-        }
+		} else {
+        	request.getSession().setAttribute("errors", errors);
+		}
+		
+		if (international)
+			response.sendRedirect("international");
+		else
+			response.sendRedirect("transfer");
         
-        fromAccount.getTransactions().add(new Transaction("Transfer to " + to, -amount));
-        toAccount.getTransactions().add(new Transaction("Transfer from " + from, amount));
+        
 
         // TODO: Message objects?
         // String message = request.getParameter("message"); // Optional
     	// if (message!=null) toAccount.getUser().getMessages().add(new Message(message));
 	}
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    	response.sendRedirect(request.getContextPath());
+    }
 }

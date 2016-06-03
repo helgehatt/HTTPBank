@@ -1,13 +1,11 @@
 package ibm.controller;
 
 import java.io.IOException;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 @WebServlet("/checkLogin")
 public class LoginController extends HttpServlet {
@@ -23,16 +21,17 @@ public class LoginController extends HttpServlet {
         if (username.equals("user") && password.equals("")) {
 			response.sendRedirect("user/accounts");
 			
-        } else if (username.equals("admin") && password.equals("")) {
-			HttpSession session = request.getSession();
-			session.removeAttribute("user");
-			session.removeAttribute("account");
-			
+        } else if (username.equals("admin") && password.equals("")) {			
 			response.sendRedirect("admin/users");
 			
         } else {
-        	response.sendRedirect(" ");
+        	response.sendRedirect(" ?s=0");
         }
 	}
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    	response.sendRedirect(request.getContextPath());
+    }
 
 }

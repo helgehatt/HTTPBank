@@ -84,4 +84,9 @@ public class AccountCreator extends HttpServlet {
         	response.sendRedirect("newaccount");
         }
     }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    	response.sendRedirect(request.getContextPath());
+    }
 }
