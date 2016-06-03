@@ -1,7 +1,6 @@
 package ibm.controller;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.HashMap;
 
 import javax.servlet.ServletException;
@@ -56,17 +55,14 @@ public class UserEditor extends HttpServlet {
         
         if (errors.isEmpty()) {
         	int id = ((User) session.getAttribute("user")).getId();
-        	
-	        try {
-	        	// TODO: updateUser without username param.
-	        	String username = "user";
-	        	DB.updateUser(id, username, cpr, name, institute, consultant);
-				
-				session.setAttribute("user", DB.getUser(id));
-				response.sendRedirect("userinfo");
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+
+        	// TODO: updateUser without username param.
+        	String username = "user";
+        	String password = "password";
+        	DB.updateUser(id, username, password, cpr, name, institute, consultant);
+			
+			session.setAttribute("user", DB.getUser(id));
+			response.sendRedirect("userinfo");
         } else {
         	session.setAttribute("errors", errors);
         	response.sendRedirect("edituser");

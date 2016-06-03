@@ -4,15 +4,28 @@ import ibm.resource.InputException;
 
 public class AttributeChecks {
 	//User Methods
+	
+	public static void checkUserName(String userName) throws InputException {
+		if (userName.length() < 5)
+			throw new InputException("Please enter at least 5 characters.");
+		if (hasWhitespace(userName))
+			throw new InputException("Please enter a user name without whitespace.");
+	}
+	
+	public static void checkPassword(String password) throws InputException {
+		if (password.length() < 6)
+			throw new InputException("Please enter at least 6 characters.");
+	}
+	
 	/**
 	 * Checks if the given string is a valid cpr-number.
 	 */
 	public static void checkCpr(String cpr) throws InputException {
     	cpr = cpr.replace("-", "");
 		if (cpr.length() != 9)
-    		throw new InputException("Please insert 9 digits.");
+    		throw new InputException("Please enter 9 digits.");
     	if (!isNumerous(cpr))
-    		throw new InputException("Please insert numbers only.");
+    		throw new InputException("Please enter numbers only.");
     }
     
 	/**
@@ -20,9 +33,9 @@ public class AttributeChecks {
 	 */
 	public static void checkName(String name) throws InputException {
 		if (name.length() == 0)
-    		throw new InputException("Please insert name.");   
+    		throw new InputException("Please enter name.");   
     	if (!isAlphabetic(name)) 
-    		throw new InputException("Please insert letters only.");    	
+    		throw new InputException("Please enter letters only.");    	
     }
     
 	/**
@@ -45,7 +58,7 @@ public class AttributeChecks {
 	 */
 	public static void checkType(String type) throws InputException {
 		if (type.length() == 0)
-			throw new InputException("Please insert type.");
+			throw new InputException("Please enter type.");
     }
     
 	/**
@@ -53,9 +66,9 @@ public class AttributeChecks {
 	 */
 	public static void checkNumber(String number) throws InputException {
 		if (number.length() != 9)
-			throw new InputException("Please insert 9 digits.");
+			throw new InputException("Please enter 9 digits.");
 		if (!isNumerous(number))
-			throw new InputException("Please insert numbers only.");
+			throw new InputException("Please enter numbers only.");
 		// TODO: check if number exists in DB?
     }
     
@@ -64,7 +77,7 @@ public class AttributeChecks {
 	 */
 	public static void checkIban(String iban) throws InputException {
 		if (iban.length() < 5)
-			throw new InputException("Please insert more than 4 characters.");
+			throw new InputException("Please enter more than 4 characters.");
 		if (!isAlphabetic(iban.substring(0, 1)))
 			throw new InputException("First and second character must be letters.");
 		if (!isNumerous(iban.substring(2, 3)))
@@ -79,7 +92,7 @@ public class AttributeChecks {
 	 */
 	public static void checkBic(String bic) throws InputException {
 		if (bic.length() != 8)
-			throw new InputException("Please insert 8 characters.");
+			throw new InputException("Please enter 8 characters.");
 	}
     
 	/**
@@ -87,7 +100,7 @@ public class AttributeChecks {
 	 */
 	public static void checkCurrency(String currency) throws InputException {
     	if (currency.length() != 3)
-    		throw new InputException("Please insert 3 letters.");
+    		throw new InputException("Please enter 3 letters.");
     	// TODO: check if currency exists in DB
     }
     
@@ -97,14 +110,14 @@ public class AttributeChecks {
 	 */
 	public static double checkInterest(String interest) throws InputException {
 		if (interest.length() == 0)
-			throw new InputException("Please insert interest rate.");
+			throw new InputException("Please enter interest rate.");
 		double value;
     	try {
     		interest = interest.replace("%", "");
     		interest = interest.replace(",", ".");
     		value = Double.parseDouble(interest);
     	} catch (NumberFormatException e) {
-    		throw new InputException("Please insert a number.");
+    		throw new InputException("Please enter a number.");
     	}
     	return value;
     }
@@ -121,7 +134,7 @@ public class AttributeChecks {
     		balance = balance.replace(",", ".");
     		value = Double.parseDouble(balance);
     	} catch (NumberFormatException e) {
-    		throw new InputException("Please insert a number.");
+    		throw new InputException("Please enter a number.");
     	}
     	return value;
     }
@@ -133,13 +146,13 @@ public class AttributeChecks {
 	 */
 	public static double checkAmount(String amount) throws InputException {
 		if (amount.length() == 0)
-			throw new InputException("Please insert an amount.");
+			throw new InputException("Please enter an amount.");
 		double value;
     	try {
     		amount = amount.replace(",", ".");
     		value = Double.parseDouble(amount);
     	} catch (NumberFormatException e) {
-    		throw new InputException("Please insert a number.");
+    		throw new InputException("Please enter a number.");
     	}
     	return value;
     }
@@ -158,6 +171,13 @@ public class AttributeChecks {
 				return false;
 		}
 		return true;
-		
+	}
+	
+	private static boolean hasWhitespace(String string) {
+		for (int i = 0; i < string.length(); i++) {
+			if (Character.isWhitespace(string.charAt(i)))
+				return true;
+		}
+		return false;
 	}
 }

@@ -1,7 +1,6 @@
 package ibm.controller;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -26,11 +25,7 @@ public class MainController extends HttpServlet {
 		
 		switch (path) {
 		case "/user/accounts":
-			try {
-				request.getSession().setAttribute("user", DB.getUser(1));
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			request.getSession().setAttribute("user", DB.getUser(1));
 			request.getRequestDispatcher("../WEB-INF/jsp/user/account-list.jsp").forward(request, response);
 			break;
 		case "/user/transfer":
@@ -43,11 +38,7 @@ public class MainController extends HttpServlet {
 			request.getRequestDispatcher("../WEB-INF/jsp/user/transaction-list.jsp").forward(request, response);
 			break;
 		case "/admin/users":
-			try {
-				request.getSession().setAttribute("users", DB.getUsers());
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			request.getSession().setAttribute("users", DB.getUsers());
 			request.getRequestDispatcher("../WEB-INF/jsp/admin/user-list.jsp").forward(request, response);
 			break;
 		case "/admin/newuser":
