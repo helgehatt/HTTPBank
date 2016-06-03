@@ -1,7 +1,6 @@
 package ibm.controller;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.HashMap;
 
 import javax.servlet.ServletException;
@@ -74,16 +73,13 @@ public class AccountEditor extends HttpServlet {
         if (errors.isEmpty()) {
 	        int id = ((Account) session.getAttribute("account")).getId();
 	        
-	        try {
-				// TODO: updateAccount without name param.
-				String name = "account";
-				DB.updateAccount(id, name, type, number, iban, currency, interest, balance);
-				
-				session.setAttribute("account", DB.getAccountByNumber(number));
-				response.sendRedirect("accountinfo");
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+
+			// TODO: updateAccount without name param.
+			String name = "account";
+			DB.updateAccount(id, name, type, number, iban, currency, interest, balance);
+			
+			session.setAttribute("account", DB.getAccountByNumber(number));
+			response.sendRedirect("accountinfo");
         } else {
         	session.setAttribute("errors", errors);
         	response.sendRedirect("editaccount");

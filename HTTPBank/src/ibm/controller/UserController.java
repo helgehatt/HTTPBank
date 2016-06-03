@@ -1,7 +1,6 @@
 package ibm.controller;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -19,12 +18,7 @@ public class UserController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         int userId = Integer.parseInt(request.getParameter("userId"));
         
-		try {
-			request.getSession().setAttribute("user", DB.getUser(userId));
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		request.getSession().setAttribute("user", DB.getUser(userId));
 		
 		response.sendRedirect("accounts");
 	

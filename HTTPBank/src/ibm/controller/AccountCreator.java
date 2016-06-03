@@ -1,7 +1,6 @@
 package ibm.controller;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.HashMap;
 
 import javax.servlet.ServletException;
@@ -73,11 +72,7 @@ public class AccountCreator extends HttpServlet {
         
         if (errors.isEmpty()) {
 	        User user = (User) session.getAttribute("user");
-	    	try {
-				DB.createAccount(user.getId(), "WHY?", type, number, iban, currency, interest, balance);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			DB.createAccount(user.getId(), "accountname", type, number, iban, currency, interest, balance);
 			response.sendRedirect("accounts");
         } else {
         	session.setAttribute("errors", errors);

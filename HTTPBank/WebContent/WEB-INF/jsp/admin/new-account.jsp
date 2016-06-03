@@ -26,6 +26,13 @@
 			<div class="panel-body">
 		    <form class="form-horizontal" role="form" action="newAccount" method="post">
 		      <div class="form-group">
+		        <label class="control-label col-sm-3" for="name">Name:</label>
+		        <div class="col-sm-9">          
+		          <input name="name" type="text" class="form-control" id="name" placeholder="Optional">
+    					<span class="error">${pageScope.errors.name}</span>
+		        </div>
+		      </div>
+		      <div class="form-group">
 		        <label class="control-label col-sm-3" for="type">Type:</label>
 		        <div class="col-sm-9">          
 		          <input name="type" type="text" class="form-control" id="type">

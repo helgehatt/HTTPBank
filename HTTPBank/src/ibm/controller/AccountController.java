@@ -1,8 +1,6 @@
 package ibm.controller;
 
 import java.io.IOException;
-import java.sql.SQLException;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -19,11 +17,7 @@ public class AccountController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String number = request.getParameter("number");
         
-		try {
-			request.getSession().setAttribute("account", DB.getAccountByNumber(number));
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		request.getSession().setAttribute("account", DB.getAccountByNumber(number));
 		
 		response.sendRedirect("accountinfo");
     }

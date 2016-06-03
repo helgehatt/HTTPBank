@@ -30,6 +30,20 @@
 		<div class="panel panel-default">
 			<div class="panel-body">
 		    <form class="form-horizontal" role="form" action="editUser" method="post">
+				  <div class="form-group">
+				    <label class="control-label col-sm-3" for="username">User name:</label>
+				    <div class="col-sm-9">          
+				      <input name="username" type="text" class="form-control" id="username" value="${user.username}">
+	   					<span class="error">${pageScope.errors.username}</span>
+				    </div>
+				  </div>
+				  <div class="form-group">
+				    <label class="control-label col-sm-3" for="password">Password:</label>
+				    <div class="col-sm-9">          
+				      <input name="password" type="text" class="form-control" id="password">
+	   					<span class="error">${pageScope.errors.password}</span>
+				    </div>
+				  </div>
 		      <div class="form-group">
 		        <label class="control-label col-sm-3" for="cpr">CPR:</label>
 		        <div class="col-sm-9">          

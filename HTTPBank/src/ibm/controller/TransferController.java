@@ -1,7 +1,6 @@
 package ibm.controller;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.HashMap;
 
 import javax.servlet.ServletException;
@@ -72,13 +71,9 @@ public class TransferController extends HttpServlet {
 		}
 		
 		if (errors.isEmpty()) {
-			try {
-				Account toAcc = (Account) DB.getAccountByNumber(to);
-				if (toAcc != null)
-					DB.createTransaction(fromId, toAcc.getId(), "Transfer to " + to, "Transfer from " + from, amount);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			Account toAcc = (Account) DB.getAccountByNumber(to);
+//			if (toAcc != null)
+//				DB.createTransaction(fromId, toAcc.getId(), "Transfer to " + to, "Transfer from " + from, amount);
 		} else {
         	request.getSession().setAttribute("errors", errors);
 		}
