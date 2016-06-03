@@ -13,16 +13,25 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Properties;
 
 /**
- * A class for handling all Database queires required by the HTTPBank.
+ * A class for handling all Database queries required by the HTTPBank.
  * Class uses PreparedStatements for easy implementation and efficiency.
- * 
- * Method TODO list:
- * What methods do we need in here? Inserts, Updates, Selects, Procedures, stuff?
  */
 public class DB {
+	//Static Constructor
+	static {
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				getConnection();
+			} catch (SQLException e) {
+				// A Database access error occurred. Can't really do anything about it at this point.
+			}
+		}
+	}
+	
 	//Fields
 	private static Connection connection;
 	private static final String url = "jdbc:db2://192.86.32.54:5040/DALLASB";
@@ -34,25 +43,40 @@ public class DB {
 	 * @return ArrayList containing all current database transactions related to the given account. Returns null if database query fails.
 	 * @throws SQLException {@link #checkConnection() CheckConnection()}
 	 */
-	public static ArrayList<Transaction> getTransactions(int accountid) throws SQLException {
-		checkConnection();
-		
-		PreparedStatement statement = connection.prepareStatement("SELECT TRANSACTION_ID, ACCOUNT_ID, DATE, DESCRIPTION, AMOUNT "
-				+ "FROM DTUGRP07.TRANSACTIONS "
-				+ "WHERE ACCOUNT_ID = ?;"
-				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		statement.setLong(1, accountid); //Sets the first '?' parameter to the integer 'accountid'.
-		
-		ArrayList<Transaction> resultList = null;
-		if (statement.execute()){ //If query is successful, create list of transactions.
-			resultList = new ArrayList<Transaction>();
-			ResultSet results = statement.getResultSet();
-			while (results.next()){ //Fetch transaction-id from results and add to resultlist.
-				resultList.add(new Transaction(results.getLong(1), results.getInt(2), results.getDate(3), results.getString(4), results.getDouble(5)));
+	public static ArrayList<Transaction> getTransactions(int accountid) {
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				PreparedStatement statement = connection.prepareStatement("SELECT TRANSACTION_ID, ACCOUNT_ID, DATE, DESCRIPTION, AMOUNT "
+						+ "FROM DTUGRP07.TRANSACTIONS "
+						+ "WHERE ACCOUNT_ID = ?;"
+						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				statement.setLong(1, accountid); //Sets the first '?' parameter to the integer 'accountid'.
+				
+				ArrayList<Transaction> resultList = null;
+				if (statement.execute()){ //If query is successful, create list of transactions.
+					resultList = new ArrayList<Transaction>();
+					ResultSet results = statement.getResultSet();
+					while (results.next()){ //Fetch transaction-id from results and add to resultlist.
+						resultList.add(new Transaction(results.getLong(1), results.getInt(2), results.getDate(3), results.getString(4), results.getDouble(5)));
+					}
+				}
+				statement.close();
+				
+				//Sorts all Transactions by Date.
+				resultList.sort(new Comparator<Transaction>(){
+					@Override
+					public int compare(Transaction o1, Transaction o2) {
+						return Long.compare(o1.getDateRaw(), o2.getDateRaw());
+					}
+				});
+				
+				return resultList;
+			} catch (SQLException e) {
+				handleSQLException(e);
+				//if no more tries, throw exception.
 			}
 		}
-		statement.close();
-		return resultList;
+		return null;
 	}
 	
 	/**
@@ -60,51 +84,63 @@ public class DB {
 	 * @return ArrayList containing all current database accounts related to the given user. Returns null if database query fails.
 	 * @throws SQLException {@link #checkConnection() CheckConnection()}
 	 */
-	public static ArrayList<Account> getAccounts(int userid) throws SQLException {
-		checkConnection();
-		
-		PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, ACCOUNT_ID, NAME, TYPE, NUMBER, IBAN, CURRENCY, INTEREST, BALANCE "
-				+ "FROM DTUGRP07.ACCOUNTS "
-				+ "WHERE USER_ID = ?;"
-				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		statement.setLong(1, userid); //Sets the '?' parameter to the integer 'userid'.
-		
-		ArrayList<Account> resultList = null;
-		if (statement.execute()){ //If query is successful, create list of accounts.
-			resultList = new ArrayList<Account>();
-			ResultSet results = statement.getResultSet();
-			while (results.next()){ //Fetch accountnames from results and add to resultlist.
-				resultList.add(new Account(results.getInt(1), results.getInt(2), results.getString(3), results.getString(4), results.getString(5), results.getString(6), results.getString(7), results.getDouble(8), results.getDouble(9)));
+	public static ArrayList<Account> getAccounts(int userid) {
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, ACCOUNT_ID, NAME, TYPE, NUMBER, IBAN, CURRENCY, INTEREST, BALANCE "
+						+ "FROM DTUGRP07.ACCOUNTS "
+						+ "WHERE USER_ID = ?;"
+						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				statement.setLong(1, userid); //Sets the '?' parameter to the integer 'userid'.
+				
+				ArrayList<Account> resultList = null;
+				if (statement.execute()){ //If query is successful, create list of accounts.
+					resultList = new ArrayList<Account>();
+					ResultSet results = statement.getResultSet();
+					while (results.next()){ //Fetch accountnames from results and add to resultlist.
+						resultList.add(new Account(results.getInt(1), results.getInt(2), results.getString(3), results.getString(4), results.getString(5), results.getString(6), results.getString(7), results.getDouble(8), results.getDouble(9)));
+					}
+				}
+				statement.close();
+				return resultList;
+			} catch (SQLException e) {
+				handleSQLException(e);
+				//if no more tries, throw exception.
 			}
 		}
-		statement.close();
-		return resultList;
+		return null;
 	}
 	
 	/**
 	 * Queries the database and returns the account with the given account id and data associated with it.
 	 * @throws SQLException 
 	 */
-	public static Account getAccount(int accountId) throws SQLException{
-		checkConnection();
-		
-		PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, ACCOUNT_ID, NAME, TYPE, NUMBER, IBAN, CURRENCY, INTEREST, BALANCE "
-				+ "FROM DTUGRP07.ACCOUNTS "
-				+ "WHERE ACCOUNT_ID = ? "
-				+ "FETCH FIRST 1 ROWS ONLY;"
-				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		statement.setInt(1, accountId);
-		
-		Account account = null;
-		if (statement.execute()){ //If query is successful, attempt to create account object.
-			ResultSet results = statement.getResultSet();
-			if (results.next()){ //Fetch row if able.
-				account = new Account(results.getInt(1), results.getInt(2), results.getString(3), results.getString(4), results.getString(5), results.getString(6), results.getString(7), results.getDouble(8), results.getDouble(9));
+	public static Account getAccount(int accountId) {
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, ACCOUNT_ID, NAME, TYPE, NUMBER, IBAN, CURRENCY, INTEREST, BALANCE "
+						+ "FROM DTUGRP07.ACCOUNTS "
+						+ "WHERE ACCOUNT_ID = ? "
+						+ "FETCH FIRST 1 ROWS ONLY;"
+						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				statement.setInt(1, accountId);
+				
+				Account account = null;
+				if (statement.execute()){ //If query is successful, attempt to create account object.
+					ResultSet results = statement.getResultSet();
+					if (results.next()){ //Fetch row if able.
+						account = new Account(results.getInt(1), results.getInt(2), results.getString(3), results.getString(4), results.getString(5), results.getString(6), results.getString(7), results.getDouble(8), results.getDouble(9));
+					}
+				}
+				statement.close();
+				
+				return account;
+			} catch (SQLException e) {
+				handleSQLException(e);
+				//if no more tries, throw exception.
 			}
 		}
-		statement.close();
-		
-		return account;
+		return null;
 	}
 	
 	/**
@@ -113,23 +149,29 @@ public class DB {
 	 * @return ArrayList containing all current database users. Returns null if database query fails.
 	 * @throws SQLException {@link #checkConnection() CheckConnection()}
 	 */
-	public static ArrayList<User> getUsers() throws SQLException {
-		checkConnection();
-		
-		PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, USERNAME, CPR, NAME "
-				+ "FROM DTUGRP07.USERS;"
-				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		
-		ArrayList<User> resultList = null;
-		if (statement.execute()){ //If query is successful, create list of users.
-			resultList = new ArrayList<User>();
-			ResultSet results = statement.getResultSet();
-			while (results.next()){ //Fetch usernames from results and add to resultlist.
-				resultList.add(new User(results.getInt(1), results.getString(2), results.getString(3), results.getString(4)));
+	public static ArrayList<User> getUsers() {
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, USERNAME, CPR, NAME "
+						+ "FROM DTUGRP07.USERS;"
+						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				
+				ArrayList<User> resultList = null;
+				if (statement.execute()){ //If query is successful, create list of users.
+					resultList = new ArrayList<User>();
+					ResultSet results = statement.getResultSet();
+					while (results.next()){ //Fetch usernames from results and add to resultlist.
+						resultList.add(new User(results.getInt(1), results.getString(2), results.getString(3), results.getString(4)));
+					}
+				}
+				statement.close();
+				return resultList;
+			} catch (SQLException e) {
+				handleSQLException(e);
+				//if no more tries, throw exception.
 			}
 		}
-		statement.close();
-		return resultList;
+		return null;
 	}
 	
 	/**
@@ -137,26 +179,32 @@ public class DB {
 	 * @return User object containing all fields except for 'accounts'. Returns null if database query fails or returns no rows.
 	 * @throws SQLException {@link #checkConnection() CheckConnection()}
 	 */
-	public static User getUser(int userId) throws SQLException{
-		checkConnection();
-		
-		PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, USERNAME, CPR, NAME, INSTITUTE, CONSULTANT "
-				+ "FROM DTUGRP07.USERS "
-				+ "WHERE USER_ID = ? "
-				+ "FETCH FIRST 1 ROWS ONLY;"
-				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		statement.setInt(1, userId);
-		
-		User user = null;
-		if (statement.execute()){ //If query is successful, attempt to create user.
-			ResultSet results = statement.getResultSet();
-			if (results.next()){ //Fetch row if able.
-				user = new User(results.getInt(1), results.getString(2), results.getString(3), results.getString(4), results.getString(5), results.getString(6));
+	public static User getUser(int userId) {
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, USERNAME, CPR, NAME, INSTITUTE, CONSULTANT "
+						+ "FROM DTUGRP07.USERS "
+						+ "WHERE USER_ID = ? "
+						+ "FETCH FIRST 1 ROWS ONLY;"
+						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				statement.setInt(1, userId);
+				
+				User user = null;
+				if (statement.execute()){ //If query is successful, attempt to create user.
+					ResultSet results = statement.getResultSet();
+					if (results.next()){ //Fetch row if able.
+						user = new User(results.getInt(1), results.getString(2), results.getString(3), results.getString(4), results.getString(5), results.getString(6));
+					}
+				}
+				statement.close();
+				
+				return user;
+			} catch (SQLException e) {
+				handleSQLException(e);
+				//if no more tries, throw exception.
 			}
 		}
-		statement.close();
-		
-		return user;
+		return null;
 	}
 	
 	/**
@@ -164,100 +212,239 @@ public class DB {
 	 * @return User object containing all fields except for 'accounts'. Returns null if database query fails or returns no rows.
 	 * @throws SQLException {@link #checkConnection() CheckConnection()}
 	 */
-	public static User getUserByCpr(String cpr) throws SQLException{
-		checkConnection();
-		
-		PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, USERNAME, CPR, NAME, INSTITUTE, CONSULTANT "
-				+ "FROM DTUGRP07.USERS "
-				+ "WHERE CPR = ? "
-				+ "FETCH FIRST 1 ROWS ONLY;"
-				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		statement.setString(1, cpr);
-		
-		User user = null;
-		if (statement.execute()){ //If query is successful, attempt to create user.
-			ResultSet results = statement.getResultSet();
-			if (results.next()){ //Fetch row if able.
-				user = new User(results.getInt(1), results.getString(2), results.getString(3), results.getString(4), results.getString(5), results.getString(6));
+	public static User getUserByCpr(String cpr) {
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, USERNAME, CPR, NAME, INSTITUTE, CONSULTANT "
+						+ "FROM DTUGRP07.USERS "
+						+ "WHERE CPR = ? "
+						+ "FETCH FIRST 1 ROWS ONLY;"
+						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				statement.setString(1, cpr);
+				
+				User user = null;
+				if (statement.execute()){ //If query is successful, attempt to create user.
+					ResultSet results = statement.getResultSet();
+					if (results.next()){ //Fetch row if able.
+						user = new User(results.getInt(1), results.getString(2), results.getString(3), results.getString(4), results.getString(5), results.getString(6));
+					}
+				}
+				statement.close();
+				
+				return user;
+			} catch (SQLException e) {
+				handleSQLException(e);
+				//if no more tries, throw exception.
 			}
 		}
-		statement.close();
-		
-		return user;
+		return null;
 	}
 	
 	/**
 	 * Queries the database for a specific account with the given account number. 
 	 * @throws SQLException 
 	 */
-	public static Account getAccountByNumber(String number) throws SQLException {
-		checkConnection();
-		
-		PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, ACCOUNT_ID, NAME, TYPE, NUMBER, IBAN, CURRENCY, INTEREST, BALANCE "
-				+ "FROM DTUGRP07.ACCOUNTS "
-				+ "WHERE NUMBER = ? "
-				+ "FETCH FIRST 1 ROWS ONLY;"
-				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		statement.setString(1, number);
-		
-		Account account = null;
-		if (statement.execute()){ //If query is successful, attempt to create account object.
-			ResultSet results = statement.getResultSet();
-			if (results.next()){ //Fetch row if able.
-				account = new Account(results.getInt(1), results.getInt(2), results.getString(3), results.getString(4), results.getString(5), results.getString(6), results.getString(7), results.getDouble(8), results.getDouble(9));
+	public static Account getAccountByNumber(String number) {
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, ACCOUNT_ID, NAME, TYPE, NUMBER, IBAN, CURRENCY, INTEREST, BALANCE "
+						+ "FROM DTUGRP07.ACCOUNTS "
+						+ "WHERE NUMBER = ? "
+						+ "FETCH FIRST 1 ROWS ONLY;"
+						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				statement.setString(1, number);
+				
+				Account account = null;
+				if (statement.execute()){ //If query is successful, attempt to create account object.
+					ResultSet results = statement.getResultSet();
+					if (results.next()){ //Fetch row if able.
+						account = new Account(results.getInt(1), results.getInt(2), results.getString(3), results.getString(4), results.getString(5), results.getString(6), results.getString(7), results.getDouble(8), results.getDouble(9));
+					}
+				}
+				statement.close();
+				
+				return account;
+			} catch (SQLException e) {
+				handleSQLException(e);
+				//if no more tries, throw exception.
 			}
 		}
-		statement.close();
-		
-		return account;
+		return null;
 	}
 	
 	
 	// CREATE Methods
 	/**
+	 * Enums to specifying which method to use to create the transaction.
+	 */
+	public static enum TransBy {
+		ID("ACCOUNT_ID"),
+		NUMBER("NUMBER"),
+		IBAN("IBAN");
+		
+		private String string;
+		
+		TransBy(String string){
+			this.string = string;
+		}
+		
+		public String toString(){
+			return string;
+		}
+	}
+	
+	/**
 	 * Queries the database to insert a new transaction into the TRANSACTIONS table.
-	 * Note that no change or checks are made to any accounts with this method.
+	 * No manipulation of the 'amount' parameters is done, meaning the 'amount' should precisely reflect how the account's balance should be changed, negative if subtracting.
+	 * If the 'TransBy.ACCOUNTNUMBER' or 'TransBy.IBAN' method is used, then it is possible that the receiver doesn't exist in the database, if the receiver isn't found, then no transaction is created for the receiver, but the transaction is still completed for the sender.
+	 * @param transBy TransBy, defines the method the create the transaction, defines what 'receiverId' contains.
 	 * @param senderId The accountId for the account sending this transfer.
-	 * @param receiverId The accountId for the account receiving this transfer.
+	 * @param receiverId The accountId, account-number or IBAN for the account receiving this transfer. Should match the 'transBy' parameter.
 	 * @param senderDescription The string with the description of the transfer for the sender.
 	 * @param receiverDescription The string with the description of the transfer for the receiver.
-	 * @param amount The amount to enter into the transactions.
+	 * @param senderAmount The amount to enter into the transaction for the sender.
+	 * @param receiverAmount The amount to enter into the transaction for the receiver.
 	 * @return The new transaction for the sender as a Transaction object with all fields, excluding 'transaction_id', if successfully created.
 	 * @throws SQLException 
 	 */
-	public static Transaction createTransaction(int senderId, int receiverId, String senderDescription, String receiverDescription, double amount) throws SQLException{
-		checkConnection();
+	public static Transaction createTransaction(TransBy transBy, int senderId, String receiverId, String senderDescription, String receiverDescription, double senderAmount, double receiverAmount) {
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				Date date = new Date(Calendar.getInstance().getTime().getTime());
+				
+				Transaction senderTransaction = null;
+				@SuppressWarnings("unused")
+				Transaction receiverTransaction = null;
+				try {
+					connection.setAutoCommit(false);
+					
+					senderTransaction = createTransaction(TransBy.ID, date, ""+senderId, senderDescription, senderAmount);
+					receiverTransaction = createTransaction(transBy, date, receiverId, receiverDescription, receiverAmount);
+					
+					//if (receiverTransaction == null) ; //The receiver was not an account we know about.
+					
+					connection.commit();
+				} catch (Exception e){
+					//Error, rollback all changes.
+					connection.rollback();
+					throw e;
+				} finally {
+					connection.setAutoCommit(true);
+				}
+				
+				return senderTransaction;
+			} catch (SQLException e) {
+				handleSQLException(e);
+				//if no more tries, throw exception.
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Queries the database to insert a new transaction into the TRANSACTIONS table.
+	 * Note that no change or checks are made to any accounts with this method.
+	 * Uses the 'ID' method to create the transaction as the 'ACCOUNTNUMBER' and 'IBAN' method allow the account to not exist and this method does not allow this.
+	 * @param accountId The accountId for the account to have the transaction.
+	 * @param description The string with the description of the transaction.
+	 * @param amount The amount to enter into the transaction, can be negative.
+	 * @return The new transaction as a Transaction object with all fields, excluding 'transaction_id', if successfully created.
+	 * @throws SQLException 
+	 */
+	public static Transaction createTransaction(int accountId, String description, double amount) {
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				Date date = new Date(Calendar.getInstance().getTime().getTime());
+				Transaction transaction = null;
+				try {
+					connection.setAutoCommit(false);
+					transaction = createTransaction(TransBy.ID, date, ""+accountId, description, amount);
+					connection.commit();
+				} catch (Exception e){
+					//Error, rollback all changes.
+					connection.rollback();
+					throw e;
+				} finally {
+					connection.setAutoCommit(true);
+				}
+				return transaction;
+			} catch (SQLException e) {
+				handleSQLException(e);
+				//if no more tries, throw exception.
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Performs multiple queries to create a new transaction. Autocommit should be disabled and commit should be managed by whatever calls this method.
+	 * @throws SQLException 
+	 */
+	private static Transaction createTransaction(TransBy transBy, Date date, String identity, String description, double amount) throws SQLException {
+		//Get the balance.
+		PreparedStatement getBalanceStatement = connection.prepareStatement("SELECT ACCOUNT_ID, BALANCE "
+				+ "FROM DTUGRP07.ACCOUNTS "
+				+ "WHERE "+transBy.toString()+" = ? "
+				+ "FETCH FIRST 1 ROWS ONLY;"
+				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+		switch(transBy){
+		case IBAN:
+		case NUMBER:
+			getBalanceStatement.setString(1, identity);
+			break;
+		case ID:
+		default:
+			getBalanceStatement.setInt(1, Integer.parseInt(identity));
+			break;
+		}
+		getBalanceStatement.execute();
+		double balance = 0;
+		int id;
+		ResultSet results = getBalanceStatement.getResultSet();
+		if (results.next()){ //Fetch row if able.
+			id = results.getInt(1);
+			balance = results.getDouble(2);
+		} else {
+			//TODO No account found!
+			return null;
+			//throw new SQLException();
+		}
+		getBalanceStatement.close();
 		
-		Date date = new Date(Calendar.getInstance().getTime().getTime());
+		//Update the balance.
+		PreparedStatement updateBalanceStatement = connection.prepareStatement("UPDATE DTUGRP07.ACCOUNTS "
+				+ "SET BALANCE = ? "
+				+ "WHERE ACCOUNT_ID = ?;"
+				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+		if ((balance+amount) < 0){
+			//TODO Updated balance will be negative.
+			//throw new SQLException();
+		}
+		updateBalanceStatement.setDouble(1, (balance+amount));
+		updateBalanceStatement.setInt(2, id);
+		updateBalanceStatement.executeUpdate();
+		updateBalanceStatement.close();
 		
-		PreparedStatement senderStatement = connection.prepareStatement("INSERT INTO DTUGRP07.TRANSACTIONS "
+		//Create the transaction.
+		PreparedStatement createTransactionStatement = connection.prepareStatement("INSERT INTO DTUGRP07.TRANSACTIONS "
 				+ "(ACCOUNT_ID, \"DATE\", DESCRIPTION, AMOUNT) VALUES "
 				+ "(?, ?, ?, ?);"
 				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		senderStatement.setInt(1, senderId);
-		senderStatement.setDate(2, date);
-		senderStatement.setString(3, senderDescription);
-		senderStatement.setDouble(4, -amount);
-		senderStatement.execute(); //Attempt to insert new row.
-		senderStatement.close();
+		createTransactionStatement.setInt(1, id);
+		createTransactionStatement.setDate(2, date);
+		createTransactionStatement.setString(3, description);
+		createTransactionStatement.setDouble(4, amount);
+		createTransactionStatement.execute(); //Attempt to insert new row.
+		createTransactionStatement.close();
 		
-		PreparedStatement receiverStatement = connection.prepareStatement("INSERT INTO DTUGRP07.TRANSACTIONS "
-				+ "(ACCOUNT_ID, \"DATE\", DESCRIPTION, AMOUNT) VALUES "
-				+ "(?, ?, ?, ?);"
-				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		receiverStatement.setInt(1, receiverId);
-		receiverStatement.setDate(2, date);
-		receiverStatement.setString(3, receiverDescription);
-		receiverStatement.setDouble(4, amount);
-		receiverStatement.execute(); //Attempt to insert new row.
-		receiverStatement.close();
-		
-		return new Transaction(null, senderId, date, senderDescription, -amount);
+		return new Transaction(null, id, date, description, amount);
 	}
 	
 	/**
 	 * Queries the database to insert a new transaction into the TRANSACTIONS table.
 	 * Note that no change is made to any accounts with this method.
+	 * 
+	 * @deprecated Use createTransaction(int accountId, String description, double amount).
 	 * 
 	 * @param accountId The accountId for the account receiving this deposit.
 	 * @param description The string with the description of the deposit.
@@ -266,28 +453,37 @@ public class DB {
 	 * @return The new transaction as a Transaction object with all fields, excluding 'transaction_id', if successfully created.
 	 * @throws SQLException 
 	 */
-	public static Transaction createDeposit(int accountId, String description, double amount) throws SQLException{
-		checkConnection();
-		
-		Date date = new Date(Calendar.getInstance().getTime().getTime());
-		
-		PreparedStatement statement = connection.prepareStatement("INSERT INTO DTUGRP07.TRANSACTIONS "
-				+ "(ACCOUNT_ID, \"DATE\", DESCRIPTION, AMOUNT) VALUES "
-				+ "(?, ?, ?, ?);"
-				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		statement.setInt(1, accountId);
-		statement.setDate(2, date);
-		statement.setString(3, description);
-		statement.setDouble(4, amount);
-		statement.execute(); //Attempt to insert new row.
-		statement.close();
-		
-		return new Transaction(null, accountId, date, description, amount);
+	@Deprecated
+	public static Transaction createDeposit(int accountId, String description, double amount) {
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				Date date = new Date(Calendar.getInstance().getTime().getTime());
+				
+				PreparedStatement statement = connection.prepareStatement("INSERT INTO DTUGRP07.TRANSACTIONS "
+						+ "(ACCOUNT_ID, \"DATE\", DESCRIPTION, AMOUNT) VALUES "
+						+ "(?, ?, ?, ?);"
+						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				statement.setInt(1, accountId);
+				statement.setDate(2, date);
+				statement.setString(3, description);
+				statement.setDouble(4, amount);
+				statement.execute(); //Attempt to insert new row.
+				statement.close();
+				
+				return new Transaction(null, accountId, date, description, amount);
+			} catch (SQLException e) {
+				handleSQLException(e);
+				//if no more tries, throw exception.
+			}
+		}
+		return null;
 	}
 	
 	/**
 	 * Queries the database to insert a new transaction into the TRANSACTIONS table.
 	 * Note that no change is made to any accounts with this method.
+	 * 
+	 * @deprecated Use createTransaction(int accountId, String description, double amount).
 	 * 
 	 * @param accountId The accountId for the account receiving this withdrawal.
 	 * @param description The string with the description of the withdrawal.
@@ -296,23 +492,30 @@ public class DB {
 	 * @return The new transaction as a Transaction object with all fields, excluding 'transaction_id', if successfully created.
 	 * @throws SQLException 
 	 */
-	public static Transaction createWithdrawal(int accountId, String description, double amount) throws SQLException{
-		checkConnection();
-		
-		Date date = new Date(Calendar.getInstance().getTime().getTime());
-		
-		PreparedStatement statement = connection.prepareStatement("INSERT INTO DTUGRP07.TRANSACTIONS "
-				+ "(ACCOUNT_ID, \"DATE\", DESCRIPTION, AMOUNT) VALUES "
-				+ "(?, ?, ?, ?);"
-				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		statement.setInt(1, accountId);
-		statement.setDate(2, date);
-		statement.setString(3, description);
-		statement.setDouble(4, -amount);
-		statement.execute(); //Attempt to insert new row.
-		statement.close();
-		
-		return new Transaction(null, accountId, date, description, -amount);
+	@Deprecated
+	public static Transaction createWithdrawal(int accountId, String description, double amount) {
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				Date date = new Date(Calendar.getInstance().getTime().getTime());
+				
+				PreparedStatement statement = connection.prepareStatement("INSERT INTO DTUGRP07.TRANSACTIONS "
+						+ "(ACCOUNT_ID, \"DATE\", DESCRIPTION, AMOUNT) VALUES "
+						+ "(?, ?, ?, ?);"
+						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				statement.setInt(1, accountId);
+				statement.setDate(2, date);
+				statement.setString(3, description);
+				statement.setDouble(4, -amount);
+				statement.execute(); //Attempt to insert new row.
+				statement.close();
+				
+				return new Transaction(null, accountId, date, description, -amount);
+			} catch (SQLException e) {
+				handleSQLException(e);
+				//if no more tries, throw exception.
+			}
+		}
+		return null;
 	}
 	
 	/**
@@ -320,28 +523,34 @@ public class DB {
 	 * @return The new account as an Account object with all fields, if successfully created.
 	 * @throws SQLException 
 	 */
-	public static Account createAccount(int userId, String name, String type, String number, String iban, String currency, double interest, double balance) throws SQLException{
-		checkConnection();
-		
-		PreparedStatement statement = connection.prepareStatement("INSERT INTO DTUGRP07.ACCOUNTS "
-				+ "(USER_ID, \"TYPE\", NAME, NUMBER, IBAN, INTEREST, BALANCE, CURRENCY) VALUES "
-				+ "(?, ?, ?, ?, ?, ?, ?, ?);"
-				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		statement.setInt(1, userId);
-		statement.setString(2, type);
-		statement.setString(3, name);
-		statement.setString(4, number);
-		statement.setString(5, iban);
-		statement.setDouble(6, interest);
-		statement.setDouble(7, balance);
-		statement.setString(8, currency);
-		
-		statement.execute(); //Attempt to insert new row.
-		statement.close();
-		
-		Account account = getAccountByNumber(number);
-		account.setTransactions(new ArrayList<Transaction>());
-		return account;
+	public static Account createAccount(int userId, String name, String type, String number, String iban, String currency, double interest, double balance) {
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				PreparedStatement statement = connection.prepareStatement("INSERT INTO DTUGRP07.ACCOUNTS "
+						+ "(USER_ID, \"TYPE\", NAME, NUMBER, IBAN, INTEREST, BALANCE, CURRENCY) VALUES "
+						+ "(?, ?, ?, ?, ?, ?, ?, ?);"
+						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				statement.setInt(1, userId);
+				statement.setString(2, type);
+				statement.setString(3, name);
+				statement.setString(4, number);
+				statement.setString(5, iban);
+				statement.setDouble(6, interest);
+				statement.setDouble(7, balance);
+				statement.setString(8, currency);
+				
+				statement.execute(); //Attempt to insert new row.
+				statement.close();
+				
+				Account account = getAccountByNumber(number);
+				account.setTransactions(new ArrayList<Transaction>());
+				return account;
+			} catch (SQLException e) {
+				handleSQLException(e);
+				//if no more tries, throw exception.
+			}
+		}
+		return null;
 	}
 	
 	/**
@@ -349,26 +558,32 @@ public class DB {
 	 * @return The new user as a User object with all fields, if successfully created.
 	 * @throws SQLException 
 	 */
-	public static User createUser(String username, String password, String cpr, String name, String institute, String consultant) throws SQLException{
-		checkConnection();
-		
-		PreparedStatement statement = connection.prepareStatement("INSERT INTO DTUGRP07.USERS "
-				+ "(USERNAME, PASSWORD, CPR, NAME, INSTITUTE, CONSULTANT) VALUES "
-				+ "(?, ?, ?, ?, ?, ?);"
-				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		statement.setString(1, username);
-		statement.setString(2, password);
-		statement.setString(3, cpr);
-		statement.setString(4, name);
-		statement.setString(5, institute);
-		statement.setString(6, consultant);
-		
-		statement.execute(); //Attempt to insert new row.
-		statement.close();
-		
-		User user = getUserByCpr(cpr);
-		user.setAccounts(new ArrayList<Account>());
-		return user;
+	public static User createUser(String username, String password, String cpr, String name, String institute, String consultant) {
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				PreparedStatement statement = connection.prepareStatement("INSERT INTO DTUGRP07.USERS "
+						+ "(USERNAME, PASSWORD, CPR, NAME, INSTITUTE, CONSULTANT) VALUES "
+						+ "(?, ?, ?, ?, ?, ?);"
+						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				statement.setString(1, username);
+				statement.setString(2, password);
+				statement.setString(3, cpr);
+				statement.setString(4, name);
+				statement.setString(5, institute);
+				statement.setString(6, consultant);
+				
+				statement.execute(); //Attempt to insert new row.
+				statement.close();
+				
+				User user = getUserByCpr(cpr);
+				user.setAccounts(new ArrayList<Account>());
+				return user;
+			} catch (SQLException e) {
+				handleSQLException(e);
+				//if no more tries, throw exception.
+			}
+		}
+		return null;
 	}
 	
 	
@@ -400,19 +615,25 @@ public class DB {
 	 * @return True if operation was successful.
 	 * @throws SQLException 
 	 */
-	public static boolean updateUser(int userId, String value, USER attribute) throws SQLException{
-		checkConnection();
-		
-		PreparedStatement statement = connection.prepareStatement("UPDATE DTUGRP07.USERS "
-				+ "SET "+ attribute.toString() +" = ? "
-				+ "WHERE USER_ID = ?;"
-				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		statement.setString(1, value);
-		statement.setInt(2, userId);
-		
-		statement.execute(); //Attempt to insert new row.
-		statement.close();
-		return true;
+	public static boolean updateUser(int userId, String value, USER attribute) {
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				PreparedStatement statement = connection.prepareStatement("UPDATE DTUGRP07.USERS "
+						+ "SET "+ attribute.toString() +" = ? "
+						+ "WHERE USER_ID = ?;"
+						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				statement.setString(1, value);
+				statement.setInt(2, userId);
+				
+				statement.execute(); //Attempt to insert new row.
+				statement.close();
+				return true;
+			} catch (SQLException e) {
+				handleSQLException(e);
+				//if no more tries, throw exception.
+			}
+		}
+		return false;
 	}
 	
 	/**
@@ -420,23 +641,30 @@ public class DB {
 	 * @return True if operation was successful.
 	 * @throws SQLException 
 	 */
-	public static boolean updateUser(int userId, String username, String cpr, String name, String institute, String consultant) throws SQLException{
-		checkConnection();
-		
-		PreparedStatement statement = connection.prepareStatement("UPDATE DTUGRP07.USERS "
-				+ "SET USERNAME = ?, CPR = ?, NAME = ?, INSTITUTE = ?, CONSULTANT = ? "
-				+ "WHERE USER_ID = ?;"
-				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		statement.setString(1, username);
-		statement.setString(2, cpr);
-		statement.setString(3, name);
-		statement.setString(4, institute);
-		statement.setString(5, consultant);
-		statement.setInt(6, userId);
-		
-		statement.execute(); //Attempt to insert new row.
-		statement.close();
-		return true;
+	public static boolean updateUser(int userId, String username, String password, String cpr, String name, String institute, String consultant) {
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				PreparedStatement statement = connection.prepareStatement("UPDATE DTUGRP07.USERS "
+						+ "SET USERNAME = ?, PASSWORD =?, CPR = ?, NAME = ?, INSTITUTE = ?, CONSULTANT = ? "
+						+ "WHERE USER_ID = ?;"
+						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				statement.setString(1, username);
+				statement.setString(2, password);
+				statement.setString(3, cpr);
+				statement.setString(4, name);
+				statement.setString(5, institute);
+				statement.setString(6, consultant);
+				statement.setInt(7, userId);
+				
+				statement.execute(); //Attempt to insert new row.
+				statement.close();
+				return true;
+			} catch (SQLException e) {
+				handleSQLException(e);
+				//if no more tries, throw exception.
+			}
+		}
+		return false;
 	}
 	
 	/**
@@ -467,33 +695,39 @@ public class DB {
 	 * @return True if operation was successful.
 	 * @throws SQLException 
 	 */
-	public static boolean updateAccount(int accountId, String value, ACCOUNT attribute) throws SQLException{
-		checkConnection();
-		
-		PreparedStatement statement = connection.prepareStatement("UPDATE DTUGRP07.ACCOUNTS "
-				+ "SET "+ attribute.toString() +" = ? "
-				+ "WHERE ACCOUNT_ID = ?;"
-				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		
-		switch (attribute){
-		case NAME:
-		case TYPE:
-		case NUMBER:
-		case IBAN:
-		case CURRENCY:
-			statement.setString(1, value);
-			break;
-		case INTEREST:
-		case BALANCE:
-			statement.setDouble(1, Double.parseDouble(value));
-			break;
+	public static boolean updateAccount(int accountId, String value, ACCOUNT attribute) {
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				PreparedStatement statement = connection.prepareStatement("UPDATE DTUGRP07.ACCOUNTS "
+						+ "SET "+ attribute.toString() +" = ? "
+						+ "WHERE ACCOUNT_ID = ?;"
+						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				
+				switch (attribute){
+				case NAME:
+				case TYPE:
+				case NUMBER:
+				case IBAN:
+				case CURRENCY:
+					statement.setString(1, value);
+					break;
+				case INTEREST:
+				case BALANCE:
+					statement.setDouble(1, Double.parseDouble(value));
+					break;
+				}
+				
+				statement.setInt(2, accountId);
+				
+				statement.execute(); //Attempt to insert new row.
+				statement.close();
+				return true;
+			} catch (SQLException e) {
+				handleSQLException(e);
+				//if no more tries, throw exception.
+			}
 		}
-		
-		statement.setInt(2, accountId);
-		
-		statement.execute(); //Attempt to insert new row.
-		statement.close();
-		return true;
+		return false;
 	}
 	
 	/**
@@ -501,26 +735,32 @@ public class DB {
 	 * @return True if operation was successful.
 	 * @throws SQLException 
 	 */
-	public static boolean updateAccount(int accountId, String name, String type, String number, String iban, String currency, double interest, double balance) throws SQLException{
-		checkConnection();
-		
-		PreparedStatement statement = connection.prepareStatement("UPDATE DTUGRP07.ACCOUNTS "
-				+ "SET NAME = ?, TYPE = ?, NUMBER = ?, IBAN = ?, CURRENCY = ?, INTEREST = ?, BALANCE = ? "
-				+ "WHERE ACCOUNT_ID = ?;"
-				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		
-		statement.setString(1, name);
-		statement.setString(2, type);
-		statement.setString(3, number);
-		statement.setString(4, iban);
-		statement.setString(5, currency);
-		statement.setDouble(6, interest);
-		statement.setDouble(7, balance);
-		statement.setInt(8, accountId);
-		
-		statement.execute(); //Attempt to insert new row.
-		statement.close();
-		return true;
+	public static boolean updateAccount(int accountId, String name, String type, String number, String iban, String currency, double interest, double balance) {
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				PreparedStatement statement = connection.prepareStatement("UPDATE DTUGRP07.ACCOUNTS "
+						+ "SET NAME = ?, TYPE = ?, NUMBER = ?, IBAN = ?, CURRENCY = ?, INTEREST = ?, BALANCE = ? "
+						+ "WHERE ACCOUNT_ID = ?;"
+						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				
+				statement.setString(1, name);
+				statement.setString(2, type);
+				statement.setString(3, number);
+				statement.setString(4, iban);
+				statement.setString(5, currency);
+				statement.setDouble(6, interest);
+				statement.setDouble(7, balance);
+				statement.setInt(8, accountId);
+				
+				statement.execute(); //Attempt to insert new row.
+				statement.close();
+				return true;
+			} catch (SQLException e) {
+				handleSQLException(e);
+				//if no more tries, throw exception.
+			}
+		}
+		return false;
 	}
 	
 	
@@ -529,68 +769,92 @@ public class DB {
 	 * Queries the database to delete the account and any transaction associated with this account with the given account-id.
 	 * @return True if operation was successful.
 	 */
-	public static boolean deleteAccount(int accountId) throws SQLException{
-		checkConnection();
-		
-		PreparedStatement statement = connection.prepareStatement("DELETE FROM DTUGRP07.ACCOUNTS "
-				+ "WHERE ACCOUNT_ID = ?;"
-				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		statement.setInt(1, accountId);
-		
-		statement.execute(); //Attempt to delete row.
-		statement.close();
-		return true;
+	public static boolean deleteAccount(int accountId) {
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				PreparedStatement statement = connection.prepareStatement("DELETE FROM DTUGRP07.ACCOUNTS "
+						+ "WHERE ACCOUNT_ID = ?;"
+						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				statement.setInt(1, accountId);
+				
+				statement.execute(); //Attempt to delete row.
+				statement.close();
+				return true;
+			} catch (SQLException e) {
+				handleSQLException(e);
+				//if no more tries, throw exception.
+			}
+		}
+		return false;
 	}
 	
 	/**
 	 * Queries the database to delete the account and any transaction associated with this account with the given account-number.
 	 * @return True if operation was successful.
 	 */
-	public static boolean deleteAccountByNumber(String number) throws SQLException{
-		checkConnection();
-		
-		PreparedStatement statement = connection.prepareStatement("DELETE FROM DTUGRP07.ACCOUNTS "
-				+ "WHERE NUMBER = ?;"
-				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		statement.setString(1, number);
-		
-		statement.execute(); //Attempt to delete row.
-		statement.close();
-		return true;
+	public static boolean deleteAccountByNumber(String number) {
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				PreparedStatement statement = connection.prepareStatement("DELETE FROM DTUGRP07.ACCOUNTS "
+						+ "WHERE NUMBER = ?;"
+						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				statement.setString(1, number);
+				
+				statement.execute(); //Attempt to delete row.
+				statement.close();
+				return true;
+			} catch (SQLException e) {
+				handleSQLException(e);
+				//if no more tries, throw exception.
+			}
+		}
+		return false;
 	}
 	
 	/**
 	 * Queries the database to delete the user with the given username.
 	 * @return True if operation was successful.
 	 */
-	public static boolean deleteUser(String username) throws SQLException{
-		checkConnection();
-		
-		PreparedStatement statement = connection.prepareStatement("DELETE FROM DTUGRP07.USERS "
-				+ "WHERE USERNAME = ?;"
-				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		statement.setString(1, username);
-		
-		statement.execute(); //Attempt to delete row.
-		statement.close();
-		return true;
+	public static boolean deleteUser(String username) {
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				PreparedStatement statement = connection.prepareStatement("DELETE FROM DTUGRP07.USERS "
+						+ "WHERE USERNAME = ?;"
+						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				statement.setString(1, username);
+				
+				statement.execute(); //Attempt to delete row.
+				statement.close();
+				return true;
+			} catch (SQLException e) {
+				handleSQLException(e);
+				//if no more tries, throw exception.
+			}
+		}
+		return false;
 	}
 	
 	/**
 	 * Queries the database to delete the user with the given cpr-number.
 	 * @return True if operation was successful.
 	 */
-	public static boolean deleteUserByCpr(String cpr) throws SQLException{
-		checkConnection();
-		
-		PreparedStatement statement = connection.prepareStatement("DELETE FROM DTUGRP07.USERS "
-				+ "WHERE CPR = ?;"
-				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		statement.setString(1, cpr);
-		
-		statement.execute(); //Attempt to delete row.
-		statement.close();
-		return true;
+	public static boolean deleteUserByCpr(String cpr) {
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				PreparedStatement statement = connection.prepareStatement("DELETE FROM DTUGRP07.USERS "
+						+ "WHERE CPR = ?;"
+						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				statement.setString(1, cpr);
+				
+				statement.execute(); //Attempt to delete row.
+				statement.close();
+				return true;
+			} catch (SQLException e) {
+				handleSQLException(e);
+				//if no more tries, throw exception.
+			}
+		}
+		return false;
 	}
 	
 	
@@ -602,29 +866,35 @@ public class DB {
 	 * @throws SQLException 
 	 * @throws InputException If invalid input is given.
 	 */
-	public static int checkLogin(String username, String password) throws SQLException, InputException {
-		checkConnection();
-		
-		if (username.matches("\\s")) throw new InputException("Invalid username."); //Checks for white space.
-		PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, USERNAME, PASSWORD "
-				+ "FROM DTUGRP07.USERS "
-				+ "WHERE USERNAME = ? "
-				+ "FETCH FIRST 1 ROWS ONLY;"
-				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		statement.setString(1, username); //Sets the '?' parameter in the SQL statement to be the string 'username'.
-		
-		int passwordIsCorrect = -1;
-		if (statement.execute()){ //Executes the SQL statement, returns false if failed for any reason.
-			ResultSet result = statement.getResultSet();
-			if (result.next()){ //Moves the cursor to first row, returns false if cursor is moved past the last row. Note: There should be 0 or 1 row.
-				String correctPassword = result.getString("PASSWORD");
+	public static int checkLogin(String username, String password) {
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				if (username.matches("\\s")) return -1; //Checks for white space.
+				PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, USERNAME, PASSWORD "
+						+ "FROM DTUGRP07.USERS "
+						+ "WHERE USERNAME = ? "
+						+ "FETCH FIRST 1 ROWS ONLY;"
+						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				statement.setString(1, username); //Sets the '?' parameter in the SQL statement to be the string 'username'.
 				
-				if (password.equals(correctPassword)) //Checks if password is correct.
-					passwordIsCorrect = result.getInt(1);
+				int passwordIsCorrect = -1;
+				if (statement.execute()){ //Executes the SQL statement, returns false if failed for any reason.
+					ResultSet result = statement.getResultSet();
+					if (result.next()){ //Moves the cursor to first row, returns false if cursor is moved past the last row. Note: There should be 0 or 1 row.
+						String correctPassword = result.getString("PASSWORD");
+						
+						if (password.equals(correctPassword)) //Checks if password is correct.
+							passwordIsCorrect = result.getInt(1);
+					}
+				}
+				statement.close();
+				return passwordIsCorrect; //Returns -1 if any of the above if statements returns false.
+			} catch (SQLException e) {
+				handleSQLException(e);
+				//if no more tries, throw exception.
 			}
 		}
-		statement.close();
-		return passwordIsCorrect; //Returns -1 if any of the above if statements returns false.
+		return -1;
 	}
 	
 	/**
@@ -633,7 +903,6 @@ public class DB {
 	 * @throws SQLException From {@link #checkConnection() checkConnection()}
 	 */
 	public static ResultSet getQuery(String query) throws SQLException {
-		checkConnection();
 		return connection.createStatement().executeQuery(query);
 	}
 	
@@ -643,24 +912,40 @@ public class DB {
 	 * Note: Should check of the application server has integrated connection pool that can be used, else create our own.
 	 * @throws SQLException If connection fails or driver is missing.
 	 */
-	public static void checkConnection() throws SQLException {
-		if (connection == null){
+	public static void getConnection() throws SQLException {
+		getConnection(false);
+	}
+	
+	/**
+	 * Checks if there is a current connection to the database and if not attempts to connect to it.
+	 * Temporary solution to creating connections and allow troubleshooting till a connection pool is integrated that can be handled reliably.
+	 * Note: Should check of the application server has integrated connection pool that can be used, else create our own.
+	 * @throws SQLException If connection fails or driver is missing.
+	 */
+	public static void getConnection(boolean forceNew) throws SQLException {
+		if (forceNew || connection == null){
 			try {
 	            Class.forName("com.ibm.db2.jcc.DB2Driver");
 	        } catch (ClassNotFoundException e) {
 	            throw new SQLException(e);
 	        }
-			connection = DriverManager.getConnection(url, getProperties());
-			Runtime.getRuntime().addShutdownHook(new Thread(){ //ShutdownHook for closing resources used by the connection.
-				@Override
-				public void run(){
-					if (connection != null){
-						try {
-							connection.close();
-						} catch (SQLException e) {}
+			if (connection == null){
+				Runtime.getRuntime().addShutdownHook(new Thread(){ //ShutdownHook for closing resources used by the connection.
+					@Override
+					public void run(){
+						if (connection != null){
+							try {
+								connection.close();
+							} catch (SQLException e) {}
+						}
 					}
-				}
-			});
+				});
+			} else {
+				try {
+					connection.close();
+				} catch (SQLException e){}
+			}
+			connection = DriverManager.getConnection(url, getProperties());
 		}
 	}
 	
@@ -675,5 +960,43 @@ public class DB {
 		properties.put("retreiveMessagesFromServerOnGetMessage", "true");
 		properties.put("emulateParameterMetaDataForZCalls", "1");
 		return properties;
+	}
+	
+	/**
+	 * Handle SQLException, possibly try to fix the problem or if not possible, throw exception.
+	 * @return Returns true if a fix was deployed and a retry could possibly be successful (Not necessarily, beware infinite loop!), false if no fix was deployed.
+	 * @throws SQLException If Exception can't be handled.
+	 */
+	private static boolean handleSQLException(SQLException e){
+		//TODO Log exceptions.
+		switch (e.getSQLState()){
+		case "01002": //disconnect error
+		case "08000": //connection exception
+		case "08001": //SQL client unable to establish SQL connection
+		case "08002": //connection name in use
+		case "08003": //connection does not exist
+		case "08004": //SQL server rejected SQL connection
+		case "08006": //connection failure
+		case "82119": //connect error; can't get error text
+		case "69000": //SQL*Connect errors
+		case "82117": //invalid OPEN or PREPARE for this connection
+		case "82118": //application context not found
+			try {
+				getConnection(true);
+			} catch (SQLException e1) {
+				//Log.
+				return false;
+			}
+			return true;
+		case "2E000": //invalid connection name
+		case "40003": //statement completion unknown
+		case "08007": //transaction resolution unknown
+		case "2D000": //invalid transaction termination
+			//Log.
+			return false;
+		default:
+			//Throw new exception for servlet.
+			return false;
+		}
 	}
 }

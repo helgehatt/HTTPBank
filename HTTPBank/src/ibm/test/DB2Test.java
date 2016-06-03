@@ -18,24 +18,26 @@ import java.util.ArrayList;
 public class DB2Test {
 	//Main
 	public static void main(String[] args) throws SQLException, ClassNotFoundException, InputException {
-		DB.checkConnection();
 		testCheckLogin("Thomas", "1234");
 		System.out.println();
 		testGetUsers();
-		System.out.println();
-		testGetUser(1);
-		System.out.println();
-		testGetAccounts(1);
-		System.out.println();
-		testGetTransactions(1);
-		System.out.println();
 		
+		System.out.println();
 		int userId = testCreateUser("NewUser", "user", "123456-7890", "User", "NewInstitute", null).getId();
 		System.out.println();
-		int senderId = testCreateAccount(userId, "New Account", "New Type", "000111222", "000111222", "DKK", 0.50, 0).getId();
+		testGetUser(userId);
+		System.out.println();
+		int senderId = testCreateAccount(userId, "New Account", "New Type", "000111222", "000111222", "DKK", 0.50, 100).getId();
 		int receiverId = testCreateAccount(userId, "Moo Account", "New Type", "000111333", "000111333", "DKK", 0.55, 0).getId();
 		System.out.println();
+		testGetAccounts(userId);
+		System.out.println();
 		testCreateTransaction(senderId, receiverId, "New Transaction", 100);
+		System.out.println();
+		testGetTransactions(senderId);
+		testGetTransactions(receiverId);
+		System.out.println();
+		testGetAccounts(userId);
 		System.out.println();
 		testUpdateUser(userId, "New Consultant", USER.CONSULTANT);
 		printUser(DB.getUserByCpr("123456-7890"));
@@ -98,7 +100,7 @@ public class DB2Test {
 
 	private static Transaction testCreateTransaction(int senderId, int receiverId, String description, double amount) throws SQLException {
 		long start = System.currentTimeMillis();
-		Transaction transaction = DB.createTransaction(senderId, receiverId, description, description, amount);
+		Transaction transaction = DB.createTransaction(DB.TransBy.ID, senderId, ""+receiverId, description, description, -amount, amount);
 		System.out.println("Created Transaction, Query Time: " + (System.currentTimeMillis()-start));
 		printTransaction(transaction);
 		return transaction;
@@ -168,7 +170,7 @@ public class DB2Test {
 	}
 	
 	private static void printAccount(Account account) {
-		System.out.println(account.getUserId() +" : "+ account.getId() +" : "+ account.getName() +" : "+ account.getType() +" : "+ account.getNumber() +" : "+ account.getIban() +" : "+ account.getCurrency() +" : "+ account.getInterest());
+		System.out.println(account.getUserId() +" : "+ account.getId() +" : "+ account.getName() +" : "+ account.getType() +" : "+ account.getNumber() +" : "+ account.getIban() +" : "+ account.getCurrency() +" : "+ account.getInterest() +" : "+account.getBalance());
 	}
 	
 	private static void printTransaction(Transaction transaction) {

@@ -1,7 +1,6 @@
 package ibm.resource;
 
 import java.io.Serializable;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 import ibm.db.DB;
@@ -62,15 +61,10 @@ public class User implements Serializable {
 	
 	/*
 	 * Get Accounts related to this User.
-	 * TODO: Attempt to query database for accounts if requested when null?
 	 * Should query whenever accounts are updated.
 	 */
 	public ArrayList<Account> getAccounts() {
-		try {
-			accounts = DB.getAccounts(userId);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		accounts = DB.getAccounts(userId);
 		return accounts;
 	}
 	
