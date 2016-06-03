@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Properties;
 
@@ -63,7 +64,7 @@ public class DB {
 				statement.close();
 				
 				//Sorts all Transactions by Date.
-				resultList.sort(new Comparator<Transaction>(){
+				Collections.sort(resultList, new Comparator<Transaction>(){
 					@Override
 					public int compare(Transaction o1, Transaction o2) {
 						return Long.compare(o1.getDateRaw(), o2.getDateRaw());
