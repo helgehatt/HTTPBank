@@ -27,4 +27,9 @@ public class AccountController extends HttpServlet {
 		
 		response.sendRedirect("accountinfo");
     }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    	response.sendRedirect(request.getContextPath());
+    }
 }

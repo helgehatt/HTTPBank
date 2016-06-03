@@ -15,6 +15,7 @@
 #login .panel-heading {
   font-size: 16pt;
   background-color: #408F8F;
+  border-bottom: none;
   color: #FFF;
 }
 
@@ -27,6 +28,15 @@
   color: #FFF;
 }
 
+#error {
+	background-color: #DE2525;
+	color: white;
+	text-align: center;
+	height: 40px;
+	width: 100%;
+	padding-top: 10px;
+}
+
 </style>
 
 </head>
@@ -36,6 +46,11 @@
   <img class="img-responsive" src="${pageContext.request.contextPath}/images/Logo.jpg" alt="HTTP">
   <div class="panel panel-default">
     <div class="panel-heading">Login</div>
+   	<c:if test="${param.s==0}">
+    <div id="error">
+   		Wrong user name or password
+    </div>
+   	</c:if>
     <div class="panel-body">
       <form role="form" action="checkLogin" method="post">
         <div class="form-group">

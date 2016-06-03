@@ -1,12 +1,24 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Insert title here</title>
-</head>
-<body>
+<%@ include file="../head.jsp" %>
+
+<style>
+
+#inbox {
+	max-width: 800px;
+}
+
+</style>
+
+<%@ include file="navbar.jsp" %>
+
+<div id="inbox" class="container">
+  <h3>Inbox</h3>
+  <p>View received messages.</p>
+  
+  
+  
+  
+</div>
+
 
 </body>
 </html>

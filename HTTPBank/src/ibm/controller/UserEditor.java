@@ -72,4 +72,9 @@ public class UserEditor extends HttpServlet {
         	response.sendRedirect("edituser");
         }
     }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    	response.sendRedirect(request.getContextPath());
+    }
 }
