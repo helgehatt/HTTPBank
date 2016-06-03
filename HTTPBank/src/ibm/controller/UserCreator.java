@@ -32,7 +32,7 @@ public class UserCreator extends HttpServlet {
         }
         
         try {
-        	AttributeChecks.checkName(name);
+        	AttributeChecks.checkRealName(name);
         } catch (InputException e) {
         	errors.put("name", e.getMessage());
         }
@@ -51,7 +51,7 @@ public class UserCreator extends HttpServlet {
 
         if (errors.isEmpty()) {
 
-			DB.createUser("Username", "", cpr, name, institute, consultant);
+			DB.createUser("Username", "Password", cpr, name, institute, consultant);
         	request.getSession().setAttribute("users", DB.getUsers());
     		response.sendRedirect("users");
         } else {

@@ -31,7 +31,7 @@ public class AttributeChecks {
 	/**
 	 * Checks if the given string is a valid name.
 	 */
-	public static void checkName(String name) throws InputException {
+	public static void checkRealName(String name) throws InputException {
 		if (name.length() == 0)
     		throw new InputException("Please enter name.");   
     	if (!isAlphabetic(name)) 
@@ -53,6 +53,17 @@ public class AttributeChecks {
     }
 	
 	//Account Methods
+	
+	/**
+	 * Checks if the given string is a valid account name.
+	 * @param accountName
+	 * @throws InputException
+	 */
+	public static void checkAccountName(String accountName) throws InputException {
+		if (!isAlphabetic(accountName))
+			throw new InputException("Please enter letters only.");
+	}
+	
 	/**
 	 * Checks if the given string is a valid type.
 	 */

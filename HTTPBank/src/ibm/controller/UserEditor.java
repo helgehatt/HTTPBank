@@ -34,7 +34,7 @@ public class UserEditor extends HttpServlet {
         }
         
         try {
-        	AttributeChecks.checkName(name);
+        	AttributeChecks.checkRealName(name);
         } catch (InputException e) {
         	errors.put("name", e.getMessage());
         }
@@ -57,9 +57,7 @@ public class UserEditor extends HttpServlet {
         	int id = ((User) session.getAttribute("user")).getId();
 
         	// TODO: updateUser without username param.
-        	String username = "user";
-        	String password = "password";
-        	DB.updateUser(id, username, password, cpr, name, institute, consultant);
+        	DB.updateUser(id, "username", "password", cpr, name, institute, consultant);
 			
 			session.setAttribute("user", DB.getUser(id));
 			response.sendRedirect("userinfo");

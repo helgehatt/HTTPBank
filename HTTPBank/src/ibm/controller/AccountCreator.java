@@ -72,7 +72,7 @@ public class AccountCreator extends HttpServlet {
         
         if (errors.isEmpty()) {
 	        User user = (User) session.getAttribute("user");
-			DB.createAccount(user.getId(), "WHY?", type, number, iban, currency, interest, balance);
+			DB.createAccount(user.getId(), "accountname", type, number, iban, currency, interest, balance);
 			response.sendRedirect("accounts");
         } else {
         	session.setAttribute("errors", errors);
