@@ -5,6 +5,7 @@ import ibm.resource.InputException;
 import ibm.resource.Transaction;
 import ibm.resource.User;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -14,6 +15,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Properties;
+
 
 /**
  * A class for handling all Database queires required by the HTTPBank.
@@ -344,6 +346,18 @@ public class DB {
 		return account;
 	}
 	
+	public static Account createAccount2(int userId, String name, String type, String number, String iban, String currency, double interest, double balance) throws SQLException{
+		checkConnection();
+		CallableStatement statement = connection.prepareCall("CALL createAccount(?,?,?,?,?,?,?,?)");
+		statement.execute(); //Attempt to insert new row.
+		statement.close();
+		
+		Account account = getAccountByNumber(number);
+		account.setTransactions(new ArrayList<Transaction>());
+		return account;
+	}
+		
+	
 	/**
 	 * Queries the database to insert a new user into the USERS table, then queries the database to return the newly created row.
 	 * @return The new user as a User object with all fields, if successfully created.
@@ -626,6 +640,25 @@ public class DB {
 		statement.close();
 		return passwordIsCorrect; //Returns -1 if any of the above if statements returns false.
 	}
+	
+	/*
+	 * 
+	 */
+	public static int checkLogin2(String username, String password) throws SQLException, InputException {
+		checkConnection();
+		int passwordIsCorrect = -1;
+		if (username.matches("\\s")) throw new InputException("Invalid username."); //Checks for white space.
+		CallableStatement statement = connection.prepareCall("{CALL DTUGRP07.CHECKLOGIN(?,?,?)}"
+				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+		statement.setString(1, username); //Sets the '?' parameter in the SQL statement to be the string 'username'.
+		statement.setString(2, password);
+		statement.registerOutParameter(3, java.sql.Types.INTEGER);
+		statement.execute();	
+		passwordIsCorrect = statement.getInt(3);		
+		statement.close();
+		return passwordIsCorrect;
+	}
+	
 	
 	/**
 	 * For executing your own queries using this connection.

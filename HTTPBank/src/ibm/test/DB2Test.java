@@ -19,7 +19,10 @@ public class DB2Test {
 	//Main
 	public static void main(String[] args) throws SQLException, ClassNotFoundException, InputException {
 		DB.checkConnection();
-		testCheckLogin("Thomas", "1234");
+		//testCheckLogin("Thomas", "1234");
+		//System.out.println();
+		
+		testCheckLogin2("Thomas", "1234");
 		System.out.println();
 		testGetUsers();
 		System.out.println();
@@ -158,6 +161,14 @@ public class DB2Test {
 	public static int testCheckLogin(String username, String password) throws SQLException, InputException {
 		long start = System.currentTimeMillis();
 		int id = DB.checkLogin(username, password);
+		System.out.println("Checklogin as Thomas: " + id);
+		System.out.println("Query Time: " + (System.currentTimeMillis()-start));
+		return id;
+	}
+	
+	public static int testCheckLogin2(String username, String password) throws SQLException, InputException {
+		long start = System.currentTimeMillis();
+		int id = DB.checkLogin2(username, password);
 		System.out.println("Checklogin as Thomas: " + id);
 		System.out.println("Query Time: " + (System.currentTimeMillis()-start));
 		return id;
