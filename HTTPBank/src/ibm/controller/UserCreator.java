@@ -20,10 +20,25 @@ public class UserCreator extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     	HashMap<String, String> errors = new HashMap<String, String>();
     	
+    	String username = request.getParameter("username");
+    	String password = request.getParameter("password");
         String cpr = request.getParameter("cpr");
         String name = request.getParameter("name");
         String institute = request.getParameter("institute");
         String consultant = request.getParameter("consultant");
+        
+        
+        try {
+        	AttributeChecks.checkUserName(username);
+        } catch (InputException e) {
+        	errors.put("username", e.getMessage());
+        }
+        
+        try {
+        	AttributeChecks.checkPassword(password);
+        } catch (InputException e) {
+        	errors.put("password", e.getMessage());
+        }
         
         try {
         	AttributeChecks.checkCpr(cpr);
@@ -51,7 +66,7 @@ public class UserCreator extends HttpServlet {
 
         if (errors.isEmpty()) {
 
-			DB.createUser("Username", "Password", cpr, name, institute, consultant);
+			DB.createUser(username, password, cpr, name, institute, consultant);
         	request.getSession().setAttribute("users", DB.getUsers());
     		response.sendRedirect("users");
         } else {
