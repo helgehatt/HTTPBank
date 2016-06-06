@@ -10,7 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import ibm.db.DB;
-import ibm.resource.Account;
+import ibm.db.DB.TransBy;
+import ibm.resource.CurrencyConverter;
 import ibm.resource.InputException;
 
 @WebServlet(urlPatterns = { "/user/doTransfer", "/admin/doTransfer" } )
@@ -25,7 +26,7 @@ public class TransferController extends HttpServlet {
         String from = request.getParameter("from");
         String to = request.getParameter("to");
         String bic = request.getParameter("bic");
-        String currency = request.getParameter("currency");
+        String toCurrency = request.getParameter("currency");
 		String amountString = request.getParameter("amount");
 		
 		int fromId = 0;
@@ -34,8 +35,16 @@ public class TransferController extends HttpServlet {
 		try {
 			fromId = Integer.parseInt(from);
 		} catch (NumberFormatException e) {
-			// TODO: Throw new "Something went wrong, try refreshing the page" exception.
+			response.sendError(418, "Lost connection to the database.");
+			return;
 		}
+		
+		try {
+			amount = AttributeChecks.checkAmount(amountString);
+		} catch (InputException e) {
+        	errors.put("amount", e.getMessage());
+		}
+		
 		
 		if (international) {
 			try {
@@ -51,10 +60,23 @@ public class TransferController extends HttpServlet {
 			}
 			
 			try {
-				AttributeChecks.checkCurrency(currency);
+				AttributeChecks.checkCurrency(toCurrency);
 			} catch (InputException e) {
 	        	errors.put("currency", e.getMessage());
 			}
+			
+			if (errors.isEmpty()) {
+				String fromCurrency = DB.getAccount(fromId).getCurrency();
+				Double toAmount = CurrencyConverter.convert(fromCurrency, toCurrency, amount);
+				if (null == toAmount) {
+					response.sendError(419, "Could not complete the conversion.");
+					return;
+				}
+				DB.createTransaction(TransBy.IBAN, fromId, to, "Transfer to " + to, "Transfer from " + from, -amount, toAmount);
+			} else
+	        	request.getSession().setAttribute("errors", errors);
+
+			response.sendRedirect("international");
 			
 		} else {
 			try {
@@ -62,29 +84,15 @@ public class TransferController extends HttpServlet {
 			} catch (InputException e) {
 	        	errors.put("to", e.getMessage());
 			}
-		}
-		
-		try {
-			amount = AttributeChecks.checkAmount(amountString);
-		} catch (InputException e) {
-        	errors.put("amount", e.getMessage());
-		}
-		
-		if (errors.isEmpty()) {
-			Account toAcc = (Account) DB.getAccountByNumber(to);
-//			if (toAcc != null)
-//				DB.createTransaction(fromId, toAcc.getId(), "Transfer to " + to, "Transfer from " + from, amount);
-		} else {
-        	request.getSession().setAttribute("errors", errors);
-		}
-		
-		if (international)
-			response.sendRedirect("international");
-		else
-			response.sendRedirect("transfer");
-        
-        
+			
+			if (errors.isEmpty())
+				DB.createTransaction(TransBy.NUMBER, fromId, to, "Transfer to " + to, "Transfer from " + from, -amount, amount);
+			else
+	        	request.getSession().setAttribute("errors", errors);
 
+			response.sendRedirect("transfer");
+		}  
+        
         // TODO: Message objects?
         // String message = request.getParameter("message"); // Optional
     	// if (message!=null) toAccount.getUser().getMessages().add(new Message(message));
