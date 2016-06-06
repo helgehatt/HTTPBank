@@ -5,6 +5,7 @@ import ibm.resource.InputException;
 import ibm.resource.Transaction;
 import ibm.resource.User;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -375,6 +376,13 @@ public class DB {
 			}
 		}
 		return null;
+	}
+	
+	public static void archiveTransactions() throws SQLException {
+		CallableStatement archive = connection.prepareCall("CALL DTUGRP07.archiveProc();",
+				ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+		archive.execute();
+		archive.close();
 	}
 	
 	/**
