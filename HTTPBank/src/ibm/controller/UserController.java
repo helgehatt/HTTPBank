@@ -16,9 +16,16 @@ public class UserController extends HttpServlet {
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int userId = Integer.parseInt(request.getParameter("userId"));
+        int id = 0;
         
-		request.getSession().setAttribute("user", DB.getUser(userId));
+        try {
+        	id = Integer.parseInt(request.getParameter("id"));
+		} catch (NumberFormatException e) {
+			response.sendError(418, "Lost connection to the database.");
+			return;
+		}
+        
+		request.getSession().setAttribute("user", DB.getUser(id));
 		
 		response.sendRedirect("accounts");
 	

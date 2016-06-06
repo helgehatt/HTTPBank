@@ -65,7 +65,7 @@
    					<span class="error">${pageScope.errors.consultant}</span>
 			    </div>
 			  </div>
-			  <button type="submit" class="btn btn-default btn-submit">Submit</button>
+			  <button name="type" value="new" type="submit" class="btn btn-default btn-submit">Submit</button>
 			</form>
 	  </div>
 	</div>

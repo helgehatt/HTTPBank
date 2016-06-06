@@ -79,7 +79,7 @@
     					<span class="error">${pageScope.errors.interest}</span>
 		        </div>
 		      </div>
-		      <button type="submit" class="btn btn-default btn-submit">Submit</button>
+		      <button name="type" value="edit" type="submit" class="btn btn-default btn-submit">Submit</button>
 		    </form>
 			</div>
 		</div>
