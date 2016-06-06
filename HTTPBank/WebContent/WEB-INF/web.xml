@@ -10,4 +10,9 @@
     <location>/WEB-INF/jsp/error/not-found.jsp</location>
 	</error-page>
 	
+  <error-page>
+    <error-code>418</error-code>
+    <location>/WEB-INF/jsp/error/lost-connection.jsp</location>
+	</error-page>
+	
 </web-app>
