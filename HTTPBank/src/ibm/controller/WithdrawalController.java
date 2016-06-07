@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import ibm.db.DB;
 import ibm.resource.InputException;
 
-@WebServlet(urlPatterns = "/admin/depositwithdrawal"  )
+@WebServlet(urlPatterns = "/admin/doDepositWithdrawal"  )
 public class WithdrawalController extends HttpServlet{
 	private static final long serialVersionUID = 1L;
 	

@@ -70,7 +70,7 @@ $(function(){
 			    <li class="active" id="deposit-pill"><a data-toggle="pill">Deposit</a></li>
 			    <li><a data-toggle="pill" id="withdrawal-pill">Withdrawal</a></li>
 			  </ul>
-			  <form class="form-horizontal" role="form">
+			  <form class="form-horizontal" role="form" action="doDepositWithdrawal" method="post">
 				  <div class="form-group">
 				    <label class="control-label col-sm-3" for="from" id="account-label">To:</label>
 				    <div class="col-sm-5">
