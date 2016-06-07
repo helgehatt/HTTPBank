@@ -275,6 +275,71 @@ public class DB {
 		return null;
 	}
 	
+	public static ArrayList<Transaction> getArchive(int account_id) {
+		for(int tries = 2; 0 < tries; tries--) {
+			try {
+				PreparedStatement statement = connection.prepareStatement("SELECT TRANSACTION_ID, ACCOUNT_ID, DATE, DESCRIPTION, AMOUNT FROM DTUGRP07.ARCHIVE "
+						+ "WHERE ACCOUNT_ID = ?;" 
+						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				statement.setInt(1, account_id);
+				
+				ArrayList<Transaction> resultList = null;
+				if(statement.execute()) {
+					resultList = new ArrayList<Transaction>();
+					ResultSet results = statement.getResultSet();
+					while(results.next()) {
+						resultList.add(new Transaction(results.getLong(1), results.getInt(2), results.getDate(3), results.getString(4), results.getDouble(5)));
+					}
+					
+				}
+				statement.close();
+				
+				//Sorts all Transactions by Date.
+				Collections.sort(resultList, new Comparator<Transaction>(){
+					@Override
+					public int compare(Transaction o1, Transaction o2) {
+						return Long.compare(o1.getDateRaw(), o2.getDateRaw());
+					}
+				});
+				
+				return resultList;
+				
+			} catch (SQLException e) {
+				handleSQLException(e);
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * 
+	 */
+	public static ArrayList<String> getCurrencies(){
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				PreparedStatement statement = connection.prepareStatement("SELECT * "
+						+ "FROM DTUGRP07.CURRENCY;"
+						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				
+				ArrayList<String> currencies = new ArrayList<String>();
+				if (statement.execute()){ //If query is successful, attempt to create account object.
+					ResultSet results = statement.getResultSet();
+					while (results.next()){ //Fetch row if able.
+						currencies.add(results.getString(1));
+					}
+				}
+				statement.close();
+				
+				return currencies;
+			} catch (SQLException e) {
+				handleSQLException(e);
+				//if no more tries, throw exception.
+
+			}
+		}
+		return null;
+	}
+	
 	
 	// CREATE Methods
 	/**

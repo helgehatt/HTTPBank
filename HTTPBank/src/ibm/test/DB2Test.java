@@ -24,6 +24,8 @@ public class DB2Test {
 		//testBatchTimer();
 		System.out.println();
 		testCreateMessage("Du skylder!!", new Date(2016,03,05), "Thomas", 2);
+		System.out.println();
+		testGetArchive(1);
 		/*testCheckLogin("Thomas", "1234");
 		System.out.println();
 		
@@ -66,6 +68,13 @@ public class DB2Test {
 		
 	}
 	
+	private static void testGetArchive(int account_id) {
+		ArrayList<Transaction> array = DB.getArchive(account_id);
+		for(Transaction t : array) {
+			System.out.println(t.getId() + " " + t.getAccountId() + " " + t.getDateAsString() + " " + t.getAmount() + " " + t.getDescription());
+		}
+	}
+
 	private static void testArchive() throws SQLException {
 		DB.archiveTransactions();
 	}
@@ -77,6 +86,13 @@ public class DB2Test {
 	
 	private static void testCreateMessage(String message, Date date, String senderName, int userID) throws SQLException {
 		DB.createMessage(message, date, senderName, userID);
+	}
+	
+	private static void testGetCurrency(){
+		long start = System.currentTimeMillis();
+		ArrayList<String> list = DB.getCurrencies();
+		for (String string : list) System.out.println(string);
+		System.out.println("Query Time: " + (System.currentTimeMillis()-start));
 	}
 	
 	private static void testDeleteUserByCpr(String cpr) throws SQLException {
