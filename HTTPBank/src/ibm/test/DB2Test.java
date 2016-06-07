@@ -9,6 +9,7 @@ import ibm.resource.Transaction;
 import ibm.resource.User;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,8 +19,14 @@ import java.util.ArrayList;
 public class DB2Test {
 	//Main
 	public static void main(String[] args) throws SQLException, ClassNotFoundException, InputException {
-		testCheckLogin("Thomas", "1234");
+		testCheckLogin2("Thomas","1234");
+		//System.out.println();
+		//testBatchTimer();
 		System.out.println();
+		testCreateMessage("Du skylder!!", new Date(2016,03,05), "Thomas", 2);
+		/*testCheckLogin("Thomas", "1234");
+		System.out.println();
+		
 		testGetUsers();
 		
 		System.out.println();
@@ -52,8 +59,24 @@ public class DB2Test {
 		System.out.println();
 		testDeleteUser("NewUser");
 		System.out.println();
-		testDeleteUserByCpr("123456-7890");
+		testDeleteUserByCpr("123456-7890"); */
+		System.out.println();
 		
+		testArchive();
+		
+	}
+	
+	private static void testArchive() throws SQLException {
+		DB.archiveTransactions();
+	}
+	
+	private static void testBatchTimer() throws SQLException {
+		DB.startBatchTimer();
+		
+	}
+	
+	private static void testCreateMessage(String message, Date date, String senderName, int userID) throws SQLException {
+		DB.createMessage(message, date, senderName, userID);
 	}
 	
 	private static void testDeleteUserByCpr(String cpr) throws SQLException {
@@ -160,6 +183,14 @@ public class DB2Test {
 	public static int testCheckLogin(String username, String password) throws SQLException, InputException {
 		long start = System.currentTimeMillis();
 		int id = DB.checkLogin(username, password);
+		System.out.println("Checklogin as Thomas: " + id);
+		System.out.println("Query Time: " + (System.currentTimeMillis()-start));
+		return id;
+	}
+	
+	public static int testCheckLogin2(String username, String password) throws SQLException, InputException {
+		long start = System.currentTimeMillis();
+		int id = DB.checkLogin2(username, password);
 		System.out.println("Checklogin as Thomas: " + id);
 		System.out.println("Query Time: " + (System.currentTimeMillis()-start));
 		return id;

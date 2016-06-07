@@ -22,7 +22,8 @@ public class AccountCreator extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     	HashMap<String, String> errors = new HashMap<String, String>();
     	
-        String type = request.getParameter("type");
+        String accountName = request.getParameter("name");
+    	String type = request.getParameter("type");
         String number = request.getParameter("number");
         String iban = request.getParameter("iban");
         String currency = request.getParameter("currency");
@@ -32,6 +33,12 @@ public class AccountCreator extends HttpServlet {
         double interest = 0;
         double balance = 0;
         
+        try {
+        	AttributeChecks.checkAccountName(accountName);
+        } catch (InputException e) {
+        	errors.put("name", e.getMessage());
+        }
+               
         try {
         	AttributeChecks.checkType(type);
         } catch (InputException e) {
