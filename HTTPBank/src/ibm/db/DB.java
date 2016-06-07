@@ -310,6 +310,43 @@ public class DB {
 		}
 		return null;
 	}
+	
+	public static ArrayList<Message> getMessages(int userId) {
+		for(int tries = 2; 0 < tries; tries--) {
+			try {
+				PreparedStatement statement = connection.prepareStatement("SELECT MESSAGE, DATE, SENDER_NAME, USER_ID FROM DTUGRP07.INBOX "
+						+ "WHERE USER_ID = ?;" 
+						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				statement.setInt(1, userId);
+				
+				ArrayList<Message> resultList = null;
+				if(statement.execute()) {
+					resultList = new ArrayList<Message>();
+					ResultSet results = statement.getResultSet();
+					while(results.next()) {
+						resultList.add(new Message(results.getString(1), results.getDate(2), results.getString(3), results.getInt(4)));
+					}
+					
+				}
+				statement.close();
+				
+				//Sorts all Transactions by Date.
+				Collections.sort(resultList, new Comparator<Message>(){
+					@Override
+					public int compare(Message o1, Message o2) {
+						return Long.compare(o1.getDateRaw(), o2.getDateRaw());
+					}
+				});
+				
+				return resultList;
+				
+			} catch (SQLException e) {
+				handleSQLException(e);
+			}
+		}
+	
+		return null;
+	}
 
 	/**
 	 * 
@@ -1105,4 +1142,6 @@ public class DB {
 			return false;
 		}
 	}
+
+	
 }
