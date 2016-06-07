@@ -27,7 +27,7 @@ public class MainController extends HttpServlet {
 		
 		switch (path) {
 		case "/user/accounts":
-			request.getSession().setAttribute("user", DB.getUser(1));
+			//request.getSession().setAttribute("user", DB.getUser(1));
 			request.getRequestDispatcher("../WEB-INF/jsp/user/account-list.jsp").forward(request, response);
 			break;
 		case "/user/transfer":

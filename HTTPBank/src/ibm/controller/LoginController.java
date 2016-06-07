@@ -1,11 +1,15 @@
 package ibm.controller;
 
 import java.io.IOException;
+import java.sql.SQLException;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import ibm.db.DB;
 
 @WebServlet("/checkLogin")
 public class LoginController extends HttpServlet {
@@ -18,15 +22,22 @@ public class LoginController extends HttpServlet {
         
         // TODO: DB Authentication: Set login status.
         
-        if (username.equals("user") && password.equals("")) {
-			response.sendRedirect("user/accounts");
-			
-        } else if (username.equals("admin") && password.equals("")) {			
-			response.sendRedirect("admin/users");
-			
-        } else {
-        	response.sendRedirect(" ?s=0");
-        }
+        try {
+        	int userID = DB.checkLogin2(username, password);
+			if (userID != -1) {
+				request.getSession().setAttribute("user", DB.getUser(userID));
+				response.sendRedirect("user/accounts");
+				
+			} else if (username.equals("admin") && password.equals("")) {			
+				response.sendRedirect("admin/users");
+				
+			} else {
+				response.sendRedirect(" ?s=0");
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
     @Override
