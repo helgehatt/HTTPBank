@@ -275,6 +275,7 @@ public class DB {
 		return null;
 	}
 	
+<<<<<<< HEAD
 	public static ArrayList<Transaction> getArchive(int account_id) {
 		for(int tries = 2; 0 < tries; tries--) {
 			try {
@@ -306,6 +307,31 @@ public class DB {
 				
 			} catch (SQLException e) {
 				handleSQLException(e);
+=======
+	/**
+	 * 
+	 */
+	public static ArrayList<String> getCurrencies(){
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				PreparedStatement statement = connection.prepareStatement("SELECT * "
+						+ "FROM DTUGRP07.CURRENCY;"
+						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				
+				ArrayList<String> currencies = new ArrayList<String>();
+				if (statement.execute()){ //If query is successful, attempt to create account object.
+					ResultSet results = statement.getResultSet();
+					while (results.next()){ //Fetch row if able.
+						currencies.add(results.getString(1));
+					}
+				}
+				statement.close();
+				
+				return currencies;
+			} catch (SQLException e) {
+				handleSQLException(e);
+				//if no more tries, throw exception.
+>>>>>>> bb26e05b93f35161c32102a4762ebef17bcd910e
 			}
 		}
 		return null;

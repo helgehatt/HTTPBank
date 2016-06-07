@@ -15,9 +15,16 @@ public class AccountController extends HttpServlet {
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String number = request.getParameter("number");
+        int id = 0;
         
-		request.getSession().setAttribute("account", DB.getAccountByNumber(number));
+        try {
+        	id = Integer.parseInt(request.getParameter("id"));
+		} catch (NumberFormatException e) {
+			response.sendError(418, "Lost connection to the database.");
+			return;
+		}
+        
+		request.getSession().setAttribute("account", DB.getAccount(id));
 		
 		response.sendRedirect("accountinfo");
     }

@@ -88,6 +88,13 @@ public class DB2Test {
 		DB.createMessage(message, date, senderName, userID);
 	}
 	
+	private static void testGetCurrency(){
+		long start = System.currentTimeMillis();
+		ArrayList<String> list = DB.getCurrencies();
+		for (String string : list) System.out.println(string);
+		System.out.println("Query Time: " + (System.currentTimeMillis()-start));
+	}
+	
 	private static void testDeleteUserByCpr(String cpr) throws SQLException {
 		long start = System.currentTimeMillis();
 		boolean success = DB.deleteUserByCpr(cpr);
