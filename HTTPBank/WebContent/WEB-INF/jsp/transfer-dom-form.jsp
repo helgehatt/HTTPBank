@@ -1,12 +1,15 @@
 <form class="form-horizontal" role="form" action="doTransfer" method="post">
   <div class="form-group">
     <label class="control-label col-sm-3" for="from">From:</label>
-    <div class="col-sm-9">
+    <div class="col-sm-5">
     	<select name="from" class="form-control" id="from">
     		<c:forEach var="account" items="${user.accounts}">
-   				<option value="${account.id}" data-currency="${account.currency}">${account.number}</option>
+   				<option value="${account.id}" data-currency="${account.currency}" data-balance="${account.balance}">${account.number}</option>
    			</c:forEach>
   		</select>
+		</div>
+		<div class="col-sm-4">
+			<input class="form-control" id="balance" value="${user.accounts[0].balance} ${user.accounts[0].currency}" readonly>
 		</div>
 	</div>
 	<div class="form-group">

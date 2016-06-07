@@ -32,6 +32,10 @@ body {
 	margin-right: 13px;
 }
 
+.form-group div {
+	padding-left: 0;
+}
+
 /* BUTTON-PANEL */
 
 .button-panel {
