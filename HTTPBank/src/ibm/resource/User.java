@@ -19,6 +19,7 @@ public class User implements Serializable {
 	private String consultant; // Required?
 	
 	private ArrayList<Account> accounts = null; // Default: None
+	private ArrayList<Message> messages = null; 
 
 	/* CONSTRUCTORS */
 	public User(int userId, String username, String cpr, String name) {
@@ -66,6 +67,11 @@ public class User implements Serializable {
 	public ArrayList<Account> getAccounts() {
 		accounts = DB.getAccounts(userId);
 		return accounts;
+	}
+	
+	public ArrayList<Message> getMessages() {
+		messages = DB.getMessages(userId);
+		return messages;
 	}
 	
 	/* SETTERS */
