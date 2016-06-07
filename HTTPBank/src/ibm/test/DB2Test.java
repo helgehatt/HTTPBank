@@ -24,7 +24,7 @@ public class DB2Test {
 		//System.out.println();
 		//testBatchTimer();
 		System.out.println();
-		testCreateMessage("Du skylder!!", new Date(Calendar.getInstance().getTime().getTime()), "Thomas", 2);
+		testCreateMessage("Tak for igår <3\nDet var sgu billigt", "Xerxes", 3);
 		System.out.println();
 		testGetArchive(1);
 		/*testCheckLogin("Thomas", "1234");
@@ -85,8 +85,8 @@ public class DB2Test {
 		
 	}
 	
-	private static void testCreateMessage(String message, Date date, String senderName, int userID) throws SQLException {
-		DB.createMessage(message, date, senderName, userID);
+	private static void testCreateMessage(String message, String senderName, int userID) throws SQLException {
+		DB.createMessage(message, senderName, userID);
 	}
 	
 	private static void testGetCurrency(){
