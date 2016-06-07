@@ -77,6 +77,10 @@ public class MainController extends HttpServlet {
 		case "/admin/edituser":
 			request.getRequestDispatcher("../WEB-INF/jsp/admin/edit-user.jsp").forward(request, response);
 			break;
+		case "/admin/archive": 
+			request.getRequestDispatcher("../WEB-INF/jsp/admin/archive.jsp").forward(request, response);
+			break;
 		}
+		
 	}
 }
