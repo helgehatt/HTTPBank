@@ -24,7 +24,7 @@ public class LoginController extends HttpServlet {
         
         try {
         	int userID = DB.checkLogin2(username, password);
-			if (userID != -1) {
+			if (userID < 1) {
 				request.getSession().setAttribute("user", DB.getUser(userID));
 				response.sendRedirect("user/accounts");
 				
