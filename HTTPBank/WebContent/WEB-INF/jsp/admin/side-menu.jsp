@@ -12,14 +12,14 @@
 					<li class="list-group-item" id="transaction-list-item">
 						<a class="btn btn-default side-menu-sub-item" href="transactions">Transactions</a>
 					</li>
+					<li class="list-group-item" id="archive-item">
+						<a class="btn btn-default side-menu-sub-item" href="archive">Archive</a>
+					</li>
 					<li class="list-group-item" id="edit-account-item">
 						<a class="btn btn-default side-menu-sub-item" href="editaccount">Edit</a>
 					</li>			
 					<li class="list-group-item" id="close-account-item">
 						<a class="btn btn-default side-menu-sub-item" href="closeaccount">Close</a>
-					</li>
-					<li class="list-group-item" id="archive-item">
-						<a class="btn btn-default side-menu-sub-item" href="archive">Archive</a>
 					</li>
 				</c:if>
 				<li class="list-group-item" id="transfer-dom-item">
