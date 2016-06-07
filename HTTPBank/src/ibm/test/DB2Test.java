@@ -18,7 +18,7 @@ import java.util.ArrayList;
 public class DB2Test {
 	//Main
 	public static void main(String[] args) throws SQLException, ClassNotFoundException, InputException {
-		/*testCheckLogin("Thomas", "1234");
+		testCheckLogin("Thomas", "1234");
 		System.out.println();
 		testGetUsers();
 		
@@ -52,7 +52,7 @@ public class DB2Test {
 		System.out.println();
 		testDeleteUser("NewUser");
 		System.out.println();
-		testDeleteUserByCpr("123456-7890");*/
+		testDeleteUserByCpr("123456-7890");
 		System.out.println();
 		testGetCurrency();
 		
