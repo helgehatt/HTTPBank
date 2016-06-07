@@ -10,7 +10,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import ibm.db.DB;
 
-@WebServlet(urlPatterns = { "/user/accounts", "/user/transfer", "/user/international", "/user/transactions", "/user/inbox", 
+@WebServlet(urlPatterns = { "/user/accounts", "/user/transfer", "/user/international", "/user/transactions", "/user/inbox",
+		"/user/archive",
 		"/admin/users", "/admin/search", "/admin/newuser", "/admin/accounts", "/admin/newaccount", 
 		"/admin/transactions", "/admin/accountinfo", "/admin/deposit", "/admin/withdrawal", "/admin/editaccount",
 		"/admin/transfer", "/admin/international", "/admin/userinfo", "/admin/edituser","/admin/archive" })
@@ -36,6 +37,9 @@ public class MainController extends HttpServlet {
 			break;
 		case "/user/transactions":
 			request.getRequestDispatcher("../WEB-INF/jsp/user/transaction-list.jsp").forward(request, response);
+			break;
+		case "/user/archive":
+			request.getRequestDispatcher("../WEB-INF/jsp/user/archive.jsp").forward(request, response);
 			break;
 		case "/admin/users":
 			request.getSession().setAttribute("users", DB.getUsers());
