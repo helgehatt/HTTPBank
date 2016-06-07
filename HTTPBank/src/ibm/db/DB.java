@@ -275,7 +275,6 @@ public class DB {
 		return null;
 	}
 	
-<<<<<<< HEAD
 	public static ArrayList<Transaction> getArchive(int account_id) {
 		for(int tries = 2; 0 < tries; tries--) {
 			try {
@@ -307,7 +306,11 @@ public class DB {
 				
 			} catch (SQLException e) {
 				handleSQLException(e);
-=======
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * 
 	 */
@@ -331,7 +334,7 @@ public class DB {
 			} catch (SQLException e) {
 				handleSQLException(e);
 				//if no more tries, throw exception.
->>>>>>> bb26e05b93f35161c32102a4762ebef17bcd910e
+
 			}
 		}
 		return null;

@@ -11,15 +11,11 @@ import javax.servlet.http.HttpServletResponse;
 import ibm.db.DB;
 
 @WebServlet(urlPatterns = { "/user/accounts", "/user/transfer", "/user/international", "/user/transactions", "/user/inbox",
-		"/user/archive",
-		"/admin/users", "/admin/search", "/admin/newuser", "/admin/accounts", "/admin/newaccount", 
-<<<<<<< HEAD
+		"/user/archive", "/admin/users", "/admin/search", "/admin/newuser", "/admin/accounts", "/admin/newaccount", 
 		"/admin/transactions", "/admin/accountinfo", "/admin/deposit", "/admin/withdrawal", "/admin/editaccount",
-		"/admin/transfer", "/admin/international", "/admin/userinfo", "/admin/edituser","/admin/archive" })
-=======
-		"/admin/transactions", "/admin/accountinfo", "/admin/depositwithdrawal", "/admin/editaccount",
-		"/admin/transfer", "/admin/international", "/admin/userinfo", "/admin/edituser" })
->>>>>>> bb26e05b93f35161c32102a4762ebef17bcd910e
+		"/admin/transfer", "/admin/international", "/admin/userinfo", "/admin/edituser","/admin/archive"})
+
+
 public class MainController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
