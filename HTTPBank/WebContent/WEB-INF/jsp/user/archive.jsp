@@ -2,15 +2,15 @@
 
 <style>
 
-#transaction-list {
+#archive {
 	max-width: 800px;
 }
 
-#transaction-list .panel-body {
+#archive .panel-body {
 	padding: 0;
 }
 
-#transaction-list .table {
+#archive .table {
 	margin: 0;
 }
 

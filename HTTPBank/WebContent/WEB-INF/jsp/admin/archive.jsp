@@ -3,19 +3,19 @@
 <style>
 
 
-#transaction-list {
+#archive {
 	max-width: 1200px;
 }
 
-#transaction-list .panel-body {
+#archive .panel-body {
 	padding: 0;
 }
 
-#transaction-list .table {
+#archive .table {
 	margin: 0;
 }
 
-#transaction-list-item a {
+#archive-item a {
 	background-color:#e6e6e6;
 }
 
