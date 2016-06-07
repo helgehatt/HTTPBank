@@ -10,10 +10,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import ibm.db.DB;
 
-@WebServlet(urlPatterns = { "/user/accounts", "/user/transfer", "/user/international", "/user/transactions", "/user/inbox", 
+@WebServlet(urlPatterns = { "/user/accounts", "/user/transfer", "/user/international", "/user/transactions", "/user/inbox",
+		"/user/archive",
 		"/admin/users", "/admin/search", "/admin/newuser", "/admin/accounts", "/admin/newaccount", 
 		"/admin/transactions", "/admin/accountinfo", "/admin/deposit", "/admin/withdrawal", "/admin/editaccount",
-		"/admin/transfer", "/admin/international", "/admin/userinfo", "/admin/edituser" })
+		"/admin/transfer", "/admin/international", "/admin/userinfo", "/admin/edituser","/admin/archive" })
 public class MainController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
@@ -36,6 +37,9 @@ public class MainController extends HttpServlet {
 			break;
 		case "/user/transactions":
 			request.getRequestDispatcher("../WEB-INF/jsp/user/transaction-list.jsp").forward(request, response);
+			break;
+		case "/user/archive":
+			request.getRequestDispatcher("../WEB-INF/jsp/user/archive.jsp").forward(request, response);
 			break;
 		case "/admin/users":
 			request.getSession().setAttribute("users", DB.getUsers());
@@ -77,6 +81,10 @@ public class MainController extends HttpServlet {
 		case "/admin/edituser":
 			request.getRequestDispatcher("../WEB-INF/jsp/admin/edit-user.jsp").forward(request, response);
 			break;
+		case "/admin/archive": 
+			request.getRequestDispatcher("../WEB-INF/jsp/admin/archive.jsp").forward(request, response);
+			break;
 		}
+		
 	}
 }
