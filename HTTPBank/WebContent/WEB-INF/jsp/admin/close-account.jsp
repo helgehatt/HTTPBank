@@ -1,12 +1,99 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Insert title here</title>
-</head>
-<body>
+<%@ include file="../head.jsp" %>
+
+<script src="${pageContext.request.contextPath}/js/close-account-script.js"></script>
+
+<style>
+
+#close-account {
+	max-width: 600px;
+}
+
+#close-account .panel {
+	border: none;
+}
+
+#close-account .panel-body {
+	padding-top: 0;
+}
+
+#close-account .nav-pills {
+	padding: 20px;
+}
+
+#close-account li a {
+	border: solid 1px;
+}
+
+#close-account-item a {
+	background-color:#e6e6e6;
+}
+
+</style>
+
+<%@ include file="navbar.jsp" %>
+
+<c:set var="currencies" value="${['DKK','NOK','EUR']}" scope="page" />
+
+<div class="container-fluid">
+
+	<c:set var="menu" scope="page" value="account"/>
+	<%@ include file="side-menu.jsp" %>
+	
+	<div id="close-account" class="container col-sm-9">
+		<div class="panel panel-default">
+			<div class="panel-body">
+			  <ul class="nav nav-pills">
+			    <li class="active" id="transfer-pill"><a data-toggle="pill">Transfer</a></li>
+			    <li><a data-toggle="pill" id="withdrawal-pill">Withdrawal</a></li>
+			  </ul>
+			  <form class="form-horizontal" role="form" action="closeAccount" method="post">
+				  <div class="form-group">
+				    <label class="control-label col-sm-3" for="from">From:</label>
+				    <div class="col-sm-5">
+				    	<input class="form-control" id="from" value="${account.number}" data-currency="${account.currency}" data-balance="${account.balance}" readonly>
+						</div>
+						<div class="col-sm-4">
+							<input class="form-control" id="from-balance" value="${account.balance} ${account.currency}" readonly>
+						</div>
+					</div>
+				  <div class="form-group" id="to-form-group">
+				    <label class="control-label col-sm-3" for="to" id="account-label">To:</label>
+				    <div class="col-sm-5">
+				    	<select name="to" class="form-control" id="to">
+				    		<c:forEach var="account" items="${user.accounts}">
+				    			<c:if test="${account.number != sessionScope.account.number}">
+				   					<option value="${account.id}" data-currency="${account.currency}" data-balance="${account.balance}">${account.number}</option>
+				   				</c:if>
+				   			</c:forEach>
+				  		</select>
+						</div>
+						<div class="col-sm-4">
+							<input class="form-control" id="to-balance" readonly>
+						</div>
+					</div>
+				  <div class="form-group">
+				    <label class="control-label col-sm-3" for="change" id="change-label">Deposited:</label>
+				    <div class="col-sm-6">          
+				      <input name="amount" type="text" class="form-control" id="change" readonly>
+				    </div>
+				    <div class="col-sm-3">
+				      <input type="text" class="form-control" id="deposit-currency" readonly>	          	
+				    	<select class="form-control" id="withdrawal-currency">
+				    		<c:forEach var="currency" items="${currencies}">
+				    			<option value="${currency}">${currency}</option>
+				    		</c:forEach>
+				    	</select>
+				    </div>
+				  </div>
+			    <button name="type" value="transfer" type="submit" class="btn btn-default btn-submit">Submit</button>
+			  </form>
+			</div>
+		</div>
+	</div>
+	
+	
+</div>
+
 
 </body>
 </html>

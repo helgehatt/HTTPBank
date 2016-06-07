@@ -7,15 +7,14 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import ibm.db.DB;
 
-@WebServlet(urlPatterns = { "/user/accounts", "/user/transfer", "/user/international", "/user/transactions", "/user/inbox",
+@WebServlet(urlPatterns = { "/login", "/user/accounts", "/user/transfer", "/user/international", "/user/transactions", "/user/inbox", 
 		"/user/archive", "/admin/users", "/admin/search", "/admin/newuser", "/admin/accounts", "/admin/newaccount", 
-		"/admin/transactions", "/admin/accountinfo", "/admin/deposit", "/admin/withdrawal", "/admin/editaccount",
-		"/admin/transfer", "/admin/international", "/admin/userinfo", "/admin/edituser","/admin/archive"})
-
-
+		"/admin/transactions", "/admin/accountinfo", "/admin/depositwithdrawal", "/admin/editaccount", "/admin/closeaccount",
+		"/admin/transfer", "/admin/international", "/admin/userinfo", "/admin/edituser" })
 public class MainController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
@@ -26,6 +25,11 @@ public class MainController extends HttpServlet {
         // TODO: DB Authentication: Check login status.
 		
 		switch (path) {
+		case "/login":
+			HttpSession session = request.getSession(false);
+			if (session != null) session.invalidate();
+			request.getRequestDispatcher("login.jsp").forward(request, response);
+			break;			
 		case "/user/accounts":
 			request.getSession().setAttribute("user", DB.getUser(1));
 			request.getRequestDispatcher("../WEB-INF/jsp/user/account-list.jsp").forward(request, response);
@@ -55,17 +59,20 @@ public class MainController extends HttpServlet {
 		case "/admin/newaccount":
 			request.getRequestDispatcher("../WEB-INF/jsp/admin/new-account.jsp").forward(request, response);
 			break;
-		case "/admin/transactions":
-			request.getRequestDispatcher("../WEB-INF/jsp/admin/transaction-list.jsp").forward(request, response);
-			break;
 		case "/admin/accountinfo":
 			request.getRequestDispatcher("../WEB-INF/jsp/admin/account-info.jsp").forward(request, response);
 			break;
-		case "/admin/depositwithdrawal":
-			request.getRequestDispatcher("../WEB-INF/jsp/admin/deposit-withdrawal.jsp").forward(request, response);
+		case "/admin/transactions":
+			request.getRequestDispatcher("../WEB-INF/jsp/admin/transaction-list.jsp").forward(request, response);
 			break;
 		case "/admin/editaccount":
 			request.getRequestDispatcher("../WEB-INF/jsp/admin/edit-account.jsp").forward(request, response);
+			break;
+		case "/admin/closeaccount":
+			request.getRequestDispatcher("../WEB-INF/jsp/admin/close-account.jsp").forward(request, response);
+			break;
+		case "/admin/depositwithdrawal":
+			request.getRequestDispatcher("../WEB-INF/jsp/admin/deposit-withdrawal.jsp").forward(request, response);
 			break;
 		case "/admin/transfer":
 			request.getRequestDispatcher("../WEB-INF/jsp/admin/transfer-dom.jsp").forward(request, response);

@@ -87,6 +87,8 @@ public class AttributeChecks {
 	 * Checks if the given string is a valid iban.
 	 */
 	public static void checkIban(String iban) throws InputException {
+		if (hasWhitespace(iban))
+			throw new InputException("Please don't enter whitespace.");
 		if (iban.length() < 5)
 			throw new InputException("Please enter more than 4 characters.");
 		if (!isAlphabetic(iban.substring(0, 1)))
