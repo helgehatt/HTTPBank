@@ -20,7 +20,7 @@
         </c:if>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <li><a role="button" class="btn btn-default" href="../"><span class="glyphicon glyphicon-log-out"></span> Log out</a></li>
+        <li><a role="button" class="btn btn-default" href="../login"><span class="glyphicon glyphicon-log-out"></span> Log out</a></li>
       </ul>
     </div>
   </div>

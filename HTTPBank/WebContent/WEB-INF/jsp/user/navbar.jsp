@@ -20,7 +20,7 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><a class="btn btn-default" href="inbox"><span class="glyphicon glyphicon-envelope"></span> Inbox</a></li>
-        <li><a class="btn btn-default" href="../"><span class="glyphicon glyphicon-log-out"></span> Log out</a></li>
+        <li><a class="btn btn-default" href="../login"><span class="glyphicon glyphicon-log-out"></span> Log out</a></li>
       </ul>
     </div>
   </div>
