@@ -13,7 +13,7 @@ import ibm.db.DB;
 @WebServlet(urlPatterns = { "/user/accounts", "/user/transfer", "/user/international", "/user/transactions", "/user/inbox", 
 		"/admin/users", "/admin/search", "/admin/newuser", "/admin/accounts", "/admin/newaccount", 
 		"/admin/transactions", "/admin/accountinfo", "/admin/deposit", "/admin/withdrawal", "/admin/editaccount",
-		"/admin/transfer", "/admin/international", "/admin/userinfo", "/admin/edituser" })
+		"/admin/transfer", "/admin/international", "/admin/userinfo", "/admin/edituser","/admin/archive" })
 public class MainController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 

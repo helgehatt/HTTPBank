@@ -28,7 +28,7 @@
 	<c:set var="menu" scope="page" value="account"/>
 	<%@ include file="side-menu.jsp" %>
 	
-	<div id="archive-list" class="container col-sm-9">
+	<div id="archive" class="container col-sm-9">
 		<div class="panel panel-default">
 			<div class="panel-body">
 		    <table class="table table-striped">
@@ -40,7 +40,7 @@
 		        </tr>
 		      </thead>
 		      <tbody>
-		      	<c:forEach var="transaction" items="${account.transactions}">
+		      	<c:forEach var="transaction" items="${account.archive}">
 		        	<tr>
 		        		<td>${transaction.date}</td>
 		        		<td>${transaction.description}</td>
