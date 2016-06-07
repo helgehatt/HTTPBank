@@ -28,7 +28,7 @@
 			<div class="panel-body">
         <table class="table">
           <thead>
-            <tr><th colspan="2">Account information</th></tr>
+            <tr><th>Account information</th><th>${account.name}</th></tr>
           </thead>
           <tbody>
             <tr><td>Account type</td><td>${account.type}</td></tr>

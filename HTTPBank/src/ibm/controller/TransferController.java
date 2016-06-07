@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import ibm.db.DB;
 import ibm.db.DB.TransBy;
-import ibm.resource.CurrencyConverter;
 import ibm.resource.InputException;
 
 @WebServlet(urlPatterns = { "/user/doTransfer", "/admin/doTransfer" } )
@@ -26,11 +25,13 @@ public class TransferController extends HttpServlet {
         String from = request.getParameter("from");
         String to = request.getParameter("to");
         String bic = request.getParameter("bic");
-        String toCurrency = request.getParameter("currency");
+//        String toCurrency = request.getParameter("to-currency");
 		String amountString = request.getParameter("amount");
+		String withdrawnString = request.getParameter("change");
 		
 		int fromId = 0;
 		double amount = 0;
+		double withdrawn = 0;
 		
 		try {
 			fromId = Integer.parseInt(from);
@@ -60,19 +61,13 @@ public class TransferController extends HttpServlet {
 			}
 			
 			try {
-				AttributeChecks.checkCurrency(toCurrency);
-			} catch (InputException e) {
-	        	errors.put("currency", e.getMessage());
+				withdrawn = Double.parseDouble(withdrawnString);
+			} catch (NumberFormatException e) {
+				errors.put("amount", "Please enter only digits.");
 			}
 			
 			if (errors.isEmpty()) {
-				String fromCurrency = DB.getAccount(fromId).getCurrency();
-				Double toAmount = CurrencyConverter.convert(fromCurrency, toCurrency, amount);
-				if (null == toAmount) {
-					response.sendError(419, "Could not complete the conversion.");
-					return;
-				}
-				DB.createTransaction(TransBy.IBAN, fromId, to, "Transfer to " + to, "Transfer from " + from, -amount, toAmount);
+				DB.createTransaction(TransBy.IBAN, fromId, to, "Transfer to " + to, "Transfer from " + from, -withdrawn, amount);
 			} else
 	        	request.getSession().setAttribute("errors", errors);
 

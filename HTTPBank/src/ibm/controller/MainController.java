@@ -12,7 +12,7 @@ import ibm.db.DB;
 
 @WebServlet(urlPatterns = { "/user/accounts", "/user/transfer", "/user/international", "/user/transactions", "/user/inbox", 
 		"/admin/users", "/admin/search", "/admin/newuser", "/admin/accounts", "/admin/newaccount", 
-		"/admin/transactions", "/admin/accountinfo", "/admin/deposit", "/admin/withdrawal", "/admin/editaccount",
+		"/admin/transactions", "/admin/accountinfo", "/admin/depositwithdrawal", "/admin/editaccount",
 		"/admin/transfer", "/admin/international", "/admin/userinfo", "/admin/edituser" })
 public class MainController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -56,11 +56,8 @@ public class MainController extends HttpServlet {
 		case "/admin/accountinfo":
 			request.getRequestDispatcher("../WEB-INF/jsp/admin/account-info.jsp").forward(request, response);
 			break;
-		case "/admin/deposit":
-			request.getRequestDispatcher("../WEB-INF/jsp/admin/deposit.jsp").forward(request, response);
-			break;
-		case "/admin/withdrawal":
-			request.getRequestDispatcher("../WEB-INF/jsp/admin/withdrawal.jsp").forward(request, response);
+		case "/admin/depositwithdrawal":
+			request.getRequestDispatcher("../WEB-INF/jsp/admin/deposit-withdrawal.jsp").forward(request, response);
 			break;
 		case "/admin/editaccount":
 			request.getRequestDispatcher("../WEB-INF/jsp/admin/edit-account.jsp").forward(request, response);
