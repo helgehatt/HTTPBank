@@ -2,9 +2,11 @@ package ibm.db;
 
 import ibm.resource.Account;
 import ibm.resource.InputException;
+import ibm.resource.Message;
 import ibm.resource.Transaction;
 import ibm.resource.User;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -375,6 +377,32 @@ public class DB {
 			}
 		}
 		return null;
+	}
+	
+	public static void startBatchTimer() throws SQLException {
+		PreparedStatement enable = connection.prepareStatement("DB2_ATS_ENABLE=YES");
+		enable.execute();
+		CallableStatement batch = connection.prepareCall("{call SYSPROC.ADMIN_TASK_ADD('archiveProc','10 14 * * 1'");
+		batch.execute();
+		
+	}
+	
+	public static void archiveTransactions() throws SQLException {
+		
+		CallableStatement archive = connection.prepareCall("{call DTUGRP07.archiveProc()}");
+		archive.execute();
+		archive.close();
+	}
+	
+	public static Message createMessage(String message, Date date, String senderName, int userID) throws SQLException {
+		PreparedStatement statement = connection.prepareStatement("INSERT INTO DTUGRP07.INBOX (MESSAGE, DATE, SENDER_NAME, USER_ID)"
+				+ "VALUES(?,?,?,?);");
+		statement.setString(1, message);
+		statement.setDate(2, date);
+		statement.setString(3, senderName);
+		statement.setInt(4, userID);
+		statement.execute();
+		return new Message(message, date, senderName,userID);	
 	}
 	
 	/**
@@ -896,6 +924,18 @@ public class DB {
 			}
 		}
 		return -1;
+	}
+	
+	public static int checkLogin2(String username, String password) throws SQLException {
+		CallableStatement check = connection.prepareCall("{call DTUGRP07.checkLogin(?,?,?)}",
+				ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+		check.setString(1,username);
+		check.setString(2, password);
+		check.registerOutParameter(3, java.sql.Types.INTEGER);
+		check.execute();
+		int result = check.getInt(3);
+		check.close();
+		return result;
 	}
 	
 	/**

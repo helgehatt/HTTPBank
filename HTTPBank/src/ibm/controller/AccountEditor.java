@@ -22,7 +22,8 @@ public class AccountEditor extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     	HashMap<String, String> errors = new HashMap<String, String>();
     	
-        String type = request.getParameter("type");
+        String accountName = request.getParameter("name");
+    	String type = request.getParameter("type");
         String number = request.getParameter("number");
         String iban = request.getParameter("iban");
         String currency = request.getParameter("currency");
@@ -31,6 +32,12 @@ public class AccountEditor extends HttpServlet {
         
         double interest = 0;
         double balance = 0;
+        
+        try {
+        	AttributeChecks.checkAccountName(accountName);
+        } catch (InputException e) {
+        	errors.put("name", e.getMessage());
+        }
         
         try {
         	AttributeChecks.checkType(type);
@@ -72,11 +79,8 @@ public class AccountEditor extends HttpServlet {
         
         if (errors.isEmpty()) {
 	        int id = ((Account) session.getAttribute("account")).getId();
-	        
-
-			// TODO: updateAccount without name param.
-			String name = "account";
-			DB.updateAccount(id, name, type, number, iban, currency, interest, balance);
+	        			
+			DB.updateAccount(id, accountName, type, number, iban, currency, interest, balance);
 			
 			session.setAttribute("account", DB.getAccountByNumber(number));
 			response.sendRedirect("accountinfo");
