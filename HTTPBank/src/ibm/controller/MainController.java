@@ -9,8 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import ibm.db.DB;
-
 @WebServlet(urlPatterns = { "/login", 
 		
 		"/user/accounts", "/user/transactions", "/user/accountinfo", 
@@ -54,7 +52,6 @@ public class MainController extends HttpServlet {
 			request.getRequestDispatcher("login.jsp").forward(request, response);
 			break;			
 		case "/user/accounts":
-			//request.getSession().setAttribute("user", DB.getUser(1));
 			request.getRequestDispatcher("../WEB-INF/jsp/user/account-list.jsp").forward(request, response);
 			break;
 		case "/user/transfer":
@@ -82,7 +79,6 @@ public class MainController extends HttpServlet {
 			request.getRequestDispatcher("../WEB-INF/jsp/user/inbox.jsp").forward(request, response);
 			break;
 		case "/admin/users":
-			request.getSession().setAttribute("users", DB.getUsers());
 			request.getRequestDispatcher("../WEB-INF/jsp/admin/user-list.jsp").forward(request, response);
 			break;
 		case "/admin/newuser":
