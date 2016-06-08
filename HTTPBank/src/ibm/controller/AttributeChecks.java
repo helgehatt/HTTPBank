@@ -1,5 +1,8 @@
 package ibm.controller;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import ibm.resource.InputException;
 
 public class AttributeChecks {
@@ -190,5 +193,35 @@ public class AttributeChecks {
 				return true;
 		}
 		return false;
+	}
+	
+	private static final String ADD_REGEX = "&|\\*|@|\\[|\\]|\\{|\\}|\\\\|\\^|:|=|!|\\/|>|<|-|\\(|\\)|%|\\+|\\?|;|'|~|\\|";
+	private static final String REMOVE_REGEX = "\\\\&|\\\\\\*|\\\\@|\\\\\\[|\\\\\\]|\\\\\\{|\\\\\\}|\\\\\\\\|\\\\\\^|\\\\:|\\\\=|\\\\!|\\\\\\/|\\\\>|\\\\<|\\\\-|\\\\\\(|\\\\\\)|\\\\%|\\\\\\+|\\\\\\?|\\\\;|\\\\'|\\\\~|\\\\\\|";
+	
+	/**
+	 * Adds escape characters to all DB2 special characters in the given string and returns a new string.
+	 * @return A string with escape characters added to all special characters used by DB2.
+	 */
+	public static String addEscapeCharacters(String input){
+		Matcher matcher = Pattern.compile(ADD_REGEX).matcher(input);
+		char bs = '\\';
+		StringBuilder builder = new StringBuilder(input);
+		int inserts = 0;
+		while (matcher.find()){
+			builder.insert(matcher.start()+inserts, bs);
+			inserts++;
+		}
+		return builder.toString();
+	}
+	
+	public static String removeEscapeCharacters(String input){
+		Matcher matcher = Pattern.compile(REMOVE_REGEX).matcher(input);
+		StringBuilder builder = new StringBuilder(input);
+		int inserts = 0;
+		while (matcher.find()){
+			builder.deleteCharAt(matcher.start()-inserts);
+			inserts++;
+		}
+		return builder.toString();
 	}
 }
