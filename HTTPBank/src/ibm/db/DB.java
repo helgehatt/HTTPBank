@@ -470,9 +470,8 @@ public class DB {
 					getBalanceStatement.close();
 					connection.commit();
 				} catch(SQLException e) {
-					e.printStackTrace();
+					handleSQLException(e);
 					connection.rollback();
-					throw e;
 				} finally {
 					connection.setAutoCommit(true);
 				}
@@ -1162,6 +1161,7 @@ public class DB {
 		case "08003": //connection does not exist
 		case "08004": //SQL server rejected SQL connection
 		case "08006": //connection failure
+		case "08008": //insufficient funds
 		case "82119": //connect error; can't get error text
 		case "69000": //SQL*Connect errors
 		case "82117": //invalid OPEN or PREPARE for this connection

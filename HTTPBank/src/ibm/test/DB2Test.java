@@ -22,7 +22,7 @@ public class DB2Test {
 	public static void main(String[] args) throws SQLException, ClassNotFoundException, InputException {
 		//testCheckLogin2("Helgo","moo");
 		//System.out.println();
-		testCreateTransaction2(1, 3, "Should be goooood","Should be great", 5000.0, 30000.0);
+		testCreateTransaction2(27, 28, "Should be goooood","Should be great", 300, 3);
 		//testBatchTimer();
 		System.out.println();
 		//testCreateMessage("Tak for igår <3\nDet var sgu billigt", "Xerxes", 3);
