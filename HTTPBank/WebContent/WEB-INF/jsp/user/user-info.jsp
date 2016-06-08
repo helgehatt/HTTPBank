@@ -10,7 +10,6 @@
 	margin: 0;
 }
 
-
 </style>
 
 <%@ include file="navbar.jsp" %>
@@ -21,7 +20,9 @@
 	
 	<%@ include file="../content/user-info.jsp" %>
 	
-	<a class="btn btn-default" href="changeinfo">Change user name or password</a>
+	<div style="text-align: center">
+		<a class="btn btn-default" href="changeinfo">Change user name or password</a>
+	</div>
 	
 </div>
 

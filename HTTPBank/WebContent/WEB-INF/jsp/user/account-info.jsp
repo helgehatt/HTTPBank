@@ -10,7 +10,7 @@
 	margin: 0;
 }
 
-#account-info-item a {
+#account-info-nav {
 	background-color:#e6e6e6;
 }
 
