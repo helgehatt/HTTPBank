@@ -56,8 +56,6 @@ $(function(){
 
 <%@ include file="navbar.jsp" %>
 
-<c:set var="currencies" value="${['DKK','NOK','EUR']}" scope="page" />
-
 <div class="container-fluid">
 
 	<%@ include file="side-menu.jsp" %>
