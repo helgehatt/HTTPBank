@@ -35,6 +35,10 @@
   <p>Your accessible accounts are shown below.</p>
   
 	<%@ include file="../content/account-list.jsp" %>
+	
+			</ul>
+		</div>
+	</div>
 </div>
 
 
