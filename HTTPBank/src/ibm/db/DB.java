@@ -413,41 +413,8 @@ public class DB {
 	 * @return The new transaction for the sender as a Transaction object with all fields, excluding 'transaction_id', if successfully created.
 	 * @throws SQLException 
 	 */
+		
 	public static Transaction createTransaction(TransBy transBy, int senderId, String receiverId, String senderDescription, String receiverDescription, double senderAmount, double receiverAmount) {
-		for (int tries = 2; 0 < tries; tries--){
-			try {
-				Date date = new Date(Calendar.getInstance().getTime().getTime());
-				
-				Transaction senderTransaction = null;
-				@SuppressWarnings("unused")
-				Transaction receiverTransaction = null;
-				try {
-					connection.setAutoCommit(false);
-					
-					senderTransaction = createTransaction(TransBy.ID, date, ""+senderId, senderDescription, senderAmount);
-					receiverTransaction = createTransaction(transBy, date, receiverId, receiverDescription, receiverAmount);
-					
-					//if (receiverTransaction == null) ; //The receiver was not an account we know about.
-					
-					connection.commit();
-				} catch (Exception e){
-					//Error, rollback all changes.
-					connection.rollback();
-					throw e;
-				} finally {
-					connection.setAutoCommit(true);
-				}
-				
-				return senderTransaction;
-			} catch (SQLException e) {
-				handleSQLException(e);
-				//if no more tries, throw exception.
-			}
-		}
-		return null;
-	}
-	
-	public static Transaction createTransaction2(TransBy transBy, int senderId, String receiverId, String senderDescription, String receiverDescription, double senderAmount, double receiverAmount) {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				Date date = new Date(Calendar.getInstance().getTime().getTime());
@@ -501,8 +468,15 @@ public class DB {
 				Transaction transaction = null;
 				try {
 					connection.setAutoCommit(false);
-					transaction = createTransaction(TransBy.ID, date, ""+accountId, description, amount);
+					CallableStatement statement = connection.prepareCall("{call DTUGRP07.createTransactionOne(?,?,?,?)}");
+					statement.setInt(1, accountId);
+					statement.setString(2, description);
+					statement.setDouble(3, amount);
+					statement.setDate(4, date);
+					statement.execute();
 					connection.commit();
+					statement.close();
+					transaction = new Transaction(null, accountId, date, description, amount);
 				} catch (Exception e){
 					//Error, rollback all changes.
 					connection.rollback();
@@ -517,14 +491,6 @@ public class DB {
 			}
 		}
 		return null;
-	}
-	
-	public static void startBatchTimer() throws SQLException {
-		PreparedStatement enable = connection.prepareStatement("DB2_ATS_ENABLE=YES");
-		enable.execute();
-		CallableStatement batch = connection.prepareCall("{call SYSPROC.ADMIN_TASK_ADD('archiveProc','10 14 * * 1'");
-		batch.execute();
-		
 	}
 	
 	public static void archiveTransactions() throws SQLException {
@@ -546,72 +512,7 @@ public class DB {
 		return new Message(message, date, senderName, receiverUserID);	
 	}
 	
-	/**
-	 * Performs multiple queries to create a new transaction. Autocommit should be disabled and commit should be managed by whatever calls this method.
-	 * @throws SQLException 
-	 */
-	private static Transaction createTransaction(TransBy transBy, Date date, String identity, String description, double amount) throws SQLException {
-		//Get the balance.
-		PreparedStatement getBalanceStatement = connection.prepareStatement("SELECT ACCOUNT_ID, BALANCE "
-				+ "FROM DTUGRP07.ACCOUNTS "
-				+ "WHERE "+transBy.toString()+" = ? "
-				+ "FETCH FIRST 1 ROWS ONLY;"
-				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		switch(transBy){
-		case IBAN:
-		case NUMBER:
-			getBalanceStatement.setString(1, identity);
-			break;
-		case ID:
-		default:
-			getBalanceStatement.setInt(1, Integer.parseInt(identity));
-			break;
-		}
-		getBalanceStatement.execute();
-		double balance = 0;
-		int id;
-		ResultSet results = getBalanceStatement.getResultSet();
-		if (results.next()){ //Fetch row if able.
-			id = results.getInt(1);
-			balance = results.getDouble(2);
-		} else {
-			//TODO No account found!
-			return null;
-			//throw new SQLException();
-		}
-		getBalanceStatement.close();
-		
-		//Update the balance.
-		PreparedStatement updateBalanceStatement = connection.prepareStatement("UPDATE DTUGRP07.ACCOUNTS "
-				+ "SET BALANCE = ? "
-				+ "WHERE ACCOUNT_ID = ?;"
-				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		if ((balance+amount) < 0){
-			//TODO Updated balance will be negative.
-			//throw new SQLException();
-		}
-		updateBalanceStatement.setDouble(1, (balance+amount));
-		updateBalanceStatement.setInt(2, id);
-		updateBalanceStatement.executeUpdate();
-		updateBalanceStatement.close();
-		
-		//Create the transaction.
-		PreparedStatement createTransactionStatement = connection.prepareStatement("INSERT INTO DTUGRP07.TRANSACTIONS "
-				+ "(ACCOUNT_ID, \"DATE\", DESCRIPTION, AMOUNT) VALUES "
-				+ "(?, ?, ?, ?);"
-				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		createTransactionStatement.setInt(1, id);
-		createTransactionStatement.setDate(2, date);
-		createTransactionStatement.setString(3, description);
-		createTransactionStatement.setDouble(4, amount);
-		createTransactionStatement.execute(); //Attempt to insert new row.
-		createTransactionStatement.close();
-		
-		return new Transaction(null, id, date, description, amount);
-	}
-	
-	
-	
+
 	/**
 	 * Queries the database to insert a new transaction into the TRANSACTIONS table.
 	 * Note that no change is made to any accounts with this method.
@@ -1038,38 +939,8 @@ public class DB {
 	 * @throws SQLException 
 	 * @throws InputException If invalid input is given.
 	 */
-	public static int checkLogin(String username, String password) {
-		for (int tries = 2; 0 < tries; tries--){
-			try {
-				if (username.matches("\\s")) return -1; //Checks for white space.
-				PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, USERNAME, PASSWORD "
-						+ "FROM DTUGRP07.USERS "
-						+ "WHERE USERNAME = ? "
-						+ "FETCH FIRST 1 ROWS ONLY;"
-						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-				statement.setString(1, username); //Sets the '?' parameter in the SQL statement to be the string 'username'.
-				
-				int passwordIsCorrect = -1;
-				if (statement.execute()){ //Executes the SQL statement, returns false if failed for any reason.
-					ResultSet result = statement.getResultSet();
-					if (result.next()){ //Moves the cursor to first row, returns false if cursor is moved past the last row. Note: There should be 0 or 1 row.
-						String correctPassword = result.getString("PASSWORD");
-						
-						if (password.equals(correctPassword)) //Checks if password is correct.
-							passwordIsCorrect = result.getInt(1);
-					}
-				}
-				statement.close();
-				return passwordIsCorrect; //Returns -1 if any of the above if statements returns false.
-			} catch (SQLException e) {
-				handleSQLException(e);
-				//if no more tries, throw exception.
-			}
-		}
-		return -1;
-	}
 	
-	public static int checkLogin2(String username, String password) throws SQLException {
+	public static int checkLogin(String username, String password) throws SQLException {
 		CallableStatement check = connection.prepareCall("{call DTUGRP07.checkLogin(?,?,?)}",
 				ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
 		check.setString(1,username);

@@ -22,7 +22,8 @@ public class DB2Test {
 	public static void main(String[] args) throws SQLException, ClassNotFoundException, InputException {
 		//testCheckLogin2("Helgo","moo");
 		//System.out.println();
-		testCreateTransaction2(27, 28, "Should be goooood","Should be great", 300, 3);
+		testCreateTransaction(1, "New Transaction", -100);
+		//testCreateTransaction2(27, 28, "Should be goooood","Should be great", 300, 3);
 		//testBatchTimer();
 		System.out.println();
 		//testCreateMessage("Tak for igår <3\nDet var sgu billigt", "Xerxes", 3);
@@ -81,11 +82,6 @@ public class DB2Test {
 		DB.archiveTransactions();
 	}
 	
-	private static void testBatchTimer() throws SQLException {
-		DB.startBatchTimer();
-		
-	}
-	
 	private static void testCreateMessage(String message, String senderName, int userID) throws SQLException {
 		DB.createMessage(message, senderName, userID);
 	}
@@ -139,17 +135,17 @@ public class DB2Test {
 		System.out.println("Query Time: " + (System.currentTimeMillis()-start));
 	}
 
-	private static Transaction testCreateTransaction(int senderId, int receiverId, String description, double amount) throws SQLException {
+	private static Transaction testCreateTransaction(int senderId, String description, double amount) throws SQLException {
 		long start = System.currentTimeMillis();
-		Transaction transaction = DB.createTransaction(DB.TransBy.ID, senderId, ""+receiverId, description, description, -amount, amount);
+		Transaction transaction = DB.createTransaction(senderId, description, amount);
 		System.out.println("Created Transaction, Query Time: " + (System.currentTimeMillis()-start));
 		printTransaction(transaction);
 		return transaction;
 	}
 	
-	private static Transaction testCreateTransaction2(int senderId, int receiverId, String senderDescription, String receiverDescription, double senderAmount, double receiverAmount) throws SQLException {
+	private static Transaction testCreateTransaction(int senderId, int receiverId, String senderDescription, String receiverDescription, double senderAmount, double receiverAmount) throws SQLException {
 		long start = System.currentTimeMillis();
-		Transaction transaction = DB.createTransaction2(DB.TransBy.ID, senderId, ""+receiverId, senderDescription, receiverDescription, -senderAmount, receiverAmount);
+		Transaction transaction = DB.createTransaction(DB.TransBy.ID, senderId, ""+receiverId, senderDescription, receiverDescription, -senderAmount, receiverAmount);
 		System.out.println("Created Transaction, Query Time: " + (System.currentTimeMillis()-start));
 		printTransaction(transaction);
 		return transaction;
@@ -209,14 +205,6 @@ public class DB2Test {
 	public static int testCheckLogin(String username, String password) throws SQLException, InputException {
 		long start = System.currentTimeMillis();
 		int id = DB.checkLogin(username, password);
-		System.out.println("Checklogin as Thomas: " + id);
-		System.out.println("Query Time: " + (System.currentTimeMillis()-start));
-		return id;
-	}
-	
-	public static int testCheckLogin2(String username, String password) throws SQLException, InputException {
-		long start = System.currentTimeMillis();
-		int id = DB.checkLogin2(username, password);
 		System.out.println("Checklogin as Thomas: " + id);
 		System.out.println("Query Time: " + (System.currentTimeMillis()-start));
 		return id;
