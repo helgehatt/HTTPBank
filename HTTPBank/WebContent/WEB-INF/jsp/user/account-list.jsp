@@ -26,6 +26,10 @@
 	}
 }
 
+#account-list-nav {
+	background-color:#e6e6e6;
+}
+
 </style>
 
 <%@ include file="navbar.jsp" %>

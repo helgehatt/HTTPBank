@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import ibm.db.DB;
-import ibm.db.DB.TransBy;
 import ibm.resource.Account;
 
 @WebServlet("/admin/closeAccount")
@@ -40,12 +39,10 @@ public class AccountCloser extends HttpServlet {
     			return;
     		}
     		
-    		DB.createTransaction(TransBy.ID, accountId, "" + receiverId, "", "Closed account: " + account.getNumber(), 0, amount);
-    		DB.deleteAccount(accountId);
-    	} else {
-    		// Assume the amount has been withdrawn.
-    		DB.deleteAccount(accountId);
+    		DB.createTransaction(receiverId, "Closed account: " + account.getNumber(), amount);
     	}
+    	
+		DB.deleteAccount(accountId);
     	
     	response.sendRedirect("accounts");
     	

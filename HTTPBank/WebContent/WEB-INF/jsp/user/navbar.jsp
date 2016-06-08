@@ -15,13 +15,13 @@
     </div>
     <div id="navbar" class="collapse navbar-collapse">
       <ul class="nav navbar-nav">
-        <li><a class="btn btn-default" href="accounts">Accounts</a></li>
+        <li><a class="btn btn-default" href="accounts" id="account-list-nav">Accounts</a></li>
         <c:if test="${account != null}">
-        	<li><a class="btn btn-default" href="transactions">Transactions</a></li>
-        	<li><a class="btn btn-default" href="accountinfo">Account info</a></li>        
+        	<li><a class="btn btn-default" href="transactions" id="transaction-list-nav">Transactions</a></li>
+        	<li><a class="btn btn-default" href="accountinfo" id="account-info-nav">Account info</a></li>        
         </c:if>
-        <li><a class="btn btn-default" href="transfer">Transfer</a></li>
-        <li><a class="btn btn-default" href="archive">Archive</a></li>
+        <li><a class="btn btn-default" href="transfer" id="transfer-nav">Transfer</a></li>
+        <li><a class="btn btn-default" href="archive" id="archive-nav">Archive</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
 	      <li class="dropdown">
