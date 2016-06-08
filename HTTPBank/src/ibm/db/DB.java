@@ -413,7 +413,6 @@ public class DB {
 	 * @return The new transaction for the sender as a Transaction object with all fields, excluding 'transaction_id', if successfully created.
 	 * @throws SQLException 
 	 */
-		
 	public static Transaction createTransaction(TransBy transBy, int senderId, String receiverId, String senderDescription, String receiverDescription, double senderAmount, double receiverAmount) {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
@@ -940,16 +939,24 @@ public class DB {
 	 * @throws InputException If invalid input is given.
 	 */
 	
-	public static int checkLogin(String username, String password) throws SQLException {
-		CallableStatement check = connection.prepareCall("{call DTUGRP07.checkLogin(?,?,?)}",
-				ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		check.setString(1,username);
-		check.setString(2, password);
-		check.registerOutParameter(3, java.sql.Types.INTEGER);
-		check.execute();
-		int result = check.getInt(3);
-		check.close();
-		return result;
+	public static int checkLogin(String username, String password) {
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				CallableStatement check = connection.prepareCall("{call DTUGRP07.checkLogin(?,?,?)}",
+						ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				check.setString(1,username);
+				check.setString(2, password);
+				check.registerOutParameter(3, java.sql.Types.INTEGER);
+				check.execute();
+				int result = check.getInt(3);
+				check.close();
+				return result;
+			} catch (SQLException e) {
+				handleSQLException(e);
+				//if no more tries, throw exception.
+			}
+		}
+		return -1;
 	}
 	
 	/**
