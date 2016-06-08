@@ -15,6 +15,8 @@ public class AccountController extends HttpServlet {
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String path = request.getRequestURI().replace(request.getContextPath(), "");
+
         int id = 0;
         
         try {
@@ -26,7 +28,14 @@ public class AccountController extends HttpServlet {
         
 		request.getSession().setAttribute("account", DB.getAccount(id));
 		
-		response.sendRedirect("accountinfo");
+		switch(path) {
+		case "/user/getAccount":
+			response.sendRedirect("transactions");
+			break;
+		case "/admin/getAccount":
+			response.sendRedirect("accountinfo");
+			break;
+		}
     }
 
     @Override

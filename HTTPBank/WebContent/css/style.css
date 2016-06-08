@@ -142,6 +142,10 @@ body {
   padding: 5px;
 }
 
+#navbar .dropdown-menu li {
+	padding: 0;
+}
+
 #navbar li a {
   padding: 9px;
 }

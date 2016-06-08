@@ -26,7 +26,7 @@
     <li class="active"><a href="#">Domestic</a></li>
     <li><a href="international">International</a></li>
   </ul>
-	<%@ include file="../transfer-dom-form.jsp" %>
+	<%@ include file="../content/transfer-dom.jsp" %>
 </div>
 
 

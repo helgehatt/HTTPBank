@@ -31,7 +31,7 @@
 	<div id="transfer-dom" class="container col-sm-9">
 		<div class="panel panel-default">
 			<div class="panel-body">
-				<%@ include file="../transfer-dom-form.jsp" %>
+				<%@ include file="../content/transfer-dom.jsp" %>
 			</div>
 		</div>
 	</div>
