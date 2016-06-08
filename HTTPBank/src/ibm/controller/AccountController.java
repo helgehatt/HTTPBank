@@ -16,7 +16,7 @@ import ibm.resource.AttributeChecks;
 import ibm.resource.InputException;
 import ibm.resource.User;
 
-@WebServlet("/admin/newAccount")
+@WebServlet(urlPatterns = { "/admin/newAccount", "/admin/editAccount" })
 public class AccountController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
     
