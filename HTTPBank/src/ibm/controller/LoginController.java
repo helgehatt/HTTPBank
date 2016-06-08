@@ -29,7 +29,7 @@ public class LoginController extends HttpServlet {
 		session.setAttribute("currencies", CURRENCIES);
         
         try {
-        	int userID = DB.checkLogin2(username, password);
+        	int userID = DB.checkLogin(username, password);
 			if (userID > 0) {
 				session.setAttribute("admin", false);
 				session.setAttribute("user", DB.getUser(userID));
