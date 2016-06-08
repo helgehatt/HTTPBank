@@ -21,7 +21,7 @@
 
 <div id="transfer-int" class="container">
   <h3>Transfer</h3>
-  <p>Insert required information to make a new transfer.</p>
+  <p>Enter required information to make a new transfer.</p>
   <ul class="nav nav-pills">
     <li><a href="transfer">Domestic</a></li>
     <li class="active"><a href="#">International</a></li>

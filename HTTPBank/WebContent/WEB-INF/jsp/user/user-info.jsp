@@ -21,6 +21,8 @@
 	
 	<%@ include file="../content/user-info.jsp" %>
 	
+	<a class="btn btn-default" href="changeinfo">Change user name or password</a>
+	
 </div>
 
 

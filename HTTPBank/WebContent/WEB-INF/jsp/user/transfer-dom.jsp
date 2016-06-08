@@ -21,7 +21,7 @@
 
 <div id="transfer-dom" class="container">
   <h3>Transfer</h3>
-  <p>Insert required information to make a new transfer.</p>
+  <p>Enter required information to make a new transfer.</p>
   <ul class="nav nav-pills">
     <li class="active"><a href="#">Domestic</a></li>
     <li><a href="international">International</a></li>
