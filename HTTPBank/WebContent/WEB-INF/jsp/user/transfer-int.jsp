@@ -19,8 +19,6 @@
 <c:set var="errors" scope="page" value="${sessionScope.errors}"/>
 <c:remove var="errors" scope="session"/>
 
-<c:set var="currencies" value="${['DKK','NOK','EUR']}" scope="page" />
-
 <div id="transfer-int" class="container">
   <h3>Transfer</h3>
   <p>Insert required information to make a new transfer.</p>

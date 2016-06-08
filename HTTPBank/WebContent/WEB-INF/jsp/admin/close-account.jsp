@@ -32,8 +32,6 @@
 
 <%@ include file="navbar.jsp" %>
 
-<c:set var="currencies" value="${['DKK','NOK','EUR']}" scope="page" />
-
 <div class="container-fluid">
 
 	<c:set var="menu" scope="page" value="account"/>

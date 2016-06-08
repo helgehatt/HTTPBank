@@ -23,8 +23,6 @@
 <c:set var="errors" scope="page" value="${sessionScope.errors}"/>
 <c:remove var="errors" scope="session"/>
 
-<c:set var="currencies" value="${['DKK','NOK','EUR']}" scope="page" />
-
 <div class="container-fluid">
 
 	<c:set var="menu" scope="page" value="transfer"/>

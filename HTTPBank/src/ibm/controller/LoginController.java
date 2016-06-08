@@ -21,6 +21,7 @@ public class LoginController extends HttpServlet {
         String password = request.getParameter("password");
         
         // TODO: DB Authentication: Set login status.
+		request.getSession().setAttribute("currencies", DB.getCurrencies());
         
         try {
         	int userID = DB.checkLogin2(username, password);
