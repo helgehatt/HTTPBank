@@ -69,7 +69,7 @@ public class DB {
 				Collections.sort(resultList, new Comparator<Transaction>(){
 					@Override
 					public int compare(Transaction o1, Transaction o2) {
-						return Long.compare(o1.getDateRaw(), o2.getDateRaw());
+						return Long.compare(o2.getDateRaw(), o1.getDateRaw());
 					}
 				});
 				
@@ -547,11 +547,11 @@ public class DB {
 				+ "SET BALANCE = ? "
 				+ "WHERE ACCOUNT_ID = ?;"
 				, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		if ((balance+amount) < 0){
+		if ((balance+amount) < 0.0){
 			//TODO Updated balance will be negative.
 			//throw new SQLException();
 		}
-		updateBalanceStatement.setDouble(1, (balance+amount));
+		updateBalanceStatement.setDouble(1, balance+amount);
 		updateBalanceStatement.setInt(2, id);
 		updateBalanceStatement.executeUpdate();
 		updateBalanceStatement.close();
@@ -1111,6 +1111,9 @@ public class DB {
 	 * @throws SQLException If Exception can't be handled.
 	 */
 	private static boolean handleSQLException(SQLException e){
+		
+		System.out.println(e.toString());
+		
 		//TODO Log exceptions.
 		switch (e.getSQLState()){
 		case "01002": //disconnect error
