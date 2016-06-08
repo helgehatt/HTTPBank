@@ -71,10 +71,6 @@ public class Account implements Serializable {
 		return FORMAT.format(interest) + "%";
 	}
 	
-	public double getBalanceRaw(){
-		return balance;
-	}
-	
 	public String getBalance() {
 		return FORMAT.format(balance);
 	}
@@ -83,12 +79,12 @@ public class Account implements Serializable {
 	 * Returns a list of Transactions related to this Account.
 	 * Should query whenever transactions are updated.
 	 */
-	public ArrayList<Transaction> getTransactions() {
+	public ArrayList<Transaction> getTransactions() throws DatabaseException {
 		transactions = DB.getTransactions(accountId);
 		return transactions;
 	}
 	
-	public ArrayList<Transaction> getArchive() {
+	public ArrayList<Transaction> getArchive() throws DatabaseException {
 		archive = DB.getArchive(accountId);
 		return archive;
 	}
