@@ -31,13 +31,26 @@ public class MainController extends HttpServlet {
 
 		String path = request.getRequestURI().replace(request.getContextPath(), "");
 
-        // TODO: DB Authentication: Check login status.
-				
+		HttpSession session = request.getSession(true);
+		if (session.getAttribute("admin") == null) {			
+			response.sendRedirect(request.getContextPath());
+			return;
+		} else {
+			boolean isAdmin = (boolean) session.getAttribute("admin");
+			String pathStart = path.substring(0, path.lastIndexOf("/"));
+			System.out.println(pathStart);
+			if (pathStart.equals("/user") && isAdmin) {
+				response.sendError(419, "Unauthorized access.");
+				return;
+			} else if (pathStart.equals("/admin") && !isAdmin) {
+				response.sendError(419, "Unauthorized access.");
+				return;
+			}
+		}		
 		
 		switch (path) {
 		case "/login":
-			HttpSession session = request.getSession(false);
-			if (session != null) session.invalidate();
+			session.invalidate();
 			request.getRequestDispatcher("login.jsp").forward(request, response);
 			break;			
 		case "/user/accounts":
