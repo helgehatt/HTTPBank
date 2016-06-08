@@ -71,6 +71,10 @@ public class Account implements Serializable {
 		return FORMAT.format(interest) + "%";
 	}
 	
+	public double getBalanceRaw(){
+		return balance;
+	}
+	
 	public String getBalance() {
 		return FORMAT.format(balance);
 	}
