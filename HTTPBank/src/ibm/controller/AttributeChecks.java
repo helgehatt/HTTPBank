@@ -195,11 +195,23 @@ public class AttributeChecks {
 		return false;
 	}
 	
+	// Regular expression for recognizing special characters.
 	private static final String ADD_REGEX = "&|\\*|@|\\[|\\]|\\{|\\}|\\\\|\\^|:|=|!|\\/|>|<|-|\\(|\\)|%|\\+|\\?|;|'|~|\\|";
 	private static final String REMOVE_REGEX = "\\\\&|\\\\\\*|\\\\@|\\\\\\[|\\\\\\]|\\\\\\{|\\\\\\}|\\\\\\\\|\\\\\\^|\\\\:|\\\\=|\\\\!|\\\\\\/|\\\\>|\\\\<|\\\\-|\\\\\\(|\\\\\\)|\\\\%|\\\\\\+|\\\\\\?|\\\\;|\\\\'|\\\\~|\\\\\\|";
 	
 	/**
+	 * returns true if a string has one or more special DB2 characters.
+	 * @parameter input The string to be checked.
+	 * @return True if the given string contains a DB2 special character.
+	 */
+	public static boolean hasSpecialCharacters(String input){
+		Matcher matcher = Pattern.compile(ADD_REGEX).matcher(input);
+		return matcher.find();
+	}
+	
+	/**
 	 * Adds escape characters to all DB2 special characters in the given string and returns a new string.
+	 * @parameter input The string to have escape characters added.
 	 * @return A string with escape characters added to all special characters used by DB2.
 	 */
 	public static String addEscapeCharacters(String input){
@@ -214,6 +226,11 @@ public class AttributeChecks {
 		return builder.toString();
 	}
 	
+	/**
+	 * Removes escape characters in front of all DB2 special characters in the given string. In effect reverses {@link addEscapeCharacters(String string)} and returns the original string.
+	 * @param input String with escapes to be removed.
+	 * @return The string with all special character escapes removed.
+	 */
 	public static String removeEscapeCharacters(String input){
 		Matcher matcher = Pattern.compile(REMOVE_REGEX).matcher(input);
 		StringBuilder builder = new StringBuilder(input);
