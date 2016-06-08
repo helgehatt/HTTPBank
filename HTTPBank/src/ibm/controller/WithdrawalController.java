@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import ibm.db.DB;
+import ibm.resource.AttributeChecks;
 import ibm.resource.InputException;
 
 @WebServlet(urlPatterns = "/admin/doDepositWithdrawal"  )

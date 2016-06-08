@@ -1,33 +1,104 @@
 package ibm.controller;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import ibm.db.DB;
+import ibm.resource.AttributeChecks;
+import ibm.resource.InputException;
+import ibm.resource.User;
 
-@WebServlet("/admin/getUser")
+@WebServlet(urlPatterns = { "/admin/newUser", "/admin/editUser" })
 public class UserController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int id = 0;
+    	HashMap<String, String> errors = new HashMap<String, String>();
+    	
+    	String username = request.getParameter("username");
+    	String password = request.getParameter("password");
+        String cpr = request.getParameter("cpr");
+        String name = request.getParameter("name");
+        String institute = request.getParameter("institute");
+        String consultant = request.getParameter("consultant");
         
         try {
-        	id = Integer.parseInt(request.getParameter("id"));
-		} catch (NumberFormatException e) {
-			response.sendError(418, "Lost connection to the database.");
-			return;
-		}
+        	AttributeChecks.checkUserName(username);
+        } catch (InputException e) {
+        	errors.put("username", e.getMessage());
+        }
         
-		request.getSession().setAttribute("user", DB.getUser(id));
+        try {
+        	AttributeChecks.checkPassword(password);
+        } catch (InputException e) {
+        	errors.put("password", e.getMessage());
+        }
+        
+        try {
+        	AttributeChecks.checkCpr(cpr);
+        } catch (InputException e) {
+        	errors.put("cpr", e.getMessage());
+        }
+        
+        try {
+        	AttributeChecks.checkRealName(name);
+        } catch (InputException e) {
+        	errors.put("name", e.getMessage());
+        }
+        
+        try {
+        	AttributeChecks.checkConsultant(consultant);
+        } catch (InputException e) {
+        	errors.put("institute", e.getMessage());
+        }
+        
+        try {
+        	AttributeChecks.checkInstitute(institute);
+        } catch (InputException e) {
+        	errors.put("consultant", e.getMessage());
+        }
 		
-		response.sendRedirect("accounts");
+        HttpSession session = request.getSession();
+
+		String path = request.getRequestURI().replace(request.getContextPath(), "");
+		
+    	switch(path) {
+    	case "/admin/newUser":
+            if (errors.isEmpty()) {
+    			DB.createUser(username, password, cpr, name, institute, consultant);
+    			
+            	session.setAttribute("users", DB.getUsers());        		
+            	response.sendRedirect("users");
+            } else {
+            	request.getSession().setAttribute("errors", errors);            	
+            	response.sendRedirect("newuser");
+            }
+            
+    		break;
+    	case "/admin/editUser":            
+            if (errors.isEmpty()) {
+            	int id = ((User) session.getAttribute("user")).getId();            	
+            	DB.updateUser(id, username, password, cpr, name, institute, consultant);
+    			
+    			session.setAttribute("user", DB.getUser(id));    			
+    			response.sendRedirect("userinfo");
+            } else {
+            	session.setAttribute("errors", errors);
+            	response.sendRedirect("edituser");
+            }
+    		
+    		break;
+    	}
+    	
+    	
 	
     }
 

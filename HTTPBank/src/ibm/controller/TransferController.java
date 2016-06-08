@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import ibm.db.DB;
 import ibm.db.DB.TransBy;
+import ibm.resource.AttributeChecks;
 import ibm.resource.InputException;
 
 @WebServlet(urlPatterns = { "/user/doTransfer", "/admin/doTransfer" } )

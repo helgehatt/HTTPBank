@@ -15,11 +15,15 @@ import ibm.db.DB;
 		
 		"/user/accounts", "/user/transactions", "/user/accountinfo", 
 		"/user/transfer", "/user/international", "/user/archive", 
-		"/user/userinfo", "/user/inbox", 
+		"/user/userinfo", "/user/changeinfo", "/user/inbox", 
 		
-		"/admin/users", "/admin/search", "/admin/newuser", "/admin/accounts", "/admin/newaccount", 
-		"/admin/transactions", "/admin/accountinfo", "/admin/depositwithdrawal", "/admin/editaccount", "/admin/closeaccount",
-		"/admin/transfer", "/admin/international", "/admin/userinfo", "/admin/edituser", "/admin/archive" })
+		"/admin/users", "/admin/newuser", 
+		"/admin/accounts", "/admin/newaccount", 
+		"/admin/accountinfo", "/admin/transactions", 
+		"/admin/editaccount", "/admin/closeaccount", "/admin/archive",
+		"/admin/transfer", "/admin/international", "/admin/depositwithdrawal", 
+		"/admin/userinfo", "/admin/edituser" })
+
 public class MainController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
@@ -57,6 +61,9 @@ public class MainController extends HttpServlet {
 			break;
 		case "/user/userinfo":
 			request.getRequestDispatcher("../WEB-INF/jsp/user/user-info.jsp").forward(request, response);
+			break;
+		case "/user/changeinfo":
+			request.getRequestDispatcher("../WEB-INF/jsp/user/change-info.jsp").forward(request, response);
 			break;
 		case "/user/inbox":
 			request.getRequestDispatcher("../WEB-INF/jsp/user/inbox.jsp").forward(request, response);

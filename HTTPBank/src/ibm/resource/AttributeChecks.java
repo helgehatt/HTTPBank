@@ -1,9 +1,7 @@
-package ibm.controller;
+package ibm.resource;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import ibm.resource.InputException;
 
 public class AttributeChecks {
 	//User Methods
@@ -25,8 +23,8 @@ public class AttributeChecks {
 	 */
 	public static void checkCpr(String cpr) throws InputException {
     	cpr = cpr.replace("-", "");
-		if (cpr.length() != 9)
-    		throw new InputException("Please enter 9 digits.");
+		if (cpr.length() != 10)
+    		throw new InputException("Please enter 10 digits.");
     	if (!isNumerous(cpr))
     		throw new InputException("Please enter numbers only.");
     }
