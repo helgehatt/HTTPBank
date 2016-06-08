@@ -1,6 +1,7 @@
 package ibm.controller;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
 
 import javax.servlet.ServletException;
@@ -29,9 +30,14 @@ public class UserInfoChanger extends HttpServlet {
     	String nPassword = request.getParameter("n-password");
     	String rPassword = request.getParameter("r-password");
     	    	
-    	if (DB.checkLogin(user.getUsername(), cPassword) < 1) {
-    		errors.put("cpassword", "Incorrect password");
-    	}
+    	try {
+			if (DB.checkLogin(user.getUsername(), cPassword) < 1) {
+				errors.put("cpassword", "Incorrect password");
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     	
     	if (!nPassword.equals(rPassword)) {
     		errors.put("rpassword", "Passwords do not match");
