@@ -20,13 +20,14 @@ import java.util.Calendar;
 public class DB2Test {
 	//Main
 	public static void main(String[] args) throws SQLException, ClassNotFoundException, InputException {
-		testCheckLogin2("Helgo","moo");
+		//testCheckLogin2("Helgo","moo");
 		//System.out.println();
+		testCreateTransaction2(1, 3, "Should be goooood","Should be great", 5000.0, 30000.0);
 		//testBatchTimer();
 		System.out.println();
-		testCreateMessage("Tak for igår <3\nDet var sgu billigt", "Xerxes", 3);
-		System.out.println();
-		testGetArchive(1);
+		//testCreateMessage("Tak for igår <3\nDet var sgu billigt", "Xerxes", 3);
+		//System.out.println();
+		//testGetArchive(1);
 		/*testCheckLogin("Thomas", "1234");
 		System.out.println();
 		
@@ -141,6 +142,14 @@ public class DB2Test {
 	private static Transaction testCreateTransaction(int senderId, int receiverId, String description, double amount) throws SQLException {
 		long start = System.currentTimeMillis();
 		Transaction transaction = DB.createTransaction(DB.TransBy.ID, senderId, ""+receiverId, description, description, -amount, amount);
+		System.out.println("Created Transaction, Query Time: " + (System.currentTimeMillis()-start));
+		printTransaction(transaction);
+		return transaction;
+	}
+	
+	private static Transaction testCreateTransaction2(int senderId, int receiverId, String senderDescription, String receiverDescription, double senderAmount, double receiverAmount) throws SQLException {
+		long start = System.currentTimeMillis();
+		Transaction transaction = DB.createTransaction2(DB.TransBy.ID, senderId, ""+receiverId, senderDescription, receiverDescription, -senderAmount, receiverAmount);
 		System.out.println("Created Transaction, Query Time: " + (System.currentTimeMillis()-start));
 		printTransaction(transaction);
 		return transaction;

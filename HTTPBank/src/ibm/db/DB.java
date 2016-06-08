@@ -5,6 +5,7 @@ import ibm.resource.InputException;
 import ibm.resource.Message;
 import ibm.resource.Transaction;
 import ibm.resource.User;
+import sun.security.action.GetBooleanAction;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -446,6 +447,44 @@ public class DB {
 		return null;
 	}
 	
+	public static Transaction createTransaction2(TransBy transBy, int senderId, String receiverId, String senderDescription, String receiverDescription, double senderAmount, double receiverAmount) {
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				Date date = new Date(Calendar.getInstance().getTime().getTime());
+				Transaction transaction = null;
+				try {
+					connection.setAutoCommit(false);
+					CallableStatement getBalanceStatement = connection.prepareCall("{call DTUGRP07.createTransaction(?,?,?,?,?,?,?,?)}");
+					
+					getBalanceStatement.setInt(1,senderId);
+					getBalanceStatement.setString(2, receiverId);	
+					getBalanceStatement.setString(3,senderDescription);
+					getBalanceStatement.setString(4, receiverDescription);
+					getBalanceStatement.setDouble(5, senderAmount);
+					getBalanceStatement.setDouble(6, receiverAmount);
+					getBalanceStatement.setDate(7, date);
+					getBalanceStatement.setString(8, transBy.toString());
+					getBalanceStatement.execute();
+					long t = -1;
+					transaction = new Transaction(t, senderId, date, senderDescription, senderAmount);
+					getBalanceStatement.close();
+					connection.commit();
+				} catch(SQLException e) {
+					e.printStackTrace();
+					connection.rollback();
+					throw e;
+				} finally {
+					connection.setAutoCommit(true);
+				}
+				return transaction;
+			} catch (SQLException e) {
+				handleSQLException(e);
+				//if no more tries, throw exception.
+			}
+		}
+		return null;
+	}
+	
 	/**
 	 * Queries the database to insert a new transaction into the TRANSACTIONS table.
 	 * Note that no change or checks are made to any accounts with this method.
@@ -571,6 +610,8 @@ public class DB {
 		
 		return new Transaction(null, id, date, description, amount);
 	}
+	
+	
 	
 	/**
 	 * Queries the database to insert a new transaction into the TRANSACTIONS table.
