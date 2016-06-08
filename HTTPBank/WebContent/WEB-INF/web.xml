@@ -15,4 +15,8 @@
     <error-code>418</error-code>
     <location>/WEB-INF/jsp/error/lost-connection.jsp</location>
   </error-page>
+  <error-page>
+    <error-code>419</error-code>
+    <location>/WEB-INF/jsp/error/unauthorized-access.jsp</location>
+  </error-page>
 </web-app>
