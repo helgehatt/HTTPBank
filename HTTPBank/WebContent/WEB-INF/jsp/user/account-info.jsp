@@ -17,18 +17,12 @@
 </style>
 
 <%@ include file="navbar.jsp" %>
-
-<div class="container-fluid">
-
-	<c:set var="menu" scope="page" value="account"/>
-	<%@ include file="side-menu.jsp" %>
 	
-	<div id="account-info" class="container col-sm-9">
+<div id="account-info" class="container">
+  <h3>Account info</h3>
+  <p>Information about your account is shown below.</p>
 	
 	<%@ include file="../content/account-info.jsp" %>
-	
-	</div>
-	
 	
 </div>
 

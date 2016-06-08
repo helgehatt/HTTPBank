@@ -15,15 +15,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class DB2Test {
 	//Main
 	public static void main(String[] args) throws SQLException, ClassNotFoundException, InputException {
-		testCheckLogin2("Thomas","1234");
+		testCheckLogin2("Helgo","moo");
 		//System.out.println();
 		//testBatchTimer();
 		System.out.println();
-		testCreateMessage("Du skylder!!", new Date(2016,03,05), "Thomas", 2);
+		testCreateMessage("Tak for igår <3\nDet var sgu billigt", "Xerxes", 3);
 		System.out.println();
 		testGetArchive(1);
 		/*testCheckLogin("Thomas", "1234");
@@ -62,9 +63,9 @@ public class DB2Test {
 		testDeleteUser("NewUser");
 		System.out.println();
 		testDeleteUserByCpr("123456-7890"); */
-		System.out.println();
+		//System.out.println();
 		
-		testArchive();
+		//testArchive();
 		
 	}
 	
@@ -84,8 +85,8 @@ public class DB2Test {
 		
 	}
 	
-	private static void testCreateMessage(String message, Date date, String senderName, int userID) throws SQLException {
-		DB.createMessage(message, date, senderName, userID);
+	private static void testCreateMessage(String message, String senderName, int userID) throws SQLException {
+		DB.createMessage(message, senderName, userID);
 	}
 	
 	private static void testGetCurrency(){

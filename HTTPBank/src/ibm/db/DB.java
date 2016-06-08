@@ -334,7 +334,7 @@ public class DB {
 				Collections.sort(resultList, new Comparator<Message>(){
 					@Override
 					public int compare(Message o1, Message o2) {
-						return Long.compare(o1.getDateRaw(), o2.getDateRaw());
+						return Long.compare(o2.getDateRaw(), o1.getDateRaw());
 					}
 				});
 				
@@ -490,21 +490,22 @@ public class DB {
 	}
 	
 	public static void archiveTransactions() throws SQLException {
-		
 		CallableStatement archive = connection.prepareCall("{call DTUGRP07.archiveProc()}");
 		archive.execute();
 		archive.close();
 	}
 	
-	public static Message createMessage(String message, Date date, String senderName, int userID) throws SQLException {
+	public static Message createMessage(String message, String senderName, int receiverUserID) throws SQLException {
+		Date date = new Date(Calendar.getInstance().getTime().getTime());
+		
 		PreparedStatement statement = connection.prepareStatement("INSERT INTO DTUGRP07.INBOX (MESSAGE, DATE, SENDER_NAME, USER_ID)"
 				+ "VALUES(?,?,?,?);");
 		statement.setString(1, message);
 		statement.setDate(2, date);
 		statement.setString(3, senderName);
-		statement.setInt(4, userID);
+		statement.setInt(4, receiverUserID);
 		statement.execute();
-		return new Message(message, date, senderName,userID);	
+		return new Message(message, date, senderName, receiverUserID);	
 	}
 	
 	/**

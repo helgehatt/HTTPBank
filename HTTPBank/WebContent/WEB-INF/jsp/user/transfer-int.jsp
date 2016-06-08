@@ -28,7 +28,7 @@
     <li><a href="transfer">Domestic</a></li>
     <li class="active"><a href="#">International</a></li>
   </ul>
-	<%@ include file="../transfer-int-form.jsp" %>
+	<%@ include file="../content/transfer-int.jsp" %>
 </div>
 
 

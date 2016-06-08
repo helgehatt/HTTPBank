@@ -40,39 +40,9 @@
 	<%@ include file="side-menu.jsp" %>
 	
 	<div id="account-list" class="container col-sm-9">
-		<div class="panel panel-default button-panel">
-			<div class="panel-body">
-				<ul class="list-group">
-					<c:forEach var="account" items="${user.accounts}">
-		   			<li class="list-group-item">
-		     			<form action="getAccount" method="post">
-		     				<button class="btn btn-default" name="id" value="${account.id}">
-		     					<h4 id="text-left">
-		     						<c:choose>
-			     						<c:when test="${account.name != '' }">
-			     							${account.name}
-			     						</c:when>
-			     						<c:otherwise>
-			     							${account.type}
-			     						</c:otherwise>
-		     						</c:choose>
-		     					</h4>
-		     					<h4 id="text-center">${account.number}</h4>
-		     					<h4 id="text-right">${account.balance} ${account.currency}</h4>
-		     				</button>
-		     			</form>
-		     		</li>
-					</c:forEach>
-					<li class="list-group-item">
-	     			<form action="newaccount" method="get">
-	     				<button class="btn btn-default">
-	     					<h4>New account</h4>
-	     				</button>
-	     			</form>
-					</li>
-				</ul>
-			</div>
-		</div>
+	
+	<%@ include file="../content/account-list.jsp" %>
+	
 	</div>
 	
 	

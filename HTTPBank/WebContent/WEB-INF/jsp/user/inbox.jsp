@@ -6,6 +6,14 @@
 	max-width: 800px;
 }
 
+#inbox .panel-body {
+	padding: 0;
+}
+
+#inbox .table {
+	margin: 0;
+}
+
 </style>
 
 <%@ include file="navbar.jsp" %>
@@ -14,7 +22,7 @@
 	
 	<c:set var="menu" scope="page" value="account"/>
 	
-	<div id="inbox" class="container col-sm-9">
+	<div id="inbox" class="container">
 		<div class="panel panel-default">
 			<div class="panel-body">
 		    <table class="table table-striped">

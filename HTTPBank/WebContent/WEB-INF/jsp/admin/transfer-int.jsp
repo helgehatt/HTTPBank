@@ -33,7 +33,7 @@
 	<div id="transfer-int" class="container col-sm-9">
 		<div class="panel panel-default">
 			<div class="panel-body">
-				<%@ include file="../transfer-int-form.jsp" %>
+				<%@ include file="../content/transfer-int.jsp" %>
 			</div>
 		</div>
 	</div>

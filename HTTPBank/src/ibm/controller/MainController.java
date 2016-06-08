@@ -11,8 +11,13 @@ import javax.servlet.http.HttpSession;
 
 import ibm.db.DB;
 
-@WebServlet(urlPatterns = { "/login", "/user/accounts", "/user/transfer", "/user/international", "/user/transactions", "/user/inbox", 
-		"/user/archive", "/user/inbox", "/admin/users", "/admin/search", "/admin/newuser", "/admin/accounts", "/admin/newaccount", 
+@WebServlet(urlPatterns = { "/login", 
+		
+		"/user/accounts", "/user/transactions", "/user/accountinfo", 
+		"/user/transfer", "/user/international", "/user/archive", 
+		"/user/userinfo", "/user/inbox", 
+		
+		"/admin/users", "/admin/search", "/admin/newuser", "/admin/accounts", "/admin/newaccount", 
 		"/admin/transactions", "/admin/accountinfo", "/admin/depositwithdrawal", "/admin/editaccount", "/admin/closeaccount",
 		"/admin/transfer", "/admin/international", "/admin/userinfo", "/admin/edituser", "/admin/archive" })
 public class MainController extends HttpServlet {
@@ -23,6 +28,7 @@ public class MainController extends HttpServlet {
 		String path = request.getRequestURI().replace(request.getContextPath(), "");
 
         // TODO: DB Authentication: Check login status.
+				
 		
 		switch (path) {
 		case "/login":
@@ -43,8 +49,14 @@ public class MainController extends HttpServlet {
 		case "/user/transactions":
 			request.getRequestDispatcher("../WEB-INF/jsp/user/transaction-list.jsp").forward(request, response);
 			break;
+		case "/user/accountinfo":
+			request.getRequestDispatcher("../WEB-INF/jsp/user/account-info.jsp").forward(request, response);
+			break;
 		case "/user/archive":
 			request.getRequestDispatcher("../WEB-INF/jsp/user/archive.jsp").forward(request, response);
+			break;
+		case "/user/userinfo":
+			request.getRequestDispatcher("../WEB-INF/jsp/user/user-info.jsp").forward(request, response);
 			break;
 		case "/user/inbox":
 			request.getRequestDispatcher("../WEB-INF/jsp/user/inbox.jsp").forward(request, response);
