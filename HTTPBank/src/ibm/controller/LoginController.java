@@ -23,7 +23,7 @@ public class LoginController extends HttpServlet {
         // TODO: DB Authentication: Set login status.
         
         try {
-        	int userID = DB.checkLogin2(username, password);
+        	int userID = DB.checkLogin(username, password);
 			if (userID > 0) {
 				request.getSession().setAttribute("user", DB.getUser(userID));
 				response.sendRedirect("user/accounts");
