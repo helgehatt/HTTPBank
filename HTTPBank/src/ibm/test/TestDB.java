@@ -2,31 +2,70 @@ package ibm.test;
 
 import static org.junit.Assert.*;
 import ibm.db.DB;
-import ibm.db.DB.ACCOUNT;
 import ibm.db.DB.USER;
 import ibm.resource.Account;
 import ibm.resource.InputException;
 import ibm.resource.Transaction;
 import ibm.resource.User;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Properties;
 
 import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class TestDB {
+	
+	private static Connection connection;
+	
+	@BeforeClass
+	public static void getConnection() throws SQLException {
+		Properties properties = new Properties();
+		properties.put("user", "DTU18");
+		properties.put("password", "FAGP2016");
+		properties.put("retreiveMessagesFromServerOnGetMessage", "true");
+		properties.put("emulateParameterMetaDataForZCalls", "1");
+		try {
+            Class.forName("com.ibm.db2.jcc.DB2Driver");
+        } catch (ClassNotFoundException e) {
+            throw new SQLException(e);
+        }
+		connection = DriverManager.getConnection("jdbc:db2://192.86.32.54:5040/DALLASB", properties);
+	}
+	
 	@AfterClass
-	private void testCleanUp(){
+	public static void cleanUp() throws SQLException{
 		//Delete everything!
+		Statement updateBalance = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+		updateBalance.executeUpdate("UPDATE DTUGRP07.ACCOUNTS "
+				+ "SET BALANCE = '0' "
+				+ "WHERE NAME LIKE 'Test%';");
+		updateBalance.close();
+		Statement deleteAccount = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+		deleteAccount.executeUpdate("DELETE FROM DTUGRP07.ACCOUNTS "
+				+ "WHERE NAME LIKE 'Test%';");
+		deleteAccount.close();
+		Statement deleteUser = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+		deleteUser.executeUpdate("DELETE FROM DTUGRP07.USERS "
+				+ "WHERE USERNAME LIKE 'Test%';");
+		deleteUser.close();
+		
+		//Close connection.
+		connection.close();
 	}
 	
 	@Test
-	private void testCreateMethods() throws SQLException {
+	public void testCreateMethods() throws SQLException {
 		//Test Create User
 		String username = "TestCreateUser";
 		String password = "Test1234";
-		String cpr = "Test1234";
+		String cpr = "TestCU1234";
 		String userName = "Test Testy Test";
 		String institute = "Test That Institute";
 		String consultant = "";
@@ -35,9 +74,12 @@ public class TestDB {
 		assertNull(nullUser);
 		//Create user
 		User user = DB.createUser(username, password, cpr, userName, institute, consultant);
+		assertNotNull(user);
 		//Get the newly created user
 		User sameUser = DB.getUserByCpr(cpr);
+		assertNotNull(sameUser);
 		//Assertion
+		assertTrue(0 < user.getId());
 		assertEquals(user.getId(), sameUser.getId());
 		assertEquals(user.getUsername(), sameUser.getUsername());
 		assertEquals(user.getName(), sameUser.getName());
@@ -86,9 +128,7 @@ public class TestDB {
 		//Assertion
 		assertEquals(transaction.getAccountId(), sameTransaction.getAccountId());
 		assertEquals(transaction.getAmount(), sameTransaction.getAmount());
-		assertEquals(transaction.getDate(), sameTransaction.getDate());
 		assertEquals(transaction.getDateAsString(), sameTransaction.getDateAsString());
-		assertEquals(transaction.getDateRaw(), sameTransaction.getDateRaw());
 		assertEquals(transaction.getDescription(), sameTransaction.getDescription());
 	}
 	
@@ -97,7 +137,7 @@ public class TestDB {
 		//Test Check Login
 		String username = "TestCreateLogin";
 		String password = "Test1234";
-		String cpr = "TestLogin1234";
+		String cpr = "TestCL1234";
 		String name = "Test Testy Test";
 		String institute = "Test That Institute";
 		String consultant = "";
@@ -117,7 +157,7 @@ public class TestDB {
 		//Test Get User
 		String username = "TestGetUser";
 		String password = "Test1234";
-		String cpr = "TestGetSingle1234";
+		String cpr = "TestGS1234";
 		String name = "Test Testy Test";
 		String institute = "Test That Institute";
 		String consultant = "";
@@ -134,45 +174,205 @@ public class TestDB {
 		assertEquals(user.getUsername(), sameUser.getUsername());
 	}
 	
-	@Test
-	public static ArrayList<User> testGetUsers() throws SQLException{
-		long start = System.currentTimeMillis();
+	public void testGetUsers() throws SQLException{
+		//Test Get Users
+		String username = "TestGetUsers";
+		String password = "Test1234";
+		String cpr = "TestGM1234";
+		String userName = "Test Testy Test";
+		String institute = "Test That Institute";
+		String consultant = "";
+		//Create user
+		User newUser = DB.createUser(username, password, cpr, userName, institute, consultant);
+		assertNotNull(newUser);
+		//Get Users
 		ArrayList<User> users = DB.getUsers();
-		System.out.println("Got Users, Query Time: " + (System.currentTimeMillis()-start));
-		for (User user : users)
-			System.out.println(user.getId()+" : "+user.getUsername());
-		return users;
+		assertFalse(users.isEmpty());
+		//Assertion
+		for (User user : users){
+			assertNotNull(user.getId());
+			assertNotNull(user.getConsultant());
+			assertNotNull(user.getCpr());
+			assertNotNull(user.getInstitute());
+			assertNotNull(user.getName());
+			assertNotNull(user.getUsername());
+		}
 	}
 
 	@Test
-	public static ArrayList<Transaction> testGetTransactions(int id) throws SQLException{
-		long start = System.currentTimeMillis();
-		ArrayList<Transaction> transactions = DB.getTransactions(id);
-		System.out.println("Got Transactions, Query Time: " + (System.currentTimeMillis()-start));
-		for (Transaction transaction : transactions)
-			printTransaction(transaction);
-		return transactions;
+	public void testGetTransactions() throws SQLException{
+		//Test Get Transactions
+		//Create User
+		String username = "TestGetTrans";
+		String password = "Test1234";
+		String cpr = "TestGT1234";
+		String userName = "Test Testy Test";
+		String institute = "Test That Institute";
+		String consultant = "";
+		//Create user
+		User user = DB.createUser(username, password, cpr, userName, institute, consultant);
+		assertNotNull(user);
+		
+		//Create Account
+		int userId = user.getId();
+		String accountName = "TestGetTrans";
+		String type = "TestTypeForTestAccount";
+		String number = "TestGT123456789"; 
+		String iban = "TestGT123456IBAN";
+		String currency = "EUR"; 
+		double interest = 0.05;
+		double balance = 0;
+		//Create Account
+		Account account = DB.createAccount(userId, accountName, type, number, iban, currency, interest, balance);
+		assertNotNull(account);
+		
+		//Create Transaction
+		int accountId = account.getId();
+		String description = "TestDecription is this, test-test, moo..."; 
+		double amount = 100;
+		//Create Transaction
+		Transaction newTransaction = DB.createTransaction(accountId, description, amount);
+		assertNotNull(newTransaction);
+		//Get Transactions
+		ArrayList<Transaction> transactions = DB.getTransactions(accountId);
+		assertFalse(transactions.isEmpty());
+		//Assertion
+		for (Transaction transaction : transactions){
+			assertNotNull(transaction.getId());
+			assertNotNull(transaction.getAccountId());
+			assertNotNull(transaction.getAmount());
+			assertNotNull(transaction.getDate());
+			assertNotNull(transaction.getDateRaw());
+			assertNotNull(transaction.getDateAsString());
+			assertNotNull(transaction.getDescription());
+		}
 	}
 
 	@Test
-	public static ArrayList<Account> testGetAccounts(int id) throws SQLException{
-		long start = System.currentTimeMillis();
-		ArrayList<Account> accounts = DB.getAccounts(id);
-		System.out.println("Got Accounts, Query Time: " + (System.currentTimeMillis()-start));
-		for (Account account : accounts)
-			printAccount(account);
-		return accounts;
+	public void testGetAccounts() throws SQLException{
+		//Test Get Accounts
+		//Create User
+		String username = "TestGetAccount";
+		String password = "Test1234";
+		String cpr = "TestGA1234";
+		String userName = "Test Testy Test";
+		String institute = "Test That Institute";
+		String consultant = "";
+		//Create user
+		User user = DB.createUser(username, password, cpr, userName, institute, consultant);
+		assertNotNull(user);
+		
+		//Create Account
+		int userId = user.getId();
+		String accountName = "TestGetAccount";
+		String type = "TestTypeForTestAccount";
+		String number = "TestGA123456789"; 
+		String iban = "TestGA123456IBAN";
+		String currency = "EUR"; 
+		double interest = 0.05;
+		double balance = 0;
+		//Create Account
+		Account newAccount = DB.createAccount(userId, accountName, type, number, iban, currency, interest, balance);
+		assertNotNull(newAccount);
+		//Get Accounts
+		ArrayList<Account> accounts = DB.getAccounts(userId);
+		assertNotNull(accounts);
+		//Assertion
+		for (Account account : accounts){
+			assertNotNull(account.getBalance());
+			assertNotNull(account.getCurrency());
+			assertNotNull(account.getIban());
+			assertNotNull(account.getId());
+			assertNotNull(account.getInterest());
+			assertNotNull(account.getName());
+			assertNotNull(account.getNumber());
+			assertNotNull(account.getType());
+			assertNotNull(account.getUserId());
+			//Range assertion
+			assertTrue(0 < account.getId());
+			assertTrue(0 < account.getUserId());
+			assertTrue(0.0 == account.getBalanceRaw());
+			assertTrue(0.0 == Double.parseDouble(account.getBalance()));
+		}
 	}
 	
-	@Test
-	private static void testUpdateAccount(int accountId, String value, ACCOUNT attribute) throws SQLException {
-		long start = System.currentTimeMillis();
-		boolean success = DB.updateAccount(accountId, value, attribute);
-		System.out.println("Updated New Account: " + success);
-		System.out.println("Query Time: " + (System.currentTimeMillis()-start));
+	public void testUpdateAccount() throws SQLException {
+		//Test Update Account
+		//Create User
+		String username = "TestUpdateAccount";
+		String password = "Test1234";
+		String cpr = "TestUA1234";
+		String userName = "Test Testy Test";
+		String institute = "Test That Institute";
+		String consultant = "";
+		//Create user
+		User user = DB.createUser(username, password, cpr, userName, institute, consultant);
+		assertNotNull(user);
+		
+		//Create Account
+		int userId = user.getId();
+		String accountName = "TestUpdateAccount";
+		String type = "TestTypeForTestAccount";
+		String number = "TestUA123456789"; 
+		String iban = "TestUA123456IBAN";
+		String currency = "EUR"; 
+		double interest = 0.05;
+		double balance = 0;
+		//Create Account
+		Account newAccount = DB.createAccount(userId, accountName, type, number, iban, currency, interest, balance);
+		assertNotNull(newAccount);
+		int accountId = newAccount.getId();
+		//Assert original values.
+		assertEquals(userId, newAccount.getUserId());
+		assertTrue(balance == newAccount.getBalanceRaw());
+		assertEquals(currency, newAccount.getCurrency());
+		assertEquals(iban, newAccount.getIban());
+		assertEquals(interest, newAccount.getInterest());
+		assertEquals(accountName, newAccount.getName());
+		assertEquals(number, newAccount.getNumber());
+		//Update Account 
+		String newAccountName = "TestUpdateAccountNew";
+		assertTrue(DB.updateAccount(accountId, newAccountName, DB.ACCOUNT.NAME));
+		double newBalance = 100;
+		assertTrue(DB.updateAccount(accountId, ""+newBalance, DB.ACCOUNT.BALANCE));
+		String newIban = "TestUAN123456IBAN";
+		assertTrue(DB.updateAccount(accountId, newIban, DB.ACCOUNT.IBAN));
+		double newInterest = 0.10;
+		assertTrue(DB.updateAccount(accountId, ""+newInterest, DB.ACCOUNT.INTEREST));
+		String newNumber = "TestUAN123456789";
+		assertTrue(DB.updateAccount(accountId, newNumber, DB.ACCOUNT.NUMBER));
+		String newType = "TestNewTypeForTestAccount";
+		assertTrue(DB.updateAccount(accountId, newType, DB.ACCOUNT.TYPE));
+		//Assertion
+		Account updatedAccount = DB.getAccount(accountId);
+		assertEquals(userId, updatedAccount.getUserId());
+		assertTrue(newBalance == updatedAccount.getBalanceRaw());
+		assertEquals(currency, updatedAccount.getCurrency());
+		assertEquals(newIban, updatedAccount.getIban());
+		assertEquals(newInterest, updatedAccount.getInterest());
+		assertEquals(newAccountName, updatedAccount.getName());
+		assertEquals(newNumber, updatedAccount.getNumber());
+		
+		//Update Account 
+		String newNewAccountName = "TestUpdateAccountNew";
+		double newNewBalance = 100;
+		String newNewIban = "TestUAN123456IBAN";
+		double newNewInterest = 0.10;
+		String newNewNumber = "TestUAN123456789";
+		String newNewType = "TestNewTypeForTestAccount";
+		String newNewCurrency = "DKK";
+		assertTrue(DB.updateAccount(accountId, newNewAccountName, newNewType, newNewNumber, newNewIban, newNewCurrency, newNewInterest, newNewBalance));
+		//Assertion
+		Account updatedUpdatedAccount = DB.getAccount(accountId);
+		assertEquals(userId, updatedUpdatedAccount.getUserId());
+		assertTrue(newNewBalance == updatedUpdatedAccount.getBalanceRaw());
+		assertEquals(newNewCurrency, updatedUpdatedAccount.getCurrency());
+		assertEquals(newNewIban, updatedUpdatedAccount.getIban());
+		assertEquals(newNewInterest, updatedUpdatedAccount.getInterest());
+		assertEquals(newNewAccountName, updatedUpdatedAccount.getName());
+		assertEquals(newNewNumber, updatedUpdatedAccount.getNumber());
 	}
 
-	@Test
 	private static void testUpdateUser(int userId, String value, USER attribute) throws SQLException {
 		long start = System.currentTimeMillis();
 		boolean success = DB.updateUser(userId, value, attribute);
@@ -180,7 +380,6 @@ public class TestDB {
 		System.out.println("Query Time: " + (System.currentTimeMillis()-start));
 	}
 	
-	@Test
 	private static void testDeleteUserByCpr(String cpr) throws SQLException {
 		long start = System.currentTimeMillis();
 		boolean success = DB.deleteUserByCpr(cpr);
@@ -188,7 +387,6 @@ public class TestDB {
 		System.out.println("Query Time: " + (System.currentTimeMillis()-start));
 	}
 
-	@Test
 	private static void testDeleteUser(String userId) throws SQLException {
 		long start = System.currentTimeMillis();
 		boolean success = DB.deleteUser(userId);
@@ -196,7 +394,6 @@ public class TestDB {
 		System.out.println("Query Time: " + (System.currentTimeMillis()-start));
 	}
 
-	@Test
 	private static void testDeleteAccountByNumber(String number) throws SQLException {
 		long start = System.currentTimeMillis();
 		boolean success = DB.deleteAccountByNumber(number);
@@ -204,23 +401,10 @@ public class TestDB {
 		System.out.println("Query Time: " + (System.currentTimeMillis()-start));
 	}
 
-	@Test
 	private static void testDeleteAccount(int accountId) throws SQLException {
 		long start = System.currentTimeMillis();
 		boolean success = DB.deleteAccount(accountId);
 		System.out.println("Delete New Account: " + success);
 		System.out.println("Query Time: " + (System.currentTimeMillis()-start));
-	}
-	
-	public static void printUser(User user){
-		System.out.println(user.getId() +" : "+ user.getUsername() +" : "+ user.getCpr() +" : "+ user.getName() +" : "+ user.getInstitute() +" : "+ user.getConsultant());
-	}
-	
-	private static void printAccount(Account account) {
-		System.out.println(account.getUserId() +" : "+ account.getId() +" : "+ account.getName() +" : "+ account.getType() +" : "+ account.getNumber() +" : "+ account.getIban() +" : "+ account.getCurrency() +" : "+ account.getInterest() +" : "+account.getBalance());
-	}
-	
-	private static void printTransaction(Transaction transaction) {
-		System.out.println(transaction.getAccountId() +" : "+ transaction.getId() +" : "+ transaction.getDateAsString() +" : "+ transaction.getDescription() +" : "+ transaction.getAmount());
 	}
 }
