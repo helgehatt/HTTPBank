@@ -19,11 +19,15 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Properties;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class TestDB {
+import org.mockito.Mockito;
+
+public class TestDB extends Mockito{
 	
 	private static Connection connection;
 	
