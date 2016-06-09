@@ -7,7 +7,7 @@
 }
 
 #change-info form {
-	padding: 20px;
+	margin-top: 20px;
 }
 
 </style>

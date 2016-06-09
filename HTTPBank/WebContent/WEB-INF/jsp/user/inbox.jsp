@@ -6,14 +6,6 @@
 	max-width: 800px;
 }
 
-#inbox .panel-body {
-	padding: 0;
-}
-
-#inbox .table {
-	margin: 0;
-}
-
 </style>
 
 <%@ include file="navbar.jsp" %>

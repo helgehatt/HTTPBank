@@ -6,14 +6,6 @@
 	max-width: 1200px;
 }
 
-#transaction-list .panel-body {
-	padding: 0;
-}
-
-#transaction-list .table {
-	margin: 0;
-}
-
 #transaction-list-item a {
 	background-color:#e6e6e6;
 }

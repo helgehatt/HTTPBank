@@ -36,14 +36,6 @@ $(function(){
 	border: none;
 }
 
-#deposit-withdrawal .panel-body {
-	padding-top: 0;
-}
-
-#deposit-withdrawal .nav-pills {
-	padding: 20px;
-}
-
 #deposit-withdrawal li a {
 	border: solid 1px;
 }

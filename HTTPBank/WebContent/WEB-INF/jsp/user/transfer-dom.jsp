@@ -8,10 +8,6 @@
 	max-width: 800px;
 }
 
-#transfer-dom form {
-	padding: 20px;
-}
-
 #transfer-nav {
 	background-color:#e6e6e6;
 }

@@ -6,12 +6,12 @@
 	max-width: 600px;
 }
 
-#account-info .table {
-	margin: 0;
-}
-
 #account-info-item a {
 	background-color:#e6e6e6;
+}
+
+.panel-body {
+	padding: 15px;
 }
 
 </style>
