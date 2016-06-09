@@ -1,11 +1,11 @@
 package ibm.db;
 
 import ibm.resource.Account;
+import ibm.resource.DatabaseException;
 import ibm.resource.InputException;
 import ibm.resource.Message;
 import ibm.resource.Transaction;
 import ibm.resource.User;
-import sun.security.action.GetBooleanAction;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -45,9 +45,10 @@ public class DB {
 	/**
 	 * Queries the database and returns a list of transactions related to a specific account-id.
 	 * @return ArrayList containing all current database transactions related to the given account. Returns null if database query fails.
+	 * @throws DatabaseException If a database error occurs.
 	 * @throws SQLException {@link #checkConnection() CheckConnection()}
 	 */
-	public static ArrayList<Transaction> getTransactions(int accountid) {
+	public static ArrayList<Transaction> getTransactions(int accountid) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				PreparedStatement statement = connection.prepareStatement("SELECT TRANSACTION_ID, ACCOUNT_ID, DATE, DESCRIPTION, AMOUNT "
@@ -76,7 +77,7 @@ public class DB {
 				
 				return resultList;
 			} catch (SQLException e) {
-				handleSQLException(e);
+				handleSQLException(e, tries);
 				//if no more tries, throw exception.
 			}
 		}
@@ -86,9 +87,10 @@ public class DB {
 	/**
 	 * Queries the database and returns a list of accounts related to a specific user-id.
 	 * @return ArrayList containing all current database accounts related to the given user. Returns null if database query fails.
+	 * @throws DatabaseException If a database error occurs.
 	 * @throws SQLException {@link #checkConnection() CheckConnection()}
 	 */
-	public static ArrayList<Account> getAccounts(int userid) {
+	public static ArrayList<Account> getAccounts(int userid) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, ACCOUNT_ID, NAME, TYPE, NUMBER, IBAN, CURRENCY, INTEREST, BALANCE "
@@ -108,7 +110,7 @@ public class DB {
 				statement.close();
 				return resultList;
 			} catch (SQLException e) {
-				handleSQLException(e);
+				handleSQLException(e, tries);
 				//if no more tries, throw exception.
 			}
 		}
@@ -117,9 +119,9 @@ public class DB {
 	
 	/**
 	 * Queries the database and returns the account with the given account id and data associated with it.
-	 * @throws SQLException 
+	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static Account getAccount(int accountId) {
+	public static Account getAccount(int accountId) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, ACCOUNT_ID, NAME, TYPE, NUMBER, IBAN, CURRENCY, INTEREST, BALANCE "
@@ -140,7 +142,7 @@ public class DB {
 				
 				return account;
 			} catch (SQLException e) {
-				handleSQLException(e);
+				handleSQLException(e, tries);
 				//if no more tries, throw exception.
 			}
 		}
@@ -151,9 +153,9 @@ public class DB {
 	 * Queries the database and returns a list of users.
 	 * Note: For now the user objects returned by this method only return the 'userId' and 'username'. No other information is received.
 	 * @return ArrayList containing all current database users. Returns null if database query fails.
-	 * @throws SQLException {@link #checkConnection() CheckConnection()}
+	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static ArrayList<User> getUsers() {
+	public static ArrayList<User> getUsers() throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, USERNAME, CPR, NAME "
@@ -171,7 +173,7 @@ public class DB {
 				statement.close();
 				return resultList;
 			} catch (SQLException e) {
-				handleSQLException(e);
+				handleSQLException(e, tries);
 				//if no more tries, throw exception.
 			}
 		}
@@ -181,9 +183,9 @@ public class DB {
 	/**
 	 * Returns the user with the given userId and all information related to them.
 	 * @return User object containing all fields except for 'accounts'. Returns null if database query fails or returns no rows.
-	 * @throws SQLException {@link #checkConnection() CheckConnection()}
+	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static User getUser(int userId) {
+	public static User getUser(int userId) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, USERNAME, CPR, NAME, INSTITUTE, CONSULTANT "
@@ -204,7 +206,7 @@ public class DB {
 				
 				return user;
 			} catch (SQLException e) {
-				handleSQLException(e);
+				handleSQLException(e, tries);
 				//if no more tries, throw exception.
 			}
 		}
@@ -214,9 +216,9 @@ public class DB {
 	/**
 	 * Returns the user with the given cpr-number and all information related to them.
 	 * @return User object containing all fields except for 'accounts'. Returns null if database query fails or returns no rows.
-	 * @throws SQLException {@link #checkConnection() CheckConnection()}
+	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static User getUserByCpr(String cpr) {
+	public static User getUserByCpr(String cpr) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, USERNAME, CPR, NAME, INSTITUTE, CONSULTANT "
@@ -237,7 +239,7 @@ public class DB {
 				
 				return user;
 			} catch (SQLException e) {
-				handleSQLException(e);
+				handleSQLException(e, tries);
 				//if no more tries, throw exception.
 			}
 		}
@@ -246,9 +248,9 @@ public class DB {
 	
 	/**
 	 * Queries the database for a specific account with the given account number. 
-	 * @throws SQLException 
+	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static Account getAccountByNumber(String number) {
+	public static Account getAccountByNumber(String number) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, ACCOUNT_ID, NAME, TYPE, NUMBER, IBAN, CURRENCY, INTEREST, BALANCE "
@@ -269,14 +271,14 @@ public class DB {
 				
 				return account;
 			} catch (SQLException e) {
-				handleSQLException(e);
+				handleSQLException(e, tries);
 				//if no more tries, throw exception.
 			}
 		}
 		return null;
 	}
 	
-	public static ArrayList<Transaction> getArchive(int account_id) {
+	public static ArrayList<Transaction> getArchive(int account_id) throws DatabaseException {
 		for(int tries = 2; 0 < tries; tries--) {
 			try {
 				PreparedStatement statement = connection.prepareStatement("SELECT TRANSACTION_ID, ACCOUNT_ID, DATE, DESCRIPTION, AMOUNT FROM DTUGRP07.ARCHIVE "
@@ -306,13 +308,13 @@ public class DB {
 				return resultList;
 				
 			} catch (SQLException e) {
-				handleSQLException(e);
+				handleSQLException(e, tries);
 			}
 		}
 		return null;
 	}
 	
-	public static ArrayList<Message> getMessages(int userId) {
+	public static ArrayList<Message> getMessages(int userId) throws DatabaseException {
 		for(int tries = 2; 0 < tries; tries--) {
 			try {
 				PreparedStatement statement = connection.prepareStatement("SELECT MESSAGE, DATE, SENDER_NAME, USER_ID FROM DTUGRP07.INBOX "
@@ -342,7 +344,7 @@ public class DB {
 				return resultList;
 				
 			} catch (SQLException e) {
-				handleSQLException(e);
+				handleSQLException(e, tries);
 			}
 		}
 	
@@ -350,9 +352,10 @@ public class DB {
 	}
 
 	/**
-	 * 
+	 * Gets a list of all currencies available in the database.
+	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static ArrayList<String> getCurrencies(){
+	public static ArrayList<String> getCurrencies() throws DatabaseException{
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				PreparedStatement statement = connection.prepareStatement("SELECT * "
@@ -370,7 +373,7 @@ public class DB {
 				
 				return currencies;
 			} catch (SQLException e) {
-				handleSQLException(e);
+				handleSQLException(e, tries);
 				//if no more tries, throw exception.
 
 			}
@@ -411,14 +414,12 @@ public class DB {
 	 * @param senderAmount The amount to enter into the transaction for the sender.
 	 * @param receiverAmount The amount to enter into the transaction for the receiver.
 	 * @return The new transaction for the sender as a Transaction object with all fields, excluding 'transaction_id', if successfully created.
-	 * @throws SQLException 
+	 * @throws DatabaseException If a database error occurs.
 	 */
-		
-	public static Transaction createTransaction(TransBy transBy, int senderId, String receiverId, String senderDescription, String receiverDescription, double senderAmount, double receiverAmount) {
+	public static boolean createTransaction(TransBy transBy, int senderId, String receiverId, String senderDescription, String receiverDescription, double senderAmount, double receiverAmount) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				Date date = new Date(Calendar.getInstance().getTime().getTime());
-				Transaction transaction = null;
 				try {
 					connection.setAutoCommit(false);
 					CallableStatement getBalanceStatement = connection.prepareCall("{call DTUGRP07.createTransaction(?,?,?,?,?,?,?,?)}");
@@ -432,23 +433,21 @@ public class DB {
 					getBalanceStatement.setDate(7, date);
 					getBalanceStatement.setString(8, transBy.toString());
 					getBalanceStatement.execute();
-					long t = -1;
-					transaction = new Transaction(t, senderId, date, senderDescription, senderAmount);
 					getBalanceStatement.close();
 					connection.commit();
 				} catch(SQLException e) {
-					handleSQLException(e);
 					connection.rollback();
+					handleSQLException(e, tries);
+					//if no more tries, throw exception.
 				} finally {
 					connection.setAutoCommit(true);
 				}
-				return transaction;
+				return true;
 			} catch (SQLException e) {
-				handleSQLException(e);
-				//if no more tries, throw exception.
+				handleSQLException(e, tries);
 			}
 		}
-		return null;
+		return false;
 	}
 	
 	/**
@@ -459,13 +458,12 @@ public class DB {
 	 * @param description The string with the description of the transaction.
 	 * @param amount The amount to enter into the transaction, can be negative.
 	 * @return The new transaction as a Transaction object with all fields, excluding 'transaction_id', if successfully created.
-	 * @throws SQLException 
+	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static Transaction createTransaction(int accountId, String description, double amount) {
+	public static boolean createTransaction(int accountId, String description, double amount) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				Date date = new Date(Calendar.getInstance().getTime().getTime());
-				Transaction transaction = null;
 				try {
 					connection.setAutoCommit(false);
 					CallableStatement statement = connection.prepareCall("{call DTUGRP07.createTransactionOne(?,?,?,?)}");
@@ -476,7 +474,6 @@ public class DB {
 					statement.execute();
 					connection.commit();
 					statement.close();
-					transaction = new Transaction(null, accountId, date, description, amount);
 				} catch (Exception e){
 					//Error, rollback all changes.
 					connection.rollback();
@@ -484,32 +481,47 @@ public class DB {
 				} finally {
 					connection.setAutoCommit(true);
 				}
-				return transaction;
+				return true;
 			} catch (SQLException e) {
-				handleSQLException(e);
+				handleSQLException(e, tries);
 				//if no more tries, throw exception.
 			}
 		}
-		return null;
+		return false;
 	}
 	
-	public static void archiveTransactions() throws SQLException {
-		CallableStatement archive = connection.prepareCall("{call DTUGRP07.archiveProc()}");
-		archive.execute();
-		archive.close();
+	public static void archiveTransactions() throws DatabaseException {
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				CallableStatement archive = connection.prepareCall("{call DTUGRP07.archiveProc()}");
+				archive.execute();
+				archive.close();
+				return;
+			} catch (SQLException e) {
+				handleSQLException(e, tries);
+				//if no more tries, throw exception.
+			}
+		}
 	}
 	
-	public static Message createMessage(String message, String senderName, int receiverUserID) throws SQLException {
-		Date date = new Date(Calendar.getInstance().getTime().getTime());
-		
-		PreparedStatement statement = connection.prepareStatement("INSERT INTO DTUGRP07.INBOX (MESSAGE, DATE, SENDER_NAME, USER_ID)"
-				+ "VALUES(?,?,?,?);");
-		statement.setString(1, message);
-		statement.setDate(2, date);
-		statement.setString(3, senderName);
-		statement.setInt(4, receiverUserID);
-		statement.execute();
-		return new Message(message, date, senderName, receiverUserID);	
+	public static boolean createMessage(String message, String senderName, int receiverUserID) throws DatabaseException {
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				Date date = new Date(Calendar.getInstance().getTime().getTime());
+				PreparedStatement statement = connection.prepareStatement("INSERT INTO DTUGRP07.INBOX (MESSAGE, DATE, SENDER_NAME, USER_ID)"
+						+ "VALUES(?,?,?,?);");
+				statement.setString(1, message);
+				statement.setDate(2, date);
+				statement.setString(3, senderName);
+				statement.setInt(4, receiverUserID);
+				statement.execute();
+				return true;
+			} catch (SQLException e) {
+				handleSQLException(e, tries);
+				//if no more tries, throw exception.
+			}
+		}
+		return false;
 	}
 	
 
@@ -524,10 +536,10 @@ public class DB {
 	 * @param amount The amount to enter into this transaction.
 	 * 
 	 * @return The new transaction as a Transaction object with all fields, excluding 'transaction_id', if successfully created.
-	 * @throws SQLException 
+	 * @throws DatabaseException If a database error occurs.
 	 */
 	@Deprecated
-	public static Transaction createDeposit(int accountId, String description, double amount) {
+	public static Transaction createDeposit(int accountId, String description, double amount) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				Date date = new Date(Calendar.getInstance().getTime().getTime());
@@ -545,7 +557,7 @@ public class DB {
 				
 				return new Transaction(null, accountId, date, description, amount);
 			} catch (SQLException e) {
-				handleSQLException(e);
+				handleSQLException(e, tries);
 				//if no more tries, throw exception.
 			}
 		}
@@ -563,10 +575,10 @@ public class DB {
 	 * @param amount The amount to subtract in this transaction.
 	 * 
 	 * @return The new transaction as a Transaction object with all fields, excluding 'transaction_id', if successfully created.
-	 * @throws SQLException 
+	 * @throws DatabaseException If a database error occurs.
 	 */
 	@Deprecated
-	public static Transaction createWithdrawal(int accountId, String description, double amount) {
+	public static Transaction createWithdrawal(int accountId, String description, double amount) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				Date date = new Date(Calendar.getInstance().getTime().getTime());
@@ -584,7 +596,7 @@ public class DB {
 				
 				return new Transaction(null, accountId, date, description, -amount);
 			} catch (SQLException e) {
-				handleSQLException(e);
+				handleSQLException(e, tries);
 				//if no more tries, throw exception.
 			}
 		}
@@ -594,9 +606,9 @@ public class DB {
 	/**
 	 * Queries the database to insert a new account into the ACCOUNTS table, then queries the database to return the newly created row.
 	 * @return The new account as an Account object with all fields, if successfully created.
-	 * @throws SQLException 
+	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static Account createAccount(int userId, String name, String type, String number, String iban, String currency, double interest, double balance) {
+	public static boolean createAccount(int userId, String name, String type, String number, String iban, String currency, double interest, double balance) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				PreparedStatement statement = connection.prepareStatement("INSERT INTO DTUGRP07.ACCOUNTS "
@@ -615,23 +627,21 @@ public class DB {
 				statement.execute(); //Attempt to insert new row.
 				statement.close();
 				
-				Account account = getAccountByNumber(number);
-				account.setTransactions(new ArrayList<Transaction>());
-				return account;
+				return true;
 			} catch (SQLException e) {
-				handleSQLException(e);
+				handleSQLException(e, tries);
 				//if no more tries, throw exception.
 			}
 		}
-		return null;
+		return false;
 	}
 	
 	/**
 	 * Queries the database to insert a new user into the USERS table, then queries the database to return the newly created row.
 	 * @return The new user as a User object with all fields, if successfully created.
-	 * @throws SQLException 
+	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static User createUser(String username, String password, String cpr, String name, String institute, String consultant) {
+	public static boolean createUser(String username, String password, String cpr, String name, String institute, String consultant) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				PreparedStatement statement = connection.prepareStatement("INSERT INTO DTUGRP07.USERS "
@@ -648,15 +658,13 @@ public class DB {
 				statement.execute(); //Attempt to insert new row.
 				statement.close();
 				
-				User user = getUserByCpr(cpr);
-				user.setAccounts(new ArrayList<Account>());
-				return user;
+				return true;
 			} catch (SQLException e) {
-				handleSQLException(e);
+				handleSQLException(e, tries);
 				//if no more tries, throw exception.
 			}
 		}
-		return null;
+		return false;
 	}
 	
 	
@@ -686,9 +694,9 @@ public class DB {
 	/**
 	 * Queries the database to update a user's information for the user with the given user id.
 	 * @return True if operation was successful.
-	 * @throws SQLException 
+	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static boolean updateUser(int userId, String value, USER attribute) {
+	public static boolean updateUser(int userId, String value, USER attribute) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				PreparedStatement statement = connection.prepareStatement("UPDATE DTUGRP07.USERS "
@@ -702,7 +710,7 @@ public class DB {
 				statement.close();
 				return true;
 			} catch (SQLException e) {
-				handleSQLException(e);
+				handleSQLException(e, tries);
 				//if no more tries, throw exception.
 			}
 		}
@@ -712,9 +720,9 @@ public class DB {
 	/**
 	 * Queries the database to update a user's information for the user with the given user id.
 	 * @return True if operation was successful.
-	 * @throws SQLException 
+	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static boolean updateUser(int userId, String username, String password, String cpr, String name, String institute, String consultant) {
+	public static boolean updateUser(int userId, String username, String password, String cpr, String name, String institute, String consultant) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				PreparedStatement statement = connection.prepareStatement("UPDATE DTUGRP07.USERS "
@@ -733,7 +741,7 @@ public class DB {
 				statement.close();
 				return true;
 			} catch (SQLException e) {
-				handleSQLException(e);
+				handleSQLException(e, tries);
 				//if no more tries, throw exception.
 			}
 		}
@@ -766,9 +774,9 @@ public class DB {
 	/**
 	 * Queries the database to update account information for the account with the given account id.
 	 * @return True if operation was successful.
-	 * @throws SQLException 
+	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static boolean updateAccount(int accountId, String value, ACCOUNT attribute) {
+	public static boolean updateAccount(int accountId, String value, ACCOUNT attribute) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				PreparedStatement statement = connection.prepareStatement("UPDATE DTUGRP07.ACCOUNTS "
@@ -796,7 +804,7 @@ public class DB {
 				statement.close();
 				return true;
 			} catch (SQLException e) {
-				handleSQLException(e);
+				handleSQLException(e, tries);
 				//if no more tries, throw exception.
 			}
 		}
@@ -806,9 +814,9 @@ public class DB {
 	/**
 	 * Queries the database to update account information for the account with the given account id.
 	 * @return True if operation was successful.
-	 * @throws SQLException 
+	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static boolean updateAccount(int accountId, String name, String type, String number, String iban, String currency, double interest, double balance) {
+	public static boolean updateAccount(int accountId, String name, String type, String number, String iban, String currency, double interest, double balance) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				PreparedStatement statement = connection.prepareStatement("UPDATE DTUGRP07.ACCOUNTS "
@@ -829,7 +837,7 @@ public class DB {
 				statement.close();
 				return true;
 			} catch (SQLException e) {
-				handleSQLException(e);
+				handleSQLException(e, tries);
 				//if no more tries, throw exception.
 			}
 		}
@@ -841,8 +849,9 @@ public class DB {
 	/**
 	 * Queries the database to delete the account and any transaction associated with this account with the given account-id.
 	 * @return True if operation was successful.
+	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static boolean deleteAccount(int accountId) {
+	public static boolean deleteAccount(int accountId) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				PreparedStatement statement = connection.prepareStatement("DELETE FROM DTUGRP07.ACCOUNTS "
@@ -854,7 +863,7 @@ public class DB {
 				statement.close();
 				return true;
 			} catch (SQLException e) {
-				handleSQLException(e);
+				handleSQLException(e, tries);
 				//if no more tries, throw exception.
 			}
 		}
@@ -864,8 +873,9 @@ public class DB {
 	/**
 	 * Queries the database to delete the account and any transaction associated with this account with the given account-number.
 	 * @return True if operation was successful.
+	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static boolean deleteAccountByNumber(String number) {
+	public static boolean deleteAccountByNumber(String number) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				PreparedStatement statement = connection.prepareStatement("DELETE FROM DTUGRP07.ACCOUNTS "
@@ -877,7 +887,7 @@ public class DB {
 				statement.close();
 				return true;
 			} catch (SQLException e) {
-				handleSQLException(e);
+				handleSQLException(e, tries);
 				//if no more tries, throw exception.
 			}
 		}
@@ -887,8 +897,9 @@ public class DB {
 	/**
 	 * Queries the database to delete the user with the given username.
 	 * @return True if operation was successful.
+	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static boolean deleteUser(String username) {
+	public static boolean deleteUser(String username) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				PreparedStatement statement = connection.prepareStatement("DELETE FROM DTUGRP07.USERS "
@@ -900,7 +911,7 @@ public class DB {
 				statement.close();
 				return true;
 			} catch (SQLException e) {
-				handleSQLException(e);
+				handleSQLException(e, tries);
 				//if no more tries, throw exception.
 			}
 		}
@@ -910,8 +921,9 @@ public class DB {
 	/**
 	 * Queries the database to delete the user with the given cpr-number.
 	 * @return True if operation was successful.
+	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static boolean deleteUserByCpr(String cpr) {
+	public static boolean deleteUserByCpr(String cpr) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				PreparedStatement statement = connection.prepareStatement("DELETE FROM DTUGRP07.USERS "
@@ -923,7 +935,7 @@ public class DB {
 				statement.close();
 				return true;
 			} catch (SQLException e) {
-				handleSQLException(e);
+				handleSQLException(e, tries);
 				//if no more tries, throw exception.
 			}
 		}
@@ -936,20 +948,27 @@ public class DB {
 	 * Queries a request for user information and checks for correct password. Returns the 'userId' of the user only if user exists and correct password is given as argument, else returns -1.
 	 * Uses a PreparedStatement to query.
 	 * TODO: This would be better to have as a stored procedure on the database.
-	 * @throws SQLException 
-	 * @throws InputException If invalid input is given.
+	 * @throws DatabaseException If a database error occurs.
 	 */
 	
-	public static int checkLogin(String username, String password) throws SQLException {
-		CallableStatement check = connection.prepareCall("{call DTUGRP07.checkLogin(?,?,?)}",
-				ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		check.setString(1,username);
-		check.setString(2, password);
-		check.registerOutParameter(3, java.sql.Types.INTEGER);
-		check.execute();
-		int result = check.getInt(3);
-		check.close();
-		return result;
+	public static int checkLogin(String username, String password) throws DatabaseException {
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				CallableStatement check = connection.prepareCall("{call DTUGRP07.checkLogin(?,?,?)}",
+						ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				check.setString(1,username);
+				check.setString(2, password);
+				check.registerOutParameter(3, java.sql.Types.INTEGER);
+				check.execute();
+				int result = check.getInt(3);
+				check.close();
+				return result;
+			} catch (SQLException e) {
+				handleSQLException(e, tries);
+				//if no more tries, throw exception.
+			}
+		}
+		return -1;
 	}
 	
 	/**
@@ -1019,14 +1038,14 @@ public class DB {
 	
 	/**
 	 * Handle SQLException, possibly try to fix the problem or if not possible, throw exception.
+	 * @param tries The number of times to try and fix the exception before it should be thrown.
 	 * @return Returns true if a fix was deployed and a retry could possibly be successful (Not necessarily, beware infinite loop!), false if no fix was deployed.
-	 * @throws SQLException If Exception can't be handled.
+	 * @throws DatabaseException If an irreversible SQLException has happened.
 	 */
-	private static boolean handleSQLException(SQLException e){
+	private static boolean handleSQLException(SQLException e, int tries) throws DatabaseException{
 		
-		System.out.println(e.toString());
+		if (tries <= 0) throw new DatabaseException(e.getMessage(), e.getErrorCode(), e.getSQLState());
 		
-		//TODO Log exceptions.
 		switch (e.getSQLState()){
 		case "01002": //disconnect error
 		case "08000": //connection exception
@@ -1043,19 +1062,15 @@ public class DB {
 			try {
 				getConnection(true);
 			} catch (SQLException e1) {
-				//Log.
-				return false;
+				throw new DatabaseException(e.getMessage(), e.getErrorCode(), e.getSQLState());
 			}
 			return true;
 		case "2E000": //invalid connection name
 		case "40003": //statement completion unknown
 		case "08007": //transaction resolution unknown
 		case "2D000": //invalid transaction termination
-			//Log.
-			return false;
 		default:
-			//Throw new exception for servlet.
-			return false;
+			throw new DatabaseException(e.getMessage(), e.getErrorCode(), e.getSQLState());
 		}
 	}
 

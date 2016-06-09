@@ -13,7 +13,10 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Properties;
 
 import org.junit.AfterClass;
@@ -73,8 +76,8 @@ public class TestDB {
 		User nullUser = DB.getUserByCpr(cpr);
 		assertNull(nullUser);
 		//Create user
-		User user = DB.createUser(username, password, cpr, userName, institute, consultant);
-		assertNotNull(user);
+		assertTrue(DB.createUser(username, password, cpr, userName, institute, consultant));
+		User user = DB.getUserByCpr(cpr);
 		//Get the newly created user
 		User sameUser = DB.getUserByCpr(cpr);
 		assertNotNull(sameUser);
@@ -100,7 +103,8 @@ public class TestDB {
 		Account nullAccount = DB.getAccountByNumber(number);
 		assertNull(nullAccount);
 		//Create Account
-		Account account = DB.createAccount(userId, accountName, type, number, iban, currency, interest, balance);
+		assertTrue(DB.createAccount(userId, accountName, type, number, iban, currency, interest, balance));
+		Account account = DB.getAccountByNumber(number);
 		//Get newly created account
 		Account sameAccount = DB.getAccountByNumber(number);
 		//Assertion
@@ -122,14 +126,14 @@ public class TestDB {
 		ArrayList<Transaction> emptyTransactions = DB.getTransactions(accountId);
 		assertTrue(emptyTransactions.isEmpty());
 		//Create Transaction
-		Transaction transaction = DB.createTransaction(accountId, description, amount);
-		//Get newly created transaction from list
-		Transaction sameTransaction = DB.getTransactions(accountId).get(0);
+		long date = Calendar.getInstance().getTime().getTime();
+		assertTrue(DB.createTransaction(accountId, description, amount));
+		ArrayList<Transaction> transaction = DB.getTransactions(accountId);
 		//Assertion
-		assertEquals(transaction.getAccountId(), sameTransaction.getAccountId());
-		assertEquals(transaction.getAmount(), sameTransaction.getAmount());
-		assertEquals(transaction.getDateAsString(), sameTransaction.getDateAsString());
-		assertEquals(transaction.getDescription(), sameTransaction.getDescription());
+		assertEquals(transaction.get(0).getAccountId(), accountId);
+		assertEquals(transaction.get(0).getAmount(), new DecimalFormat("#0.00").format(amount));
+		assertEquals(transaction.get(0).getDateAsString(), new SimpleDateFormat("yyyy-MM-dd").format(date));
+		assertEquals(transaction.get(0).getDescription(), description);
 	}
 	
 	@Test
@@ -145,7 +149,8 @@ public class TestDB {
 		User nullUser = DB.getUserByCpr(cpr);
 		assertNull(nullUser);
 		//Create user
-		User user = DB.createUser(username, password, cpr, name, institute, consultant);
+		assertTrue(DB.createUser(username, password, cpr, name, institute, consultant));
+		User user = DB.getUserByCpr(cpr);
 		//Check login
 		int id = DB.checkLogin(username, password);
 		//Assert Id is equal
@@ -162,7 +167,8 @@ public class TestDB {
 		String institute = "Test That Institute";
 		String consultant = "";
 		//Create a user to get
-		User user = DB.createUser(username, password, cpr, name, institute, consultant);
+		assertTrue(DB.createUser(username, password, cpr, name, institute, consultant));
+		User user = DB.getUserByCpr(cpr);
 		//Get user
 		User sameUser = DB.getUser(user.getId());
 		//Assert
@@ -174,6 +180,7 @@ public class TestDB {
 		assertEquals(user.getUsername(), sameUser.getUsername());
 	}
 	
+	@Test
 	public void testGetUsers() throws SQLException{
 		//Test Get Users
 		String username = "TestGetUsers";
@@ -183,7 +190,8 @@ public class TestDB {
 		String institute = "Test That Institute";
 		String consultant = "";
 		//Create user
-		User newUser = DB.createUser(username, password, cpr, userName, institute, consultant);
+		assertTrue(DB.createUser(username, password, cpr, userName, institute, consultant));
+		User newUser = DB.getUserByCpr(cpr);
 		assertNotNull(newUser);
 		//Get Users
 		ArrayList<User> users = DB.getUsers();
@@ -210,7 +218,8 @@ public class TestDB {
 		String institute = "Test That Institute";
 		String consultant = "";
 		//Create user
-		User user = DB.createUser(username, password, cpr, userName, institute, consultant);
+		assertTrue(DB.createUser(username, password, cpr, userName, institute, consultant));
+		User user = DB.getUserByCpr(cpr);
 		assertNotNull(user);
 		
 		//Create Account
@@ -223,7 +232,8 @@ public class TestDB {
 		double interest = 0.05;
 		double balance = 0;
 		//Create Account
-		Account account = DB.createAccount(userId, accountName, type, number, iban, currency, interest, balance);
+		assertTrue(DB.createAccount(userId, accountName, type, number, iban, currency, interest, balance));
+		Account account = DB.getAccountByNumber(number);
 		assertNotNull(account);
 		
 		//Create Transaction
@@ -231,8 +241,7 @@ public class TestDB {
 		String description = "TestDecription is this, test-test, moo..."; 
 		double amount = 100;
 		//Create Transaction
-		Transaction newTransaction = DB.createTransaction(accountId, description, amount);
-		assertNotNull(newTransaction);
+		assertTrue(DB.createTransaction(accountId, description, amount));
 		//Get Transactions
 		ArrayList<Transaction> transactions = DB.getTransactions(accountId);
 		assertFalse(transactions.isEmpty());
@@ -259,7 +268,8 @@ public class TestDB {
 		String institute = "Test That Institute";
 		String consultant = "";
 		//Create user
-		User user = DB.createUser(username, password, cpr, userName, institute, consultant);
+		assertTrue(DB.createUser(username, password, cpr, userName, institute, consultant));
+		User user = DB.getUserByCpr(cpr);
 		assertNotNull(user);
 		
 		//Create Account
@@ -272,7 +282,8 @@ public class TestDB {
 		double interest = 0.05;
 		double balance = 0;
 		//Create Account
-		Account newAccount = DB.createAccount(userId, accountName, type, number, iban, currency, interest, balance);
+		assertTrue(DB.createAccount(userId, accountName, type, number, iban, currency, interest, balance));
+		Account newAccount = DB.getAccountByNumber(number);
 		assertNotNull(newAccount);
 		//Get Accounts
 		ArrayList<Account> accounts = DB.getAccounts(userId);
@@ -291,11 +302,11 @@ public class TestDB {
 			//Range assertion
 			assertTrue(0 < account.getId());
 			assertTrue(0 < account.getUserId());
-			assertTrue(0.0 == account.getBalanceRaw());
-			assertTrue(0.0 == Double.parseDouble(account.getBalance()));
+			assertTrue(0.0 == Double.parseDouble(account.getBalance().replace(',', '.')));
 		}
 	}
 	
+	@Test
 	public void testUpdateAccount() throws SQLException {
 		//Test Update Account
 		//Create User
@@ -306,7 +317,8 @@ public class TestDB {
 		String institute = "Test That Institute";
 		String consultant = "";
 		//Create user
-		User user = DB.createUser(username, password, cpr, userName, institute, consultant);
+		assertTrue(DB.createUser(username, password, cpr, userName, institute, consultant));
+		User user = DB.getUserByCpr(cpr);
 		assertNotNull(user);
 		
 		//Create Account
@@ -319,15 +331,16 @@ public class TestDB {
 		double interest = 0.05;
 		double balance = 0;
 		//Create Account
-		Account newAccount = DB.createAccount(userId, accountName, type, number, iban, currency, interest, balance);
+		assertTrue(DB.createAccount(userId, accountName, type, number, iban, currency, interest, balance));
+		Account newAccount = DB.getAccountByNumber(number);
 		assertNotNull(newAccount);
 		int accountId = newAccount.getId();
 		//Assert original values.
 		assertEquals(userId, newAccount.getUserId());
-		assertTrue(balance == newAccount.getBalanceRaw());
+		assertEquals(new DecimalFormat("#0.00").format(balance), newAccount.getBalance());
 		assertEquals(currency, newAccount.getCurrency());
 		assertEquals(iban, newAccount.getIban());
-		assertEquals(interest, newAccount.getInterest());
+		assertEquals(new DecimalFormat("#0.00").format(interest)+"%", newAccount.getInterest());
 		assertEquals(accountName, newAccount.getName());
 		assertEquals(number, newAccount.getNumber());
 		//Update Account 
@@ -346,10 +359,10 @@ public class TestDB {
 		//Assertion
 		Account updatedAccount = DB.getAccount(accountId);
 		assertEquals(userId, updatedAccount.getUserId());
-		assertTrue(newBalance == updatedAccount.getBalanceRaw());
+		assertEquals(new DecimalFormat("#0.00").format(newBalance), updatedAccount.getBalance());
 		assertEquals(currency, updatedAccount.getCurrency());
 		assertEquals(newIban, updatedAccount.getIban());
-		assertEquals(newInterest, updatedAccount.getInterest());
+		assertEquals(new DecimalFormat("#0.00").format(newInterest)+"%", updatedAccount.getInterest());
 		assertEquals(newAccountName, updatedAccount.getName());
 		assertEquals(newNumber, updatedAccount.getNumber());
 		
@@ -365,46 +378,161 @@ public class TestDB {
 		//Assertion
 		Account updatedUpdatedAccount = DB.getAccount(accountId);
 		assertEquals(userId, updatedUpdatedAccount.getUserId());
-		assertTrue(newNewBalance == updatedUpdatedAccount.getBalanceRaw());
+		assertEquals(new DecimalFormat("#0.00").format(newNewBalance), updatedUpdatedAccount.getBalance());
 		assertEquals(newNewCurrency, updatedUpdatedAccount.getCurrency());
 		assertEquals(newNewIban, updatedUpdatedAccount.getIban());
-		assertEquals(newNewInterest, updatedUpdatedAccount.getInterest());
+		assertEquals(new DecimalFormat("#0.00").format(newNewInterest)+"%", updatedUpdatedAccount.getInterest());
 		assertEquals(newNewAccountName, updatedUpdatedAccount.getName());
 		assertEquals(newNewNumber, updatedUpdatedAccount.getNumber());
 	}
 
-	private static void testUpdateUser(int userId, String value, USER attribute) throws SQLException {
-		long start = System.currentTimeMillis();
-		boolean success = DB.updateUser(userId, value, attribute);
-		System.out.println("Updated New User: " + success);
-		System.out.println("Query Time: " + (System.currentTimeMillis()-start));
+	@Test
+	public void testUpdateUser() throws SQLException {
+		//Test Update User
+		//Create User
+		String username = "TestUpdateUser";
+		String password = "Test1234";
+		String cpr = "TestUU1234";
+		String userName = "Test Testy Test";
+		String institute = "Test That Institute";
+		String consultant = "";
+		//Create user
+		assertTrue(DB.createUser(username, password, cpr, userName, institute, consultant));
+		User user = DB.getUserByCpr(cpr);
+		assertNotNull(user);
+		
+		//Assert original values.
+		assertEquals(consultant, user.getConsultant());
+		assertEquals(cpr, user.getCpr());
+		assertTrue(0 < user.getId());
+		assertEquals(institute, user.getInstitute());
+		assertEquals(userName, user.getName());
+		assertEquals(username, user.getUsername());
+		assertTrue(0 < DB.checkLogin(username, password));
+		
+		//Update User
+		String newusername = "TestNewUpdateUser";
+		String newpassword = "TestN1234";
+		String newcpr = "TestUUN1234";
+		String newuserName = "New Test Testy Test";
+		String newinstitute = "New Test That Institute";
+		String newconsultant = "Tommy";
+		assertTrue(DB.updateUser(user.getId(), newusername, USER.USERNAME));
+		assertTrue(DB.updateUser(user.getId(), newuserName, USER.NAME));
+		assertTrue(DB.updateUser(user.getId(), newpassword, USER.PASSWORD));
+		assertTrue(DB.updateUser(user.getId(), newconsultant, USER.CONSULTANT));
+		assertTrue(DB.updateUser(user.getId(), newcpr, USER.CPR));
+		assertTrue(DB.updateUser(user.getId(), newinstitute, USER.INSTITUTE));
+		
+		//Assertion
+		User updatedUser = DB.getUser(user.getId());
+		assertEquals(user.getId(), updatedUser.getId());
+		assertEquals(newconsultant, updatedUser.getConsultant());
+		assertEquals(newcpr, updatedUser.getCpr());
+		assertEquals(newinstitute, updatedUser.getInstitute());
+		assertEquals(newuserName, updatedUser.getName());
+		assertEquals(newusername, updatedUser.getUsername());
+		assertFalse(0 < DB.checkLogin(username, password));
+		assertFalse(0 < DB.checkLogin(newusername, password));
+		assertFalse(0 < DB.checkLogin(username, newpassword));
+		assertTrue(0 < DB.checkLogin(newusername, newpassword));
+		
+		//Update User 
+		String newnewusername = "TestNewNewUpdateUser";
+		String newnewpassword = "TestNN1234";
+		String newnewcpr = "TestUUNN1234";
+		String newnewuserName = "New Moo Testy Test";
+		String newnewinstitute = "New Moo That Institute";
+		String newnewconsultant = "Tommy the 2rd";
+		assertTrue(DB.updateUser(user.getId(), newnewusername, newnewpassword, newnewcpr, newnewuserName, newnewinstitute, newnewconsultant));
+		//Assertion
+		User updatedUpdatedUser = DB.getUser(user.getId());
+		assertEquals(user.getId(), updatedUpdatedUser.getId());
+		assertEquals(newnewconsultant, updatedUpdatedUser.getConsultant());
+		assertEquals(newnewcpr, updatedUpdatedUser.getCpr());
+		assertEquals(newnewinstitute, updatedUpdatedUser.getInstitute());
+		assertEquals(newnewuserName, updatedUpdatedUser.getName());
+		assertEquals(newnewusername, updatedUpdatedUser.getUsername());
+		assertFalse(0 < DB.checkLogin(newusername, newpassword));
+		assertFalse(0 < DB.checkLogin(newnewusername, newpassword));
+		assertFalse(0 < DB.checkLogin(newusername, newnewpassword));
+		assertTrue(0 < DB.checkLogin(newnewusername, newnewpassword));
 	}
 	
-	private static void testDeleteUserByCpr(String cpr) throws SQLException {
-		long start = System.currentTimeMillis();
-		boolean success = DB.deleteUserByCpr(cpr);
-		System.out.println("Delete New User: " + success);
-		System.out.println("Query Time: " + (System.currentTimeMillis()-start));
-	}
-
-	private static void testDeleteUser(String userId) throws SQLException {
-		long start = System.currentTimeMillis();
-		boolean success = DB.deleteUser(userId);
-		System.out.println("Delete New User: " + success);
-		System.out.println("Query Time: " + (System.currentTimeMillis()-start));
-	}
-
-	private static void testDeleteAccountByNumber(String number) throws SQLException {
-		long start = System.currentTimeMillis();
-		boolean success = DB.deleteAccountByNumber(number);
-		System.out.println("Delete New Account: " + success);
-		System.out.println("Query Time: " + (System.currentTimeMillis()-start));
-	}
-
-	private static void testDeleteAccount(int accountId) throws SQLException {
-		long start = System.currentTimeMillis();
-		boolean success = DB.deleteAccount(accountId);
-		System.out.println("Delete New Account: " + success);
-		System.out.println("Query Time: " + (System.currentTimeMillis()-start));
+	@Test
+	public void testDeleteMethods() throws SQLException {
+		//Test Delete User
+		String username = "TestDeleteUserByCpr";
+		String password = "Test1234";
+		String cpr = "TestDUBC1234";
+		String userName = "DUBC Test Testy Test";
+		String institute = "Test That Institute";
+		String consultant = "";
+		//Create user
+		assertTrue(DB.createUser(username, password, cpr, userName, institute, consultant));
+		User user = DB.getUserByCpr(cpr);
+		assertNotNull(user);
+		
+		//Create Account
+		int userId = user.getId();
+		String accountName = "TestAccountIsTest";
+		String type = "TestTypeForTestAccount";
+		String number = "TestDABN123456789"; 
+		String iban = "TestDABN123456IBAN";
+		String currency = "EUR"; 
+		double interest = 0.05;
+		double balance = 0;
+		//Create Account
+		assertTrue(DB.createAccount(userId, accountName, type, number, iban, currency, interest, balance));
+		Account account = DB.getAccountByNumber(number);
+		assertNotNull(account);
+		
+		//Delete Account
+		assertTrue(DB.deleteAccountByNumber(number));
+		assertNull(DB.getAccountByNumber(number));
+		
+		//Delete User
+		User sameUser = DB.getUserByCpr(cpr);
+		assertNotNull(sameUser);
+		assertTrue(DB.deleteUserByCpr(cpr));
+		assertNull(DB.getUserByCpr(cpr));
+		
+		//Create User
+		String username2 = "TestDeleteUser";
+		String password2 = "Test1234";
+		String cpr2 = "TestDU1234";
+		String userName2 = "DU Test Testy Test";
+		String institute2 = "Test That Institute";
+		String consultant2 = "";
+		//Create user
+		assertTrue(DB.createUser(username2, password2, cpr2, userName2, institute2, consultant2));
+		User user2 = DB.getUserByCpr(cpr2);
+		assertNotNull(user2);
+		
+		//Create Account
+		int userId2 = user2.getId();
+		String accountName2 = "TestAccountIsTest";
+		String type2 = "TestTypeForTestAccount";
+		String number2 = "TestDA123456789"; 
+		String iban2 = "TestDA123456IBAN";
+		String currency2 = "EUR"; 
+		double interest2 = 0.05;
+		double balance2 = 0;
+		//Create Account
+		assertTrue(DB.createAccount(userId2, accountName2, type2, number2, iban2, currency2, interest2, balance2));
+		Account account2 = DB.getAccountByNumber(number2);
+		assertNotNull(account2);
+		
+		//Delete Account
+		assertTrue(DB.deleteAccount(account2.getId()));
+		assertNull(DB.getAccount(account2.getId()));
+		assertNull(DB.getAccountByNumber(number2));
+		
+		//Delete User
+		User sameUser2 = DB.getUserByCpr(cpr2);
+		assertNotNull(sameUser2);
+		assertTrue(DB.deleteUser(sameUser2.getUsername()));
+		assertNull(DB.getUser(sameUser2.getId()));
+		assertNull(DB.getUserByCpr(cpr2));
 	}
 }
