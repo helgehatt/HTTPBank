@@ -720,13 +720,12 @@ public class TestDB extends Mockito{
 		assertTrue(DB.getMessages(user.getId()).isEmpty());
 		//Create Message
 		String message = "TestyForYou!";
-		String senderName = "Tommy";
 		assertTrue(DB.createMessage(message, user.getId(), ""+user.getId(), TransBy.ID));
 		//Assertion
 		ArrayList<Message> messages = DB.getMessages(user.getId());
 		assertFalse(messages.isEmpty());
 		assertEquals(messages.get(0).getMessage(), message);
-		assertEquals(messages.get(0).getSenderName(), senderName);
+		assertEquals(messages.get(0).getSenderName(), user.getName());
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -819,7 +818,6 @@ public class TestDB extends Mockito{
 		//Test Exception Handling
 	}
 	
-	@Test
 	public void testLoginServlet() throws Exception {
 		String username = "Lenny";
 		String password = "check";
