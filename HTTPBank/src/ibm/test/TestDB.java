@@ -2,9 +2,12 @@ package ibm.test;
 
 import static org.junit.Assert.*;
 import ibm.db.DB;
+import ibm.db.DB.TransBy;
 import ibm.db.DB.USER;
 import ibm.resource.Account;
+import ibm.resource.DatabaseException;
 import ibm.resource.InputException;
+import ibm.resource.Message;
 import ibm.resource.Transaction;
 import ibm.resource.User;
 
@@ -64,7 +67,7 @@ public class TestDB {
 	}
 	
 	@Test
-	public void testCreateMethods() throws SQLException {
+	public void testCreateMethods() throws DatabaseException {
 		//Test Create User
 		String username = "TestCreateUser";
 		String password = "Test1234";
@@ -120,7 +123,7 @@ public class TestDB {
 		
 		//Test Create Transaction
 		int accountId = account.getId();
-		String description = "TestDecription is this, test-test, moo..."; 
+		String description = "TestDecription is this, test-test, moo...";
 		double amount = 100;
 		//Get empty list of transactions
 		ArrayList<Transaction> emptyTransactions = DB.getTransactions(accountId);
@@ -134,10 +137,17 @@ public class TestDB {
 		assertEquals(transaction.get(0).getAmount(), new DecimalFormat("#0.00").format(amount));
 		assertEquals(transaction.get(0).getDateAsString(), new SimpleDateFormat("yyyy-MM-dd").format(date));
 		assertEquals(transaction.get(0).getDescription(), description);
+		
+		//Archive transactions
+		DB.archiveTransactions();
+		
+		//Get Archive
+		ArrayList<Transaction> archive = DB.getArchive(account.getId());
+		assertFalse(archive.isEmpty());
 	}
 	
 	@Test
-	public void testCheckLogin() throws SQLException, InputException {
+	public void testCheckLogin() throws DatabaseException, InputException {
 		//Test Check Login
 		String username = "TestCreateLogin";
 		String password = "Test1234";
@@ -158,7 +168,7 @@ public class TestDB {
 	}
 	
 	@Test
-	public void testGetUser() throws SQLException{
+	public void testGetUser() throws DatabaseException{
 		//Test Get User
 		String username = "TestGetUser";
 		String password = "Test1234";
@@ -181,7 +191,7 @@ public class TestDB {
 	}
 	
 	@Test
-	public void testGetUsers() throws SQLException{
+	public void testGetUsers() throws DatabaseException{
 		//Test Get Users
 		String username = "TestGetUsers";
 		String password = "Test1234";
@@ -199,16 +209,14 @@ public class TestDB {
 		//Assertion
 		for (User user : users){
 			assertNotNull(user.getId());
-			assertNotNull(user.getConsultant());
 			assertNotNull(user.getCpr());
-			assertNotNull(user.getInstitute());
 			assertNotNull(user.getName());
 			assertNotNull(user.getUsername());
 		}
 	}
 
 	@Test
-	public void testGetTransactions() throws SQLException{
+	public void testGetTransactions() throws DatabaseException{
 		//Test Get Transactions
 		//Create User
 		String username = "TestGetTrans";
@@ -258,7 +266,7 @@ public class TestDB {
 	}
 
 	@Test
-	public void testGetAccounts() throws SQLException{
+	public void testGetAccounts() throws DatabaseException{
 		//Test Get Accounts
 		//Create User
 		String username = "TestGetAccount";
@@ -307,7 +315,7 @@ public class TestDB {
 	}
 	
 	@Test
-	public void testUpdateAccount() throws SQLException {
+	public void testUpdateAccount() throws DatabaseException {
 		//Test Update Account
 		//Create User
 		String username = "TestUpdateAccount";
@@ -387,7 +395,7 @@ public class TestDB {
 	}
 
 	@Test
-	public void testUpdateUser() throws SQLException {
+	public void testUpdateUser() throws DatabaseException {
 		//Test Update User
 		//Create User
 		String username = "TestUpdateUser";
@@ -460,15 +468,15 @@ public class TestDB {
 	}
 	
 	@Test
-	public void testDeleteMethods() throws SQLException {
+	public void testDeleteMethods() throws DatabaseException {
 		//Test Delete User
+		//Create user
 		String username = "TestDeleteUserByCpr";
 		String password = "Test1234";
 		String cpr = "TestDUBC1234";
 		String userName = "DUBC Test Testy Test";
 		String institute = "Test That Institute";
 		String consultant = "";
-		//Create user
 		assertTrue(DB.createUser(username, password, cpr, userName, institute, consultant));
 		User user = DB.getUserByCpr(cpr);
 		assertNotNull(user);
@@ -482,7 +490,6 @@ public class TestDB {
 		String currency = "EUR"; 
 		double interest = 0.05;
 		double balance = 0;
-		//Create Account
 		assertTrue(DB.createAccount(userId, accountName, type, number, iban, currency, interest, balance));
 		Account account = DB.getAccountByNumber(number);
 		assertNotNull(account);
@@ -504,7 +511,6 @@ public class TestDB {
 		String userName2 = "DU Test Testy Test";
 		String institute2 = "Test That Institute";
 		String consultant2 = "";
-		//Create user
 		assertTrue(DB.createUser(username2, password2, cpr2, userName2, institute2, consultant2));
 		User user2 = DB.getUserByCpr(cpr2);
 		assertNotNull(user2);
@@ -518,7 +524,6 @@ public class TestDB {
 		String currency2 = "EUR"; 
 		double interest2 = 0.05;
 		double balance2 = 0;
-		//Create Account
 		assertTrue(DB.createAccount(userId2, accountName2, type2, number2, iban2, currency2, interest2, balance2));
 		Account account2 = DB.getAccountByNumber(number2);
 		assertNotNull(account2);
@@ -534,5 +539,274 @@ public class TestDB {
 		assertTrue(DB.deleteUser(sameUser2.getUsername()));
 		assertNull(DB.getUser(sameUser2.getId()));
 		assertNull(DB.getUserByCpr(cpr2));
+	}
+	
+	@Test
+	public void testCreateTransactionAndGetArchive() throws DatabaseException {
+		//Test Get Archive
+		//Create user
+		String username = "TestGetArchive1";
+		String password = "Test1234";
+		String cpr = "TestGAR11234";
+		String userName = "GAR1 Test Testy Test";
+		String institute = "Test That Institute";
+		String consultant = "";
+		assertTrue(DB.createUser(username, password, cpr, userName, institute, consultant));
+		User user1 = DB.getUserByCpr(cpr);
+		assertNotNull(user1);
+		
+		//Create User
+		String username2 = "TestGetArchive2";
+		String password2 = "Test1234";
+		String cpr2 = "TestGAR21234";
+		String userName2 = "GAR2 Test Testy Test";
+		String institute2 = "Test That Institute";
+		String consultant2 = "";
+		assertTrue(DB.createUser(username2, password2, cpr2, userName2, institute2, consultant2));
+		User user2 = DB.getUserByCpr(cpr2);
+		assertNotNull(user2);
+		
+		//Create Account
+		int userId = user1.getId();
+		String accountName = "TestAccount1IsTest";
+		String type = "TestTypeForTestAccount";
+		String number = "TestGAR1123456789"; 
+		String iban = "TestGAR1123456IBAN";
+		String currency = "EUR"; 
+		double interest = 0.1;
+		double balance = 175;
+		assertTrue(DB.createAccount(userId, accountName, type, number, iban, currency, interest, balance));
+		Account account1 = DB.getAccountByNumber(number);
+		assertNotNull(account1);
+		
+		//Create Account
+		int userId2 = user2.getId();
+		String accountName2 = "TestAccount2IsTest";
+		String type2 = "TestTypeForTestAccount";
+		String number2 = "TestGAR2123456789"; 
+		String iban2 = "TestGAR2123456IBAN";
+		String currency2 = "EUR"; 
+		double interest2 = 0.05;
+		double balance2 = 0;
+		assertTrue(DB.createAccount(userId2, accountName2, type2, number2, iban2, currency2, interest2, balance2));
+		Account account2 = DB.getAccountByNumber(number2);
+		assertNotNull(account2);
+		
+		//Assert there are no transactions
+		assertTrue(DB.getTransactions(account1.getId()).isEmpty());
+		assertTrue(DB.getTransactions(account2.getId()).isEmpty());
+		
+		//Create transaction (ID)
+		String description1 = "TestDecription1ID is this, test-test, moo...";
+		String description2 = "TestDecription2ID is this, test-test, moo...";
+		double amount = 100;
+		assertTrue(DB.createTransaction(TransBy.ID, account1.getId(), ""+account2.getId(), description1, description2, -amount, amount));
+		//Assertion
+		ArrayList<Transaction> transactions1 = DB.getTransactions(account1.getId());
+		assertFalse(transactions1.isEmpty());
+		assertEquals(transactions1.get(0).getAccountId(), account1.getId());
+		assertEquals(transactions1.get(0).getAmount(), new DecimalFormat("#0.00").format(-amount));
+		assertEquals(transactions1.get(0).getDescription(), description1);
+		ArrayList<Transaction> transactions2 = DB.getTransactions(account2.getId());
+		assertFalse(transactions2.isEmpty());
+		assertEquals(transactions2.get(0).getAccountId(), account2.getId());
+		assertEquals(transactions2.get(0).getAmount(), new DecimalFormat("#0.00").format(amount));
+		assertEquals(transactions2.get(0).getDescription(), description2);
+		
+		//Create transaction (IBAN)
+		String description11 = "TestDecription1IBAN is this, test-test, moo...";
+		String description22 = "TestDecription2IBAN is this, test-test, moo...";
+		double amount2 = 50;
+		assertTrue(DB.createTransaction(TransBy.IBAN, account1.getId(), account2.getIban(), description11, description22, -amount2, amount2));
+		//Assertion (Note: First transaction should always be the most recent.)
+		ArrayList<Transaction> transactions11 = DB.getTransactions(account1.getId());
+		assertFalse(transactions11.isEmpty());
+		assertEquals(transactions11.get(0).getAccountId(), account1.getId());
+		assertEquals(transactions11.get(0).getAmount(), new DecimalFormat("#0.00").format(-amount2));
+		assertEquals(transactions11.get(0).getDescription(), description11);
+		ArrayList<Transaction> transactions22 = DB.getTransactions(account2.getId());
+		assertFalse(transactions22.isEmpty());
+		assertEquals(transactions22.get(0).getAccountId(), account2.getId());
+		assertEquals(transactions22.get(0).getAmount(), new DecimalFormat("#0.00").format(amount2));
+		assertEquals(transactions22.get(0).getDescription(), description22);
+		
+		//Create transaction (NUMBER)
+		String description111 = "TestDecription1NUMBER is this, test-test, moo...";
+		String description222 = "TestDecription2NUMBER is this, test-test, moo...";
+		double amount3 = 25;
+		assertTrue(DB.createTransaction(TransBy.NUMBER, account1.getId(), account2.getNumber(), description111, description222, -amount3, amount3));
+		//Assertion (Note: First transaction should always be the most recent.)
+		ArrayList<Transaction> transactions111 = DB.getTransactions(account1.getId());
+		assertFalse(transactions111.isEmpty());
+		assertEquals(transactions111.get(0).getAccountId(), account1.getId());
+		assertEquals(transactions111.get(0).getAmount(), new DecimalFormat("#0.00").format(-amount3));
+		assertEquals(transactions111.get(0).getDescription(), description111);
+		ArrayList<Transaction> transactions222 = DB.getTransactions(account2.getId());
+		assertFalse(transactions222.isEmpty());
+		assertEquals(transactions222.get(0).getAccountId(), account2.getId());
+		assertEquals(transactions222.get(0).getAmount(), new DecimalFormat("#0.00").format(amount3));
+		assertEquals(transactions222.get(0).getDescription(), description222);
+		
+		//Archive transactions
+		DB.archiveTransactions();
+		
+		//Get Archive
+		ArrayList<Transaction> archive = DB.getArchive(account1.getId());
+		assertFalse(archive.isEmpty());
+	}
+	
+	public void testGetMessages() throws DatabaseException{
+		//Test Get Archive
+		//Create user
+		String username = "TestGetArchive1";
+		String password = "Test1234";
+		String cpr = "TestGAR11234";
+		String userName = "GAR1 Test Testy Test";
+		String institute = "Test That Institute";
+		String consultant = "";
+		assertTrue(DB.createUser(username, password, cpr, userName, institute, consultant));
+		User user1 = DB.getUserByCpr(cpr);
+		assertNotNull(user1);
+		
+		//Create Account
+		int userId = user1.getId();
+		String accountName = "TestAccount1IsTest";
+		String type = "TestTypeForTestAccount";
+		String number = "TestGAR1123456789"; 
+		String iban = "TestGAR1123456IBAN";
+		String currency = "EUR"; 
+		double interest = 0.1;
+		double balance = 0;
+		assertTrue(DB.createAccount(userId, accountName, type, number, iban, currency, interest, balance));
+		Account account1 = DB.getAccountByNumber(number);
+		assertNotNull(account1);
+		
+	}
+	
+	@Test
+	public void testGetCurrencies() throws DatabaseException{
+		//Test Get Currencies
+		//Get Currencies
+		ArrayList<String> currencies = DB.getCurrencies();
+		assertFalse(currencies.isEmpty());
+		assertTrue(currencies.contains("EUR"));
+		assertTrue(currencies.contains("DKK"));
+		assertTrue(currencies.contains("NOK"));
+	}
+	
+	@Test
+	public void testCreateMessage() throws DatabaseException{
+		//Test Create and Get Messages.
+		//Create user
+		String username = "TestCreateGetMessage";
+		String password = "Test1234";
+		String cpr = "TestCGM1234";
+		String userName = "CGM Test Testy Test";
+		String institute = "Test That Institute";
+		String consultant = "";
+		assertTrue(DB.createUser(username, password, cpr, userName, institute, consultant));
+		User user = DB.getUserByCpr(cpr);
+		assertNotNull(user);
+		//Get Empty Messages list
+		assertTrue(DB.getMessages(user.getId()).isEmpty());
+		//Create Message
+		String message = "TestyForYou!";
+		String senderName = "Tommy";
+		assertTrue(DB.createMessage(message, senderName, user.getId()));
+		//Assertion
+		ArrayList<Message> messages = DB.getMessages(user.getId());
+		assertFalse(messages.isEmpty());
+		assertEquals(messages.get(0).getMessage(), message);
+		assertEquals(messages.get(0).getSenderName(), senderName);
+	}
+	
+	@SuppressWarnings("deprecation")
+	@Test
+	public void testCreateDeposit() throws DatabaseException{
+		//Test Create Deposit
+		//Create user
+		String username = "TestCreateDeposit";
+		String password = "Test1234";
+		String cpr = "TestCD1234";
+		String userName = "CD Test Testy Test";
+		String institute = "Test That Institute";
+		String consultant = "";
+		assertTrue(DB.createUser(username, password, cpr, userName, institute, consultant));
+		User user1 = DB.getUserByCpr(cpr);
+		assertNotNull(user1);
+		
+		//Create Account
+		int userId = user1.getId();
+		String accountName = "TestAccountIsTest";
+		String type = "TestTypeForTestAccount";
+		String number = "TestCD123456789"; 
+		String iban = "TestCD123456IBAN";
+		String currency = "EUR"; 
+		double interest = 0.1;
+		double balance = 0;
+		assertTrue(DB.createAccount(userId, accountName, type, number, iban, currency, interest, balance));
+		Account account1 = DB.getAccountByNumber(number);
+		assertNotNull(account1);
+		
+		//Assert there are no transactions
+		assertTrue(DB.getTransactions(account1.getId()).isEmpty());
+		
+		//Create transaction (ID)
+		String description1 = "TestDecription is this, test-test, moo...";
+		double amount = 100;
+		assertNotNull(DB.createDeposit(account1.getId(), description1, amount));
+		//Assertion
+		ArrayList<Transaction> transactions1 = DB.getTransactions(account1.getId());
+		assertFalse(transactions1.isEmpty());
+		assertEquals(transactions1.get(0).getAccountId(), account1.getId());
+		assertEquals(transactions1.get(0).getAmount(), new DecimalFormat("#0.00").format(amount));
+		assertEquals(transactions1.get(0).getDescription(), description1);
+	}
+	
+	@SuppressWarnings("deprecation")
+	@Test
+	public void testCreateWithdrawal() throws DatabaseException{
+		//Test Create Withdrawal
+		//Create User
+		String username = "TestCreateWithdrawal";
+		String password = "Test1234";
+		String cpr = "TestCW1234";
+		String userName = "CW Test Testy Test";
+		String institute = "Test That Institute";
+		String consultant = "";
+		assertTrue(DB.createUser(username, password, cpr, userName, institute, consultant));
+		User user = DB.getUserByCpr(cpr);
+		assertNotNull(user);
+		
+		//Create Account
+		int userId = user.getId();
+		String accountName = "TestAccountIsTest";
+		String type = "TestTypeForTestAccount";
+		String number = "TestCW123456789"; 
+		String iban = "TestCW123456IBAN";
+		String currency = "EUR"; 
+		double interest = 0.1;
+		double balance = 0;
+		assertTrue(DB.createAccount(userId, accountName, type, number, iban, currency, interest, balance));
+		Account account = DB.getAccountByNumber(number);
+		assertNotNull(account);
+		
+		//Assert there are no transactions
+		assertTrue(DB.getTransactions(account.getId()).isEmpty());
+		
+		//Create transaction (ID)
+		String description1 = "TestDecription1ID is this, test-test, moo...";
+		double amount = 100;
+		assertNotNull(DB.createWithdrawal(account.getId(), description1, amount));
+		//Assertion
+		ArrayList<Transaction> transactions1 = DB.getTransactions(account.getId());
+		assertFalse(transactions1.isEmpty());
+		assertEquals(transactions1.get(0).getAccountId(), account.getId());
+		assertEquals(transactions1.get(0).getAmount(), new DecimalFormat("#0.00").format(-amount));
+		assertEquals(transactions1.get(0).getDescription(), description1);
+	}
+	
+	public void testExceptionHandling() throws DatabaseException{
+		//Test Exception Handling
 	}
 }
