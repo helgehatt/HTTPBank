@@ -7,6 +7,11 @@ import ibm.resource.Account;
 import ibm.resource.InputException;
 import ibm.resource.Transaction;
 import ibm.resource.User;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 //hej
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -20,11 +25,11 @@ import java.util.Calendar;
 import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 import org.mockito.Mockito;
 
 public class TestDB extends Mockito{
@@ -538,5 +543,24 @@ public class TestDB extends Mockito{
 		assertTrue(DB.deleteUser(sameUser2.getUsername()));
 		assertNull(DB.getUser(sameUser2.getId()));
 		assertNull(DB.getUserByCpr(cpr2));
+	}
+	
+	@Test
+	public void testLoginServlet() throws Exception {
+		String username = "Lenny";
+		String password = "check";
+		HttpServletRequest request = mock(HttpServletRequest.class);       
+	    HttpServletResponse response = mock(HttpServletResponse.class);
+	    PrintWriter writer = new PrintWriter(new StringWriter()); 
+	    when(request.getParameter("username")).thenReturn(username);
+	    when(request.getParameter("password")).thenReturn(password);
+	    when(response.getWriter()).thenReturn(writer);
+	    
+	    new TestServlet().doPost(request, response);
+	    verify(request, atLeast(1)).getParameter(username);
+	    writer.flush();
+	    System.out.println(writer.toString());
+	    
+	    //assertTrue(writer.toString().contains(""));
 	}
 }
