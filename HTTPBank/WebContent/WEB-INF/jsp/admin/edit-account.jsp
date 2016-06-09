@@ -1,5 +1,13 @@
 <%@ include file="../head.jsp" %>
 
+<script type="text/javascript">
+
+$(function(){
+	$('#currency').val("${account.currency}");
+})
+
+</script>
+
 <style>
 
 #edit-account {
@@ -67,9 +75,12 @@
 		      </div>
 		      <div class="form-group">
 		        <label class="control-label col-sm-3" for="currency">Currency:</label>
-		        <div class="col-sm-9">          
-		          <input name="currency" type="text" class="form-control" id="currency" value="${account.currency}">
-    					<span class="error">${pageScope.errors.currency}</span>
+		        <div class="col-sm-9">
+				    	<select name="currency" class="form-control" id="currency">
+				    		<c:forEach var="currency" items="${currencies}">
+				    			<option value="${currency}">${currency}</option>
+				    		</c:forEach>
+				    	</select>	
 		        </div>
 		      </div>
 		      <div class="form-group">

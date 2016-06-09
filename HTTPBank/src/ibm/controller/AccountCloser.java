@@ -1,14 +1,17 @@
 package ibm.controller;
 
 import java.io.IOException;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import ibm.db.DB;
 import ibm.resource.Account;
+import ibm.resource.DatabaseException;
 
 @WebServlet("/admin/closeAccount")
 public class AccountCloser extends HttpServlet {
@@ -16,7 +19,8 @@ public class AccountCloser extends HttpServlet {
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	boolean transfer = request.getParameter("type").equals("transfer");
+		HttpSession session = request.getSession();
+    	boolean transfer = request.getParameter("type").equals("transfer");    	
     	
     	Account account = (Account) request.getSession().getAttribute("account");
     	int accountId = account.getId();
@@ -27,7 +31,8 @@ public class AccountCloser extends HttpServlet {
     	try {
     		amount = Double.parseDouble(amountString);
     	} catch (NumberFormatException e) {
-    		e.printStackTrace();
+    		DatabaseException.handleException(new DatabaseException(), session, response, "cloesaccount");
+    		return;
     	}
     	
     	if (transfer) {
@@ -35,16 +40,27 @@ public class AccountCloser extends HttpServlet {
     		try {
     			receiverId = Integer.parseInt(request.getParameter("to"));
     		} catch (NumberFormatException e) {
-    			response.sendError(418, "Lost connection to the database.");
+	    		DatabaseException.handleException(new DatabaseException(), session, response, "accounts");
     			return;
     		}
     		
-    		DB.createTransaction(receiverId, "Closed account: " + account.getNumber(), amount);
+    		try {
+				DB.createTransaction(receiverId, "Closed account: " + account.getNumber(), amount);
+				DatabaseException.success("Transfer completed, but account did not close successfully.", session);
+			} catch (DatabaseException e) {
+	    		DatabaseException.handleException(e, session, response, "cloesaccount");
+	    		return;
+			}
     	}
     	
-		DB.deleteAccount(accountId);
+		try {
+			DB.deleteAccount(accountId);
+			DatabaseException.success("Successfully closed account: " + account.getNumber(), session);
+	    	response.sendRedirect("accounts");
+		} catch (DatabaseException e) {
+    		DatabaseException.handleException(e, session, response, "cloesaccount");
+		}
     	
-    	response.sendRedirect("accounts");
     	
     	
     }

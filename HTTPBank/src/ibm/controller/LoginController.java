@@ -1,7 +1,6 @@
 package ibm.controller;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.servlet.ServletException;
@@ -12,19 +11,29 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import ibm.db.DB;
+import ibm.resource.DatabaseException;
 
 @WebServlet("/checkLogin")
 public class LoginController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
-	private static final ArrayList<String> CURRENCIES = DB.getCurrencies();
+	private static final ArrayList<String> CURRENCIES = initCurrencies();
+	
+	private static ArrayList<String> initCurrencies() {
+		try {
+			return DB.getCurrencies();
+		} catch (DatabaseException e) {
+			// TODO: Any suggestions?
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		HttpSession session = request.getSession();
         
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-        
-        HttpSession session = request.getSession();
 
 		session.setAttribute("currencies", CURRENCIES);
         
@@ -42,9 +51,8 @@ public class LoginController extends HttpServlet {
 			} else {
 				response.sendRedirect(" ?s=0");
 			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch(DatabaseException e) {
+    		DatabaseException.handleException(e, session, response, "login");			
 		}
 	}
 

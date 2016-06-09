@@ -12,6 +12,7 @@ import javax.servlet.http.HttpSession;
 
 import ibm.db.DB;
 import ibm.resource.AttributeChecks;
+import ibm.resource.DatabaseException;
 import ibm.resource.InputException;
 import ibm.resource.User;
 
@@ -21,8 +22,9 @@ public class UserController extends HttpServlet {
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	HashMap<String, String> errors = new HashMap<String, String>();
-    	
+		HttpSession session = request.getSession();
+		
+    	HashMap<String, String> errors = new HashMap<String, String>();    	
     	String username = request.getParameter("username");
     	String password = request.getParameter("password");
         String cpr = request.getParameter("cpr");
@@ -65,18 +67,20 @@ public class UserController extends HttpServlet {
         } catch (InputException e) {
         	errors.put("consultant", e.getMessage());
         }
-		
-        HttpSession session = request.getSession();
 
 		String path = request.getRequestURI().replace(request.getContextPath(), "");
 		
     	switch(path) {
     	case "/admin/newUser":
             if (errors.isEmpty()) {
-    			DB.createUser(username, password, cpr, name, institute, consultant);
-    			
-            	session.setAttribute("users", DB.getUsers());        		
-            	response.sendRedirect("users");
+    			try {
+					DB.createUser(username, password, cpr, name, institute, consultant);
+					DatabaseException.success("Successfully created new user: " + username, session);
+					session.setAttribute("users", DB.getUsers());
+	            	response.sendRedirect("users");
+				} catch (DatabaseException e) {
+		    		DatabaseException.handleException(e, session, response, "newuser");
+				}    			
             } else {
             	request.getSession().setAttribute("errors", errors);            	
             	response.sendRedirect("newuser");
@@ -86,10 +90,14 @@ public class UserController extends HttpServlet {
     	case "/admin/editUser":            
             if (errors.isEmpty()) {
             	int id = ((User) session.getAttribute("user")).getId();            	
-            	DB.updateUser(id, username, password, cpr, name, institute, consultant);
-    			
-    			session.setAttribute("user", DB.getUser(id));    			
-    			response.sendRedirect("userinfo");
+            	try {
+					DB.updateUser(id, username, password, cpr, name, institute, consultant);
+					DatabaseException.success("Successfully updated user: " + username, session);
+					session.setAttribute("user", DB.getUser(id));
+	    			response.sendRedirect("userinfo");
+				} catch (DatabaseException e) {
+		    		DatabaseException.handleException(e, session, response, "edituser");
+				}
             } else {
             	session.setAttribute("errors", errors);
             	response.sendRedirect("edituser");

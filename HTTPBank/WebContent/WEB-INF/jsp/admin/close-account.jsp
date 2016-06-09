@@ -51,7 +51,7 @@
 				    	<input class="form-control" id="from" value="${account.number}" data-currency="${account.currency}" data-balance="${account.balance}" readonly>
 						</div>
 						<div class="col-sm-4">
-							<input class="form-control" id="from-balance" value="${account.balance} ${account.currency}" readonly>
+							<input class="form-control" value="${account.balance} ${account.currency}" readonly>
 						</div>
 					</div>
 				  <div class="form-group" id="to-form-group">

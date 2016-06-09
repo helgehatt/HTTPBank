@@ -2,10 +2,18 @@
 
 <body>
 
+<c:set var="exception" scope="page" value="${sessionScope.exception}"/>
+<c:remove var="exception" scope="session"/>
+<c:set var="confirmation" scope="page" value="${sessionScope.confirmation}"/>
+<c:remove var="confirmation" scope="session"/>
+
+
 <nav id="nav" class="navbar navbar-default">
   <div class="container-fluid">
     <div class="navbar-header">
-      <img src="${pageContext.request.contextPath}/images/LogoPlain.jpg" alt="HTTP">
+    	<a href="users">
+     		<img src="${pageContext.request.contextPath}/images/LogoPlain.jpg" alt="HTTP">
+    	</a>
       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
@@ -25,3 +33,13 @@
     </div>
   </div>
 </nav>
+<c:if test="${pageScope.confirmation != null}">
+	<div class="response-banner" style="background-color:rgb(17, 187, 44)">
+		${pageScope.confirmation}
+	</div>
+</c:if>
+<c:if test="${pageScope.exception != null}">
+	<div class="response-banner" style="background-color:#DE2525">
+		${pageScope.exception}
+	</div>
+</c:if>

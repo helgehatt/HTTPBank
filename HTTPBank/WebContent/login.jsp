@@ -60,9 +60,9 @@
   <div class="panel panel-default">
     <div class="panel-heading">Login</div>
    	<c:if test="${param.s==0}">
-    <div id="error">
-   		Wrong user name or password
-    </div>
+	    <div id="error">
+	   		Wrong user name or password
+	    </div>
    	</c:if>
     <div class="panel-body">
       <form role="form" action="checkLogin" method="post">

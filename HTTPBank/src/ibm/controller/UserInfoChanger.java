@@ -1,7 +1,6 @@
 package ibm.controller;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.HashMap;
 
 import javax.servlet.ServletException;
@@ -13,18 +12,19 @@ import javax.servlet.http.HttpSession;
 
 import ibm.db.DB;
 import ibm.db.DB.USER;
+import ibm.resource.DatabaseException;
 import ibm.resource.User;
 
-@WebServlet("/user/doUserUpdate")
+@WebServlet("/user/doChangeInfo")
 public class UserInfoChanger extends HttpServlet {
 	private static final long serialVersionUID = 1L;
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	HashMap<String, String> errors = new HashMap<String, String>();
     	HttpSession session = request.getSession();
-    	User user = (User) session.getAttribute("user");
+    	User user = (User) session.getAttribute("user");    	
     	
+    	HashMap<String, String> errors = new HashMap<String, String>();
     	String cPassword = request.getParameter("c-password");
     	String nUsername = request.getParameter("username");
     	String nPassword = request.getParameter("n-password");
@@ -34,9 +34,9 @@ public class UserInfoChanger extends HttpServlet {
 			if (DB.checkLogin(user.getUsername(), cPassword) < 1) {
 				errors.put("cpassword", "Incorrect password");
 			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (DatabaseException e) {
+    		DatabaseException.handleException(e, session, response, "changeinfo");
+    		return;
 		}
     	
     	if (!nPassword.equals(rPassword)) {
@@ -47,19 +47,36 @@ public class UserInfoChanger extends HttpServlet {
     		int id = user.getId();
     		
     		if (!nUsername.isEmpty()) {
-    			DB.updateUser(id, nUsername, USER.USERNAME);
+    			try {
+					DB.updateUser(id, nUsername, USER.USERNAME);
+					DatabaseException.success("Successfully changed user name.", session);
+				} catch (DatabaseException e) {
+		    		DatabaseException.handleException(e, session, response, "changeinfo");
+		    		return;
+				}
     		}
     		
     		if (!nPassword.isEmpty()) {
-    			DB.updateUser(id, nPassword, USER.PASSWORD);
+    			try {
+					DB.updateUser(id, nPassword, USER.PASSWORD);
+					DatabaseException.success("Successfully changed user name and password.", session);
+				} catch (DatabaseException e) {
+		    		DatabaseException.handleException(e, session, response, "changeinfo");
+		    		return;
+				}
     		}
 
-			session.setAttribute("user", DB.getUser(id));
-        	response.sendRedirect("userinfo");
-    	} else {
+			try {
+				session.setAttribute("user", DB.getUser(id));
+	        	response.sendRedirect("userinfo");
+			} catch (DatabaseException e) {
+	    		DatabaseException.handleException(e, session, response, "changeinfo");
+	    		return;
+			}
+    	} else 
     		session.setAttribute("errors", errors);
-    		response.sendRedirect("changeinfo");
-    	}  	  	
+    	
+		response.sendRedirect("changeinfo");
     }
 
     @Override

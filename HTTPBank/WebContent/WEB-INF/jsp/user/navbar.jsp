@@ -5,7 +5,9 @@
 <nav id="nav" class="navbar navbar-default">
   <div class="container-fluid">
     <div class="navbar-header">
-      <img src="${pageContext.request.contextPath}/images/LogoPlain.jpg" alt="HTTP">
+    	<a href="accounts">
+     		<img src="${pageContext.request.contextPath}/images/LogoPlain.jpg" alt="HTTP">
+    	</a>
       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
