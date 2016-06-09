@@ -20,7 +20,7 @@
 <div id="change-info" class="container">
   <h3>Change user name or password</h3>
   <p>Enter your password to make any changes.</p>
-	<form class="form-horizontal" role="form" action="doUserUpdate" method="post">
+	<form class="form-horizontal" role="form" action="doChangeInfo" method="post">
 		<div class="form-group">
 			<label class="control-label col-sm-3" for="c-password">Current password:</label>
   		<div class="col-sm-9">          

@@ -10,14 +10,14 @@ function convert(from, to, amount) {
 }
 
 function updateChange(currency) {
-	var accountCurrency = $('#from').data('currency');
-	var selectedCurrency = currency;
-	var balance = parseFloat($('#from').data('balance')).toFixed(2);
+	var from = $('#from').data('currency');
+	var to = currency;
+	var amount = parseFloat($('#from').data('balance'));
 	
-	if (accountCurrency === selectedCurrency) {
-		$('#change').val(balance);
+	if (from === to) {
+		$('#change').val(amount.toFixed(2));
 	} else {
-		convert(accountCurrency, selectedCurrency, balance);
+		convert(from, to, amount);
 	}
 }
 
@@ -29,8 +29,8 @@ function transfer(){
 	$('button').val('transfer');
 	
 	var currency = $('#to').find('option:selected').data('currency');
-	updateChange(currency);
 	$('#deposit-currency').val($('#to').find('option:selected').data('currency'));
+	updateChange(currency);
 }
 
 function withdrawal(){
@@ -42,7 +42,6 @@ function withdrawal(){
 	
 	var currency = $('#withdrawal-currency').find('option:selected').val();
 	updateChange(currency);
-	$('#to-currency').val($('#from').data('currency'));
 }
 
 $(function(){

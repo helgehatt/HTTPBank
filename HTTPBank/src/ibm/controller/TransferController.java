@@ -8,10 +8,12 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import ibm.db.DB;
 import ibm.db.DB.TransBy;
 import ibm.resource.AttributeChecks;
+import ibm.resource.DatabaseException;
 import ibm.resource.InputException;
 
 @WebServlet(urlPatterns = { "/user/doTransfer", "/admin/doTransfer" } )
@@ -20,15 +22,16 @@ public class TransferController extends HttpServlet {
 	
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	HashMap<String, String> errors = new HashMap<String, String>();
-    	
+		HttpSession session = request.getSession();
+		
+    	HashMap<String, String> errors = new HashMap<String, String>();    	
 		boolean international = request.getParameter("international") != null;
         String from = request.getParameter("from");
         String to = request.getParameter("to");
         String bic = request.getParameter("bic");
-//        String toCurrency = request.getParameter("to-currency");
 		String amountString = request.getParameter("amount");
 		String withdrawnString = request.getParameter("change");
+		String message = request.getParameter("message");
 		
 		int fromId = 0;
 		double amount = 0;
@@ -37,7 +40,7 @@ public class TransferController extends HttpServlet {
 		try {
 			fromId = Integer.parseInt(from);
 		} catch (NumberFormatException e) {
-			response.sendError(418, "Lost connection to the database.");
+    		DatabaseException.handleException(new DatabaseException(), session, response, "accounts");
 			return;
 		}
 		
@@ -68,7 +71,12 @@ public class TransferController extends HttpServlet {
 			}
 			
 			if (errors.isEmpty()) {
-				DB.createTransaction(TransBy.IBAN, fromId, to, "Transfer to " + to, "Transfer from " + from, -withdrawn, amount);
+				try {
+					DB.createTransaction(TransBy.IBAN, fromId, to, "Transfer to " + to, "Transfer from " + from, -withdrawn, amount);
+					DatabaseException.success("Transfer to " + to + " completed successfully.", session);
+				} catch (DatabaseException e) {
+		    		DatabaseException.handleException(e, session);
+				}
 			} else
 	        	request.getSession().setAttribute("errors", errors);
 
@@ -82,13 +90,20 @@ public class TransferController extends HttpServlet {
 			}
 			
 			if (errors.isEmpty())
-				DB.createTransaction(TransBy.NUMBER, fromId, to, "Transfer to " + to, "Transfer from " + from, -amount, amount);
+				try {
+					DB.createTransaction(TransBy.NUMBER, fromId, to, "Transfer to " + to, "Transfer from " + from, -amount, amount);
+					DatabaseException.success("Transfer to " + to + " completed successfully.", session);
+				} catch (DatabaseException e) {
+		    		DatabaseException.handleException(e, session);
+				}
 			else
 	        	request.getSession().setAttribute("errors", errors);
 
 			response.sendRedirect("transfer");
 		}  
         
+//		if (!message.isEmpty())
+//			DB.createMessage(message, senderName, receiverUserID)
         // TODO: Message objects?
         // String message = request.getParameter("message"); // Optional
     	// if (message!=null) toAccount.getUser().getMessages().add(new Message(message));

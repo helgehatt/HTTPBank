@@ -26,22 +26,18 @@ public class MainController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		HttpSession session = request.getSession(true);
 
 		String path = request.getRequestURI().replace(request.getContextPath(), "");
 
-		HttpSession session = request.getSession(true);
 		if (session.getAttribute("admin") == null) {			
 			response.sendRedirect(request.getContextPath());
 			return;
 		} else {
 			boolean isAdmin = (boolean) session.getAttribute("admin");
-			String pathStart = path.substring(0, path.lastIndexOf("/"));
-			System.out.println(pathStart);
-			if (pathStart.equals("/user") && isAdmin) {
-				response.sendError(419, "Unauthorized access.");
-				return;
-			} else if (pathStart.equals("/admin") && !isAdmin) {
-				response.sendError(419, "Unauthorized access.");
+			String prefix = path.substring(0, path.lastIndexOf("/"));
+			if (prefix.equals("/user") && isAdmin || prefix.equals("/admin") && !isAdmin) {
+				response.sendError(419);
 				return;
 			}
 		}		

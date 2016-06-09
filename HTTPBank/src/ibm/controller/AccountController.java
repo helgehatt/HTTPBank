@@ -13,6 +13,7 @@ import javax.servlet.http.HttpSession;
 import ibm.db.DB;
 import ibm.resource.Account;
 import ibm.resource.AttributeChecks;
+import ibm.resource.DatabaseException;
 import ibm.resource.InputException;
 import ibm.resource.User;
 
@@ -22,8 +23,9 @@ public class AccountController extends HttpServlet {
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	HashMap<String, String> errors = new HashMap<String, String>();
-    	
+		HttpSession session = request.getSession();
+		
+    	HashMap<String, String> errors = new HashMap<String, String>();    	
         String accountName = request.getParameter("name");
     	String type = request.getParameter("type");
         String number = request.getParameter("number");
@@ -60,12 +62,6 @@ public class AccountController extends HttpServlet {
         }
         
         try {
-        	AttributeChecks.checkCurrency(currency);
-        } catch (InputException e) {
-        	errors.put("currency", e.getMessage());
-        }
-        
-        try {
         	interest = AttributeChecks.checkInterest(interestString);
         } catch (InputException e) {
         	errors.put("interest", e.getMessage());
@@ -77,8 +73,6 @@ public class AccountController extends HttpServlet {
         	errors.put("balance", e.getMessage());
         }
 
-        HttpSession session = request.getSession();
-
 		String path = request.getRequestURI().replace(request.getContextPath(), "");
 		
 		switch(path) {
@@ -86,9 +80,13 @@ public class AccountController extends HttpServlet {
 	        
 	        if (errors.isEmpty()) {
 		        User user = (User) session.getAttribute("user");
-				DB.createAccount(user.getId(), "", type, number, iban, currency, interest, balance);
-				
-				response.sendRedirect("accounts");
+				try {
+					DB.createAccount(user.getId(), "", type, number, iban, currency, interest, balance);
+					DatabaseException.success("Successfully created new account: " + number, session);
+					response.sendRedirect("accounts");
+				} catch (DatabaseException e) {
+		    		DatabaseException.handleException(e, session, response, "newaccount");
+				}				
 	        } else {
 	        	session.setAttribute("errors", errors);
 	        	response.sendRedirect("newaccount");
@@ -99,10 +97,20 @@ public class AccountController extends HttpServlet {
 
 	        if (errors.isEmpty()) {
 		        int id = ((Account) session.getAttribute("account")).getId();		        			
-				DB.updateAccount(id, accountName, type, number, iban, currency, interest, balance);
+				try {
+					DB.updateAccount(id, accountName, type, number, iban, currency, interest, balance);
+					DatabaseException.success("Successfully updated account: " + number, session);
+				} catch (DatabaseException e) {
+		    		DatabaseException.handleException(e, session, response, "editaccount");
+		    		return;
+				}
 				
-				session.setAttribute("account", DB.getAccountByNumber(number));
-				response.sendRedirect("accountinfo");
+				try {
+					session.setAttribute("account", DB.getAccountByNumber(number));
+					response.sendRedirect("accountinfo");
+				} catch (DatabaseException e) {
+		    		DatabaseException.handleException(e, session, response, "editaccount");
+				}
 	        } else {
 	        	session.setAttribute("errors", errors);
 	        	response.sendRedirect("editaccount");

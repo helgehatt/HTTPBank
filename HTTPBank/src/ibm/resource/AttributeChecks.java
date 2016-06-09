@@ -110,15 +110,6 @@ public class AttributeChecks {
 	}
     
 	/**
-	 * Checks if the given string is a valid currency.
-	 */
-	public static void checkCurrency(String currency) throws InputException {
-    	if (currency.length() != 3)
-    		throw new InputException("Please enter 3 letters.");
-    	// TODO: check if currency exists in DB
-    }
-    
-	/**
 	 * Checks if the given string is a valid interest.
 	 * @return The string parsed to double.
 	 */
