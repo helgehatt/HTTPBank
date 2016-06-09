@@ -15,8 +15,8 @@ public class User implements Serializable {
 	
 	private String cpr; // Required
 	private String name; // Required
-	private String institute = ""; // Required?
-	private String consultant = ""; // Required?
+	private String institute; // Required?
+	private String consultant; // Required?
 	
 	private ArrayList<Account> accounts = null; // Default: None
 	private ArrayList<Message> messages = null; 

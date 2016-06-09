@@ -71,7 +71,7 @@ public class DB {
 				Collections.sort(resultList, new Comparator<Transaction>(){
 					@Override
 					public int compare(Transaction o1, Transaction o2) {
-						return Long.compare(o2.getDateRaw(), o1.getDateRaw());
+						return o1.getDateRaw() < o2.getDateRaw() ? -1 : o1.getDateRaw() > o2.getDateRaw() ? 1 : 0;
 					}
 				});
 				
@@ -435,14 +435,14 @@ public class DB {
 					getBalanceStatement.execute();
 					getBalanceStatement.close();
 					connection.commit();
-				} catch(SQLException e) {
+					return true;
+				} catch (Exception e){
+					//Error, rollback all changes.
 					connection.rollback();
-					handleSQLException(e, tries);
-					//if no more tries, throw exception.
+					throw e;
 				} finally {
 					connection.setAutoCommit(true);
 				}
-				return true;
 			} catch (SQLException e) {
 				handleSQLException(e, tries);
 			}
@@ -474,6 +474,7 @@ public class DB {
 					statement.execute();
 					connection.commit();
 					statement.close();
+					return true;
 				} catch (Exception e){
 					//Error, rollback all changes.
 					connection.rollback();
@@ -481,7 +482,6 @@ public class DB {
 				} finally {
 					connection.setAutoCommit(true);
 				}
-				return true;
 			} catch (SQLException e) {
 				handleSQLException(e, tries);
 				//if no more tries, throw exception.
@@ -1045,7 +1045,7 @@ public class DB {
 	 */
 	private static boolean handleSQLException(SQLException e, int tries) throws DatabaseException{
 		
-		if (tries <= 0) throw new DatabaseException(e.getMessage(), e.getErrorCode(), e.getSQLState());
+		if (tries <= 1) throw new DatabaseException(e.getMessage(), e.getErrorCode(), e.getSQLState());
 		
 		switch (e.getSQLState()){
 		case "01002": //disconnect error
@@ -1055,7 +1055,6 @@ public class DB {
 		case "08003": //connection does not exist
 		case "08004": //SQL server rejected SQL connection
 		case "08006": //connection failure
-		case "08008": //insufficient funds
 		case "82119": //connect error; can't get error text
 		case "69000": //SQL*Connect errors
 		case "82117": //invalid OPEN or PREPARE for this connection
@@ -1070,6 +1069,7 @@ public class DB {
 		case "40003": //statement completion unknown
 		case "08007": //transaction resolution unknown
 		case "2D000": //invalid transaction termination
+		case "08008": //insufficient funds
 		default:
 			throw new DatabaseException(e.getMessage(), e.getErrorCode(), e.getSQLState());
 		}
