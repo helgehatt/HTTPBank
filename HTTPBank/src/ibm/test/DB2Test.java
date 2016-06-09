@@ -27,7 +27,7 @@ public class DB2Test {
 		//testCreateTransaction2(27, 28, "Should be goooood","Should be great", 300, 3);
 		//testBatchTimer();
 		System.out.println();
-		//testCreateMessage("Tak for igår <3\nDet var sgu billigt", "Xerxes", 3);
+		testCreateMessage("Tak for igår", 1, "DK00002", DB.TransBy.IBAN);
 		//System.out.println();
 		//testGetArchive(1);
 		/*testCheckLogin("Thomas", "1234");
@@ -83,8 +83,8 @@ public class DB2Test {
 		DB.archiveTransactions();
 	}
 	
-	private static void testCreateMessage(String message, String senderName, int userID) throws SQLException {
-		DB.createMessage(message, senderName, userID);
+	private static void testCreateMessage(String message, int userID, String receiver, DB.TransBy transBy) throws SQLException {
+		DB.createMessage(message, userID, receiver, transBy);
 	}
 	
 	private static void testGetCurrency() throws DatabaseException{
