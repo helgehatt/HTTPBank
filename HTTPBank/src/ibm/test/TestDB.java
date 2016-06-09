@@ -7,7 +7,7 @@ import ibm.resource.Account;
 import ibm.resource.InputException;
 import ibm.resource.Transaction;
 import ibm.resource.User;
-
+//hej
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
