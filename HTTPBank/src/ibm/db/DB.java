@@ -504,16 +504,17 @@ public class DB {
 		}
 	}
 	
-	public static boolean createMessage(String message, String senderName, int receiverUserID) throws DatabaseException {
+	public static boolean createMessage(String message, int senderID, String receiver, TransBy transBy) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				Date date = new Date(Calendar.getInstance().getTime().getTime());
-				PreparedStatement statement = connection.prepareStatement("INSERT INTO DTUGRP07.INBOX (MESSAGE, DATE, SENDER_NAME, USER_ID)"
-						+ "VALUES(?,?,?,?);");
+				CallableStatement statement = connection.prepareCall("CALL DTUGRP07.CREATEMESSAGE(?,?,?,?,?)");
+				
 				statement.setString(1, message);
 				statement.setDate(2, date);
-				statement.setString(3, senderName);
-				statement.setInt(4, receiverUserID);
+				statement.setInt(3, senderID);
+				statement.setString(4, receiver);
+				statement.setString(5, transBy.toString());
 				statement.execute();
 				return true;
 			} catch (SQLException e) {
