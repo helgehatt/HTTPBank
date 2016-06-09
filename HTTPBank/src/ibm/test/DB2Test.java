@@ -4,6 +4,7 @@ import ibm.db.DB;
 import ibm.db.DB.ACCOUNT;
 import ibm.db.DB.USER;
 import ibm.resource.Account;
+import ibm.resource.DatabaseException;
 import ibm.resource.InputException;
 import ibm.resource.Transaction;
 import ibm.resource.User;
@@ -71,7 +72,7 @@ public class DB2Test {
 		
 	}
 	
-	private static void testGetArchive(int account_id) {
+	private static void testGetArchive(int account_id) throws DatabaseException {
 		ArrayList<Transaction> array = DB.getArchive(account_id);
 		for(Transaction t : array) {
 			System.out.println(t.getId() + " " + t.getAccountId() + " " + t.getDateAsString() + " " + t.getAmount() + " " + t.getDescription());
@@ -86,7 +87,7 @@ public class DB2Test {
 		DB.createMessage(message, senderName, userID);
 	}
 	
-	private static void testGetCurrency(){
+	private static void testGetCurrency() throws DatabaseException{
 		long start = System.currentTimeMillis();
 		ArrayList<String> list = DB.getCurrencies();
 		for (String string : list) System.out.println(string);
@@ -135,36 +136,28 @@ public class DB2Test {
 		System.out.println("Query Time: " + (System.currentTimeMillis()-start));
 	}
 
-	private static Transaction testCreateTransaction(int senderId, String description, double amount) throws SQLException {
+	private static void testCreateTransaction(int senderId, String description, double amount) throws SQLException {
 		long start = System.currentTimeMillis();
-		Transaction transaction = DB.createTransaction(senderId, description, amount);
-		System.out.println("Created Transaction, Query Time: " + (System.currentTimeMillis()-start));
-		printTransaction(transaction);
-		return transaction;
+		boolean transaction = DB.createTransaction(senderId, description, amount);
+		System.out.println("Created Transaction "+transaction+", Query Time: " + (System.currentTimeMillis()-start));
 	}
 	
-	private static Transaction testCreateTransaction(int senderId, int receiverId, String senderDescription, String receiverDescription, double senderAmount, double receiverAmount) throws SQLException {
+	private static void testCreateTransaction(int senderId, int receiverId, String senderDescription, String receiverDescription, double senderAmount, double receiverAmount) throws SQLException {
 		long start = System.currentTimeMillis();
-		Transaction transaction = DB.createTransaction(DB.TransBy.ID, senderId, ""+receiverId, senderDescription, receiverDescription, -senderAmount, receiverAmount);
-		System.out.println("Created Transaction, Query Time: " + (System.currentTimeMillis()-start));
-		printTransaction(transaction);
-		return transaction;
+		boolean transaction = DB.createTransaction(DB.TransBy.ID, senderId, ""+receiverId, senderDescription, receiverDescription, -senderAmount, receiverAmount);
+		System.out.println("Created Transaction "+transaction+", Query Time: " + (System.currentTimeMillis()-start));
 	}
 
-	private static Account testCreateAccount(int userId, String name, String type, String number, String iban, String currency, double interest, double balance) throws SQLException {
+	private static void testCreateAccount(int userId, String name, String type, String number, String iban, String currency, double interest, double balance) throws SQLException {
 		long start = System.currentTimeMillis();
-		Account account = DB.createAccount(userId, name, type, number, iban, currency, interest, balance);
-		System.out.println("Created Account, Query Time: " + (System.currentTimeMillis()-start));
-		printAccount(account);
-		return account;
+		boolean account = DB.createAccount(userId, name, type, number, iban, currency, interest, balance);
+		System.out.println("Created Account "+account+", Query Time: " + (System.currentTimeMillis()-start));
 	}
 
-	private static User testCreateUser(String username, String password, String cpr, String name, String institute, String consultant) throws SQLException {
+	private static void testCreateUser(String username, String password, String cpr, String name, String institute, String consultant) throws SQLException {
 		long start = System.currentTimeMillis();
-		User user = DB.createUser(username, password, cpr, name, institute, consultant);
-		System.out.println("Create User, Query Time: " + (System.currentTimeMillis()-start));
-		printUser(user);
-		return user;
+		boolean user = DB.createUser(username, password, cpr, name, institute, consultant);
+		System.out.println("Create User "+user+", Query Time: " + (System.currentTimeMillis()-start));
 	}
 
 	public static ArrayList<Transaction> testGetTransactions(int id) throws SQLException{

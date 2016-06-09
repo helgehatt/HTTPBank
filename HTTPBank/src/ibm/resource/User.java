@@ -15,8 +15,8 @@ public class User implements Serializable {
 	
 	private String cpr; // Required
 	private String name; // Required
-	private String institute; // Required?
-	private String consultant; // Required?
+	private String institute = ""; // Required?
+	private String consultant = ""; // Required?
 	
 	private ArrayList<Account> accounts = null; // Default: None
 	private ArrayList<Message> messages = null; 
@@ -64,12 +64,12 @@ public class User implements Serializable {
 	 * Get Accounts related to this User.
 	 * Should query whenever accounts are updated.
 	 */
-	public ArrayList<Account> getAccounts() {
+	public ArrayList<Account> getAccounts() throws DatabaseException {
 		accounts = DB.getAccounts(userId);
 		return accounts;
 	}
 	
-	public ArrayList<Message> getMessages() {
+	public ArrayList<Message> getMessages() throws DatabaseException {
 		messages = DB.getMessages(userId);
 		return messages;
 	}
