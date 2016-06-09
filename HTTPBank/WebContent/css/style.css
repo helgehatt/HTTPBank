@@ -13,6 +13,19 @@ body {
 	margin-left: auto;
 }
 
+.nav-pills {
+	padding: 20px;
+}
+
+.nav-pills li a {
+	border: solid 1px;
+}
+
+.table {
+	margin: 0;
+}
+
+
 @media (min-width: 300px) {
 	.alignleft {
 		float: left;
@@ -89,6 +102,18 @@ body {
 	outline: none;
 }
 
+/* PANEL */
+
+.panel {
+	margin-bottom: 0;
+}
+
+@media (max-width: 767px) {
+	.panel-body {
+		padding: 0;
+	}
+}
+
 /* SIDE-MENU */
 @media (min-width: 768px) {
 	#side-menu {
@@ -109,20 +134,35 @@ body {
 
 /* CONTAINERS */
 .container-fluid {
-	padding-left: 10px;
-	padding-right: 10px;
+	padding-left: 0;
+	padding-right: 0;
 }
 
 .container {
-	padding: 5px;
+	padding: 15px 15px 0 15px;
+}
+
+/* FORMS */
+
+.form-group {
+	margin-bottom: 10px;
+}
+
+.form-group div {
+	margin-bottom: 5px;
+}
+
+.form-horizontal .form-group {
+	margin-left: 0;
 }
 
 /* NAVBAR */
 #nav {
-  padding-top: 10px;
-  padding-bottom: 10px;
-  margin-bottom: 10px;
+	padding: 10px;
+  margin-bottom: 0;
   background-color: #FFF;
+  border-left: none;
+  border-right: none;
 }
 
 #nav .navbar-header {

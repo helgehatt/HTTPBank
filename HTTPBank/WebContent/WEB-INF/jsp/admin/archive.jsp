@@ -7,14 +7,6 @@
 	max-width: 1200px;
 }
 
-#archive .panel-body {
-	padding: 0;
-}
-
-#archive .table {
-	margin: 0;
-}
-
 #archive-item a {
 	background-color:#e6e6e6;
 }

@@ -32,6 +32,10 @@
   color: #FFF;
 }
 
+#login .panel-body {
+	padding: 15px;
+}
+
 #login button {
   display: block;
   margin-left: auto;

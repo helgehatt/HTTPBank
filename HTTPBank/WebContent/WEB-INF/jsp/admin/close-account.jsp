@@ -12,18 +12,6 @@
 	border: none;
 }
 
-#close-account .panel-body {
-	padding-top: 0;
-}
-
-#close-account .nav-pills {
-	padding: 20px;
-}
-
-#close-account li a {
-	border: solid 1px;
-}
-
 #close-account-item a {
 	background-color:#e6e6e6;
 }

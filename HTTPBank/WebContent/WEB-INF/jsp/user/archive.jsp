@@ -6,14 +6,6 @@
 	max-width: 800px;
 }
 
-#archive .panel-body {
-	padding: 0;
-}
-
-#archive .table {
-	margin: 0;
-}
-
 #archive-nav {
 	background-color:#e6e6e6;
 }

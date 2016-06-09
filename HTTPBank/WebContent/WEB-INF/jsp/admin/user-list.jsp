@@ -5,7 +5,6 @@
 
 #user-list {
 	max-width: 800px;
-	padding: 20px;
 }
 
 </style>
