@@ -721,7 +721,7 @@ public class TestDB extends Mockito{
 		//Create Message
 		String message = "TestyForYou!";
 		String senderName = "Tommy";
-		assertTrue(DB.createMessage(message, senderName, user.getId()));
+		assertTrue(DB.createMessage(message, user.getId(), ""+user.getId(), TransBy.ID));
 		//Assertion
 		ArrayList<Message> messages = DB.getMessages(user.getId());
 		assertFalse(messages.isEmpty());
