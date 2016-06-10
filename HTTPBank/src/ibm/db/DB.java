@@ -166,7 +166,7 @@ public class DB {
 					resultList = new ArrayList<User>();
 					ResultSet results = statement.getResultSet();
 					while (results.next()){ //Fetch usernames from results and add to resultlist.
-						resultList.add(new User(results.getInt(1), results.getString(2), results.getString(3), results.getString(4)));
+						resultList.add(new User(results.getInt(1), results.getString(2), results.getString(3)));
 					}
 				}
 				statement.close();
@@ -507,7 +507,7 @@ public class DB {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				Date date = new Date(Calendar.getInstance().getTime().getTime());
-				CallableStatement statement = connection.prepareCall("CALL DTUGRP07.CREATEMESSAGE(?,?,?,?,?)");
+				CallableStatement statement = connection.prepareCall("{CALL DTUGRP07.CREATEMESSAGE(?,?,?,?,?)}");
 				
 				statement.setString(1, message);
 				statement.setDate(2, date);
@@ -517,6 +517,7 @@ public class DB {
 				statement.execute();
 				return true;
 			} catch (SQLException e) {
+				e.printStackTrace();
 				handleSQLException(e, tries);
 				//if no more tries, throw exception.
 			}
@@ -937,6 +938,64 @@ public class DB {
 			}
 		}
 		return false;
+	}
+	
+	public static ArrayList<User> searchUsers(String name, String cpr) throws DatabaseException {
+		for (int tries = 2; 0 < tries; tries--) {
+			try {
+				PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, NAME, CPR " +
+			"FROM DTUGRP07.USERS WHERE NAME LIKE ? OR CPR LIKE ?;");
+				statement.setString(1, "%"+name+"%");
+				statement.setString(2, "%"+cpr+"%");
+				ArrayList<User> resultList = null;
+				if(statement.execute()) {
+					resultList = new ArrayList<User>();
+					ResultSet results = statement.getResultSet();
+					while(results.next()) {
+						resultList.add(new User(results.getInt(1), results.getString(2), results.getString(3)));
+					}
+					
+				}
+				statement.close();
+				return resultList;
+			} catch (SQLException e) {
+				handleSQLException(e, tries);
+			}
+		}
+		return null;
+	}
+	
+	//Change date to timestamp!! when db works
+	public static ArrayList<Transaction> searchArchive(String dateFrom, String dateTo) throws DatabaseException {
+		for (int tries = 2; 0 < tries; tries--) {
+			try {
+				PreparedStatement statement = connection.prepareStatement("SELECT TRANSACTION_ID, ACCOUNT_ID, DESCRIPTION, DATE, AMOUNT " +
+			"FROM DTUGRP07.ARCHIVE WHERE DATE > DATE ? AND DATE < DATE ?;");
+				statement.setString(1, dateFrom);
+				statement.setString(2, dateTo);
+				ArrayList<Transaction> resultList = null;
+				if(statement.execute()) {
+					resultList = new ArrayList<Transaction>();
+					ResultSet results = statement.getResultSet();
+					while(results.next()) {
+						resultList.add(new Transaction(results.getLong(1), results.getInt(2), results.getDate(4), results.getString(3), results.getInt(5)));
+					}
+					
+				}
+				statement.close();
+				Collections.sort(resultList, new Comparator<Transaction>(){
+					@Override
+					public int compare(Transaction o1, Transaction o2) {
+						return Long.compare(o2.getDateRaw(), o1.getDateRaw());
+					}
+				});				
+				return resultList;
+			} catch (SQLException e) {
+				//handleSQLException(e, tries);
+				e.printStackTrace();
+			}
+		}
+		return null;
 	}
 	
 	/**

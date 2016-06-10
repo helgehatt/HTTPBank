@@ -13,7 +13,7 @@ import ibm.resource.User;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-//hej
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -33,7 +33,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-public class TestDB extends Mockito{
+public class TestDB extends Mockito {
 	
 	private static Connection connection;
 	
