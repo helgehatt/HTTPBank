@@ -924,9 +924,9 @@ public class DB {
 		for (int tries = 2; 0 < tries; tries--) {
 			try {
 				PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, NAME, CPR " +
-			"FROM DTUGRP07.USERS WHERE NAME LIKE '%?%' OR CPR LIKE '%?%';");
-				statement.setString(1, name);
-				statement.setString(2, cpr);
+			"FROM DTUGRP07.USERS WHERE NAME LIKE ? OR CPR LIKE ?;");
+				statement.setString(1, "%"+name+"%");
+				statement.setString(2, "%"+cpr+"%");
 				ArrayList<User> resultList = null;
 				if(statement.execute()) {
 					resultList = new ArrayList<User>();
@@ -945,13 +945,14 @@ public class DB {
 		return null;
 	}
 	
+	//Change date to timestamp!! when db works
 	public static ArrayList<Transaction> searchArchive(String dateFrom, String dateTo) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--) {
 			try {
 				PreparedStatement statement = connection.prepareStatement("SELECT TRANSACTION_ID, ACCOUNT_ID, DESCRIPTION, DATE, AMOUNT " +
 			"FROM DTUGRP07.ARCHIVE WHERE DATE > DATE ? AND DATE < DATE ?;");
-				statement.setString(1, "'" + dateFrom + "'");
-				statement.setString(2, "'" + dateTo + "'");
+				statement.setString(1, dateFrom);
+				statement.setString(2, dateTo);
 				ArrayList<Transaction> resultList = null;
 				if(statement.execute()) {
 					resultList = new ArrayList<Transaction>();
