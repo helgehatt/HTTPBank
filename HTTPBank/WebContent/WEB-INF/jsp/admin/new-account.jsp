@@ -2,10 +2,6 @@
 
 <style>
 
-#new-account {
-	max-width: 800px;
-}
-
 #new-account .panel {
 	border: none;
 }
@@ -21,7 +17,7 @@
 
 	<%@ include file="side-menu.jsp" %>
 	
-	<div id="new-account" class="container col-sm-9">
+	<div id="new-account" class="container container-md col-sm-9">
 		<div class="panel panel-default">
 			<div class="panel-body">
 		    <form class="form-horizontal" role="form" action="newAccount" method="post">

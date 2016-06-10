@@ -7,7 +7,6 @@
 <c:set var="confirmation" scope="page" value="${sessionScope.confirmation}"/>
 <c:remove var="confirmation" scope="session"/>
 
-
 <nav id="nav" class="navbar navbar-default">
   <div class="container-fluid">
     <div class="navbar-header">

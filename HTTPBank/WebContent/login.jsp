@@ -16,13 +16,12 @@
 <style>
 
 #login {
-  margin-top: 40px;
   max-width: 360px;
-  padding: 0;
+  padding: 10px;
 }
 
 #login img {
-  margin-bottom: 40px;
+  margin-bottom: 20px;
 }
 
 #login .panel-heading {

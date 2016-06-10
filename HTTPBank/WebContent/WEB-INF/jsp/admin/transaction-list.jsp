@@ -2,10 +2,6 @@
 
 <style>
 
-#transaction-list {
-	max-width: 1200px;
-}
-
 #transaction-list-item a {
 	background-color:#e6e6e6;
 }
@@ -19,7 +15,7 @@
 	<c:set var="menu" scope="page" value="account"/>
 	<%@ include file="side-menu.jsp" %>
 	
-	<div id="transaction-list" class="container col-sm-9">
+	<div id="transaction-list" class="container container-lg col-sm-9">
 
 	<%@ include file="../content/transaction-list.jsp" %>
 	

@@ -3,15 +3,11 @@
 
 <style>
 
-#user-list {
-	max-width: 800px;
-}
-
 </style>
 
 <%@ include file="navbar.jsp" %>
 
-<div id="user-list" class="container">
+<div id="user-list" class="container container-md">
 	<div class="panel panel-default button-panel">
 	  <div class="panel-body">
 	  	<ul class="list-group">

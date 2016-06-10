@@ -2,10 +2,6 @@
 
 <style>
 
-#transaction-list {
-	max-width: 800px;
-}
-
 #transaction-list-nav {
 	background-color:#e6e6e6;
 }
@@ -14,7 +10,7 @@
 
 <%@ include file="navbar.jsp" %>
 
-<div id="transaction-list" class="container">
+<div id="transaction-list" class="container container-md">
   <h3>Transactions</h3>
   <p>Current week's transactions for your account ${account.number}.</p>
   

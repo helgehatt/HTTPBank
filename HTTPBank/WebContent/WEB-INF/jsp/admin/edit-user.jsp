@@ -2,10 +2,6 @@
 
 <style>
 
-#edit-user {
-	max-width: 600px;
-}
-
 #edit-user .panel {
 	border: none;
 }
@@ -26,7 +22,7 @@
 	<c:set var="menu" scope="page" value="user"/>
 	<%@ include file="side-menu.jsp" %>
 	
-	<div id="edit-user" class="container col-sm-9">
+	<div id="edit-user" class="container container-sm col-sm-9">
 		<div class="panel panel-default">
 			<div class="panel-body">
 		    <form class="form-horizontal" role="form" action="editUser" method="post">

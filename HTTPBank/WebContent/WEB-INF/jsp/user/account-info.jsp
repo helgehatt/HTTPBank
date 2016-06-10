@@ -2,10 +2,6 @@
 
 <style>
 
-#account-info {
-	max-width: 600px;
-}
-
 #account-info-nav {
 	background-color:#e6e6e6;
 }
@@ -18,7 +14,7 @@
 
 <%@ include file="navbar.jsp" %>
 	
-<div id="account-info" class="container">
+<div id="account-info" class="container container-sm">
   <h3>Account info</h3>
   <p>Information about your account is shown below.</p>
 	

@@ -31,6 +31,8 @@ public class UserController extends HttpServlet {
         String name = request.getParameter("name");
         String institute = request.getParameter("institute");
         String consultant = request.getParameter("consultant");
+
+		String path = request.getRequestURI().replace(request.getContextPath(), "");
         
         try {
         	AttributeChecks.checkUserName(username);
@@ -38,10 +40,12 @@ public class UserController extends HttpServlet {
         	errors.put("username", e.getMessage());
         }
         
-        try {
-        	AttributeChecks.checkPassword(password);
-        } catch (InputException e) {
-        	errors.put("password", e.getMessage());
+        if (path.equals("/admin/newUser") || path.equals("/admin/editUser") && !password.isEmpty()) {
+	        try {
+	        	AttributeChecks.checkPassword(password);
+	        } catch (InputException e) {
+	        	errors.put("password", e.getMessage());
+	        }
         }
         
         try {
@@ -67,8 +71,6 @@ public class UserController extends HttpServlet {
         } catch (InputException e) {
         	errors.put("consultant", e.getMessage());
         }
-
-		String path = request.getRequestURI().replace(request.getContextPath(), "");
 		
     	switch(path) {
     	case "/admin/newUser":
@@ -91,7 +93,11 @@ public class UserController extends HttpServlet {
             if (errors.isEmpty()) {
             	int id = ((User) session.getAttribute("user")).getId();            	
             	try {
-					DB.updateUser(id, username, password, cpr, name, institute, consultant);
+            		if (password.isEmpty())
+                		// TODO: Remove password parameter
+            			DB.updateUser(id, username, password, cpr, name, institute, consultant);
+            		else
+            			DB.updateUser(id, username, password, cpr, name, institute, consultant);
 					DatabaseException.success("Successfully updated user: " + username, session);
 					session.setAttribute("user", DB.getUser(id));
 	    			response.sendRedirect("userinfo");

@@ -2,10 +2,6 @@
 
 <style>
 
-#user-info {
-	max-width: 600px;
-}
-
 #user-info-item a {
 	background-color:#e6e6e6;
 }
@@ -23,7 +19,7 @@
 	<c:set var="menu" scope="page" value="user"/>
 	<%@ include file="side-menu.jsp" %>
 	
-	<div id="user-info" class="container col-sm-9">
+	<div id="user-info" class="container container-sm col-sm-9">
 	
 	<%@ include file="../content/user-info.jsp" %>
 

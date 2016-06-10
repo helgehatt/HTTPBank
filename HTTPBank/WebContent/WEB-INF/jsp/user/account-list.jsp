@@ -2,30 +2,6 @@
 
 <style>
 
-#account-list {
-	max-width: 800px;
-}
-
-@media (min-width: 768px) {
-	#text-left {
-		float: left;
-		text-align: left;
-		width: 40%;
-	}
-	
-	#text-center {
-		display: inline-block;
-		text-align: center;
-		width: 20%;
-	}
-	
-	#text-right {
-		float: right;
-		text-align: right;
-		width: 40%;
-	}
-}
-
 #account-list-nav {
 	background-color:#e6e6e6;
 }
@@ -34,7 +10,7 @@
 
 <%@ include file="navbar.jsp" %>
 
-<div id="account-list" class="container">
+<div id="account-list" class="container container-md">
   <h3>Accounts</h3>
   <p>Your accessible accounts are shown below.</p>
   

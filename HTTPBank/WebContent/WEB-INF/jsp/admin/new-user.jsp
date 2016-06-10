@@ -4,7 +4,6 @@
 <style>
 
 #new-user {
-	max-width: 800px;
 	padding: 20px;
 }
 
@@ -19,7 +18,7 @@
 <c:set var="errors" scope="page" value="${sessionScope.errors}"/>
 <c:remove var="errors" scope="session"/>
 
-<div id="new-user" class="container">
+<div id="new-user" class="container container-md">
 		<div class="panel panel-default">
 	  <div class="panel-body">
 			<form class="form-horizontal" role="form" action="newUser" method="post">
