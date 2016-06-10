@@ -86,7 +86,7 @@ public class UserController extends HttpServlet {
     	case "/admin/newUser":
             if (errors.isEmpty()) {
     			try {
-					DB.createUser(username, password, cpr, name, institute, consultant);
+					DB.createUser(username, cpr, name, institute, consultant);
 					DatabaseException.success("Successfully created new user: " + username, session);
 					session.setAttribute("users", DB.getUsers());
 	            	response.sendRedirect("users");
@@ -103,7 +103,7 @@ public class UserController extends HttpServlet {
             if (errors.isEmpty()) {
             	int id = user.getId();            	
             	try {
-            		DB.updateUser(id, username, password, cpr, name, institute, consultant);
+            		DB.updateUser(id, username, cpr, name, institute, consultant);
 					DatabaseException.success("Successfully updated user: " + username, session);
 					session.setAttribute("user", DB.getUser(id));
 	    			response.sendRedirect("userinfo");
