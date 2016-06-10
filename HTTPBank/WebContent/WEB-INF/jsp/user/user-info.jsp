@@ -2,10 +2,6 @@
 
 <style>
 
-#user-info {
-	max-width: 600px;
-}
-
 .panel-body {
 	padding: 15px;
 }
@@ -14,7 +10,7 @@
 
 <%@ include file="navbar.jsp" %>
 	
-<div id="user-info" class="container">
+<div id="user-info" class="container container-sm">
   <h3>User info</h3>
   <p>Your information is shown below.</p>
 	

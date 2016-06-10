@@ -2,10 +2,6 @@
 
 <style>
 
-#archive {
-	max-width: 800px;
-}
-
 #archive-nav {
 	background-color:#e6e6e6;
 }
@@ -14,7 +10,7 @@
 
 <%@ include file="navbar.jsp" %>
 
-<div id="archive" class="container">
+<div id="archive" class="container container-md">
   <h3>Archive</h3>
   <p>History of all transactions.</p>
   <div id="transaction-accordion" class="transaction-list panel-group">

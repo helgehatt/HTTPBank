@@ -28,16 +28,8 @@ $(function(){
 
 <style>
 
-#deposit-withdrawal {
-	max-width: 600px;
-}
-
 #deposit-withdrawal .panel {
 	border: none;
-}
-
-#deposit-withdrawal li a {
-	border: solid 1px;
 }
 
 #deposit-withdrawal-item a {
@@ -52,7 +44,7 @@ $(function(){
 
 	<%@ include file="side-menu.jsp" %>
 	
-	<div id="deposit-withdrawal" class="container col-sm-9">
+	<div id="deposit-withdrawal" class="container container-sm col-sm-9">
 		<div class="panel panel-default">
 			<div class="panel-body">
 			  <ul class="nav nav-pills">

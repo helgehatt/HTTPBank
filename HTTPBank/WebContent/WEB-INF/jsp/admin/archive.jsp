@@ -2,11 +2,6 @@
 
 <style>
 
-
-#archive {
-	max-width: 1200px;
-}
-
 #archive-item a {
 	background-color:#e6e6e6;
 }
@@ -20,7 +15,7 @@
 	<c:set var="menu" scope="page" value="account"/>
 	<%@ include file="side-menu.jsp" %>
 	
-	<div id="archive" class="container col-sm-9">
+	<div id="archive" class="container container-lg col-sm-9">
 		<div class="panel panel-default">
 			<div class="panel-body">
 		    <table class="table table-striped">

@@ -5,7 +5,7 @@
    			<li class="list-group-item">
      			<form action="getAccount" method="post">
      				<button class="btn btn-default" name="id" value="${account.id}">
-     					<h4 id="text-left">
+     					<h4 class="trio-text-left">
      						<c:choose>
 	     						<c:when test="${account.name != '' }">
 	     							${account.name}
@@ -15,8 +15,8 @@
 	     						</c:otherwise>
      						</c:choose>
      					</h4>
-     					<h4 id="text-center">${account.number}</h4>
-     					<h4 id="text-right">${account.balance} ${account.currency}</h4>
+     					<h4 class="trio-text-center">${account.number}</h4>
+     					<h4 class="trio-text-right">${account.balance} ${account.currency}</h4>
      				</button>
      			</form>
      		</li>

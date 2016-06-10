@@ -4,10 +4,6 @@
 
 <style>
 
-#transfer-dom {
-	max-width: 800px;
-}
-
 #transfer-nav {
 	background-color:#e6e6e6;
 }
@@ -19,7 +15,7 @@
 <c:set var="errors" scope="page" value="${sessionScope.errors}"/>
 <c:remove var="errors" scope="session"/>
 
-<div id="transfer-dom" class="container">
+<div id="transfer-dom" class="container container-md">
   <h3>Transfer</h3>
   <p>Enter required information to make a new transfer.</p>
   <ul class="nav nav-pills">

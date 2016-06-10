@@ -10,10 +10,6 @@ $(function(){
 
 <style>
 
-#edit-account {
-	max-width: 600px;
-}
-
 #edit-account .panel {
 	border: none;
 }
@@ -34,7 +30,7 @@ $(function(){
 	<c:set var="menu" scope="page" value="account"/>
 	<%@ include file="side-menu.jsp" %>
 	
-	<div id="edit-account" class="container col-sm-9">
+	<div id="edit-account" class="container container-sm col-sm-9">
 		<div class="panel panel-default">
 			<div class="panel-body">
 		    <form class="form-horizontal" role="form" action="editAccount" method="post">

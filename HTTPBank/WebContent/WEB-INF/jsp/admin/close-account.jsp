@@ -4,10 +4,6 @@
 
 <style>
 
-#close-account {
-	max-width: 600px;
-}
-
 #close-account .panel {
 	border: none;
 }
@@ -25,7 +21,7 @@
 	<c:set var="menu" scope="page" value="account"/>
 	<%@ include file="side-menu.jsp" %>
 	
-	<div id="close-account" class="container col-sm-9">
+	<div id="close-account" class="container container-sm col-sm-9">
 		<div class="panel panel-default">
 			<div class="panel-body">
 			  <ul class="nav nav-pills">

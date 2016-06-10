@@ -2,10 +2,6 @@
 
 <style>
 
-#change-info {
-	max-width: 800px;
-}
-
 #change-info form {
 	margin-top: 20px;
 }
@@ -17,7 +13,7 @@
 <c:set var="errors" scope="page" value="${sessionScope.errors}"/>
 <c:remove var="errors" scope="session"/>
 	
-<div id="change-info" class="container">
+<div id="change-info" class="container container-md">
   <h3>Change user name or password</h3>
   <p>Enter your password to make any changes.</p>
 	<form class="form-horizontal" role="form" action="doChangeInfo" method="post">

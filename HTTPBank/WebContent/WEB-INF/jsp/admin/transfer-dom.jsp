@@ -4,10 +4,6 @@
 
 <style>
 
-#transfer-dom {
-	max-width: 800px;
-}
-
 #transfer-dom .panel {
 	border: none;
 }
@@ -28,7 +24,7 @@
 	<c:set var="menu" scope="page" value="transfer"/>
 	<%@ include file="side-menu.jsp" %>
 	
-	<div id="transfer-dom" class="container col-sm-9">
+	<div id="transfer-dom" class="container container-md col-sm-9">
 		<div class="panel panel-default">
 			<div class="panel-body">
 				<%@ include file="../content/transfer-dom.jsp" %>

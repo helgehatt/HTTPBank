@@ -2,10 +2,6 @@
 
 <style>
 
-#inbox {
-	max-width: 800px;
-}
-
 </style>
 
 <%@ include file="navbar.jsp" %>
@@ -14,7 +10,7 @@
 	
 	<c:set var="menu" scope="page" value="account"/>
 	
-	<div id="inbox" class="container">
+	<div id="inbox" class="container container-md">
 		<div class="panel panel-default">
 			<div class="panel-body">
 		    <table class="table table-striped">
