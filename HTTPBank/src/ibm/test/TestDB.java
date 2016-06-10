@@ -11,8 +11,6 @@ import ibm.resource.Message;
 import ibm.resource.Transaction;
 import ibm.resource.User;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 //hej
@@ -79,7 +77,6 @@ public class TestDB extends Mockito{
 	public void testCreateMethods() throws DatabaseException {
 		//Test Create User
 		String username = "TestCreateUser";
-		String password = "Test1234";
 		String cpr = "TestCU1234";
 		String userName = "Test Testy Test";
 		String institute = "Test That Institute";
@@ -88,7 +85,7 @@ public class TestDB extends Mockito{
 		User nullUser = DB.getUserByCpr(cpr);
 		assertNull(nullUser);
 		//Create user
-		assertTrue(DB.createUser(username, password, cpr, userName, institute, consultant));
+		assertTrue(DB.createUser(username, cpr, userName, institute, consultant));
 		User user = DB.getUserByCpr(cpr);
 		//Get the newly created user
 		User sameUser = DB.getUserByCpr(cpr);
@@ -159,7 +156,7 @@ public class TestDB extends Mockito{
 	public void testCheckLogin() throws DatabaseException, InputException {
 		//Test Check Login
 		String username = "TestCreateLogin";
-		String password = "Test1234";
+		String password = "password";
 		String cpr = "TestCL1234";
 		String name = "Test Testy Test";
 		String institute = "Test That Institute";
@@ -168,7 +165,7 @@ public class TestDB extends Mockito{
 		User nullUser = DB.getUserByCpr(cpr);
 		assertNull(nullUser);
 		//Create user
-		assertTrue(DB.createUser(username, password, cpr, name, institute, consultant));
+		assertTrue(DB.createUser(username, cpr, name, institute, consultant));
 		User user = DB.getUserByCpr(cpr);
 		//Check login
 		int id = DB.checkLogin(username, password);
@@ -180,13 +177,12 @@ public class TestDB extends Mockito{
 	public void testGetUser() throws DatabaseException{
 		//Test Get User
 		String username = "TestGetUser";
-		String password = "Test1234";
 		String cpr = "TestGS1234";
 		String name = "Test Testy Test";
 		String institute = "Test That Institute";
 		String consultant = "";
 		//Create a user to get
-		assertTrue(DB.createUser(username, password, cpr, name, institute, consultant));
+		assertTrue(DB.createUser(username, cpr, name, institute, consultant));
 		User user = DB.getUserByCpr(cpr);
 		//Get user
 		User sameUser = DB.getUser(user.getId());
@@ -203,13 +199,12 @@ public class TestDB extends Mockito{
 	public void testGetUsers() throws DatabaseException{
 		//Test Get Users
 		String username = "TestGetUsers";
-		String password = "Test1234";
 		String cpr = "TestGM1234";
 		String userName = "Test Testy Test";
 		String institute = "Test That Institute";
 		String consultant = "";
 		//Create user
-		assertTrue(DB.createUser(username, password, cpr, userName, institute, consultant));
+		assertTrue(DB.createUser(username, cpr, userName, institute, consultant));
 		User newUser = DB.getUserByCpr(cpr);
 		assertNotNull(newUser);
 		//Get Users
@@ -229,13 +224,12 @@ public class TestDB extends Mockito{
 		//Test Get Transactions
 		//Create User
 		String username = "TestGetTrans";
-		String password = "Test1234";
 		String cpr = "TestGT1234";
 		String userName = "Test Testy Test";
 		String institute = "Test That Institute";
 		String consultant = "";
 		//Create user
-		assertTrue(DB.createUser(username, password, cpr, userName, institute, consultant));
+		assertTrue(DB.createUser(username, cpr, userName, institute, consultant));
 		User user = DB.getUserByCpr(cpr);
 		assertNotNull(user);
 		
@@ -279,13 +273,12 @@ public class TestDB extends Mockito{
 		//Test Get Accounts
 		//Create User
 		String username = "TestGetAccount";
-		String password = "Test1234";
 		String cpr = "TestGA1234";
 		String userName = "Test Testy Test";
 		String institute = "Test That Institute";
 		String consultant = "";
 		//Create user
-		assertTrue(DB.createUser(username, password, cpr, userName, institute, consultant));
+		assertTrue(DB.createUser(username, cpr, userName, institute, consultant));
 		User user = DB.getUserByCpr(cpr);
 		assertNotNull(user);
 		
@@ -328,13 +321,12 @@ public class TestDB extends Mockito{
 		//Test Update Account
 		//Create User
 		String username = "TestUpdateAccount";
-		String password = "Test1234";
 		String cpr = "TestUA1234";
 		String userName = "Test Testy Test";
 		String institute = "Test That Institute";
 		String consultant = "";
 		//Create user
-		assertTrue(DB.createUser(username, password, cpr, userName, institute, consultant));
+		assertTrue(DB.createUser(username, cpr, userName, institute, consultant));
 		User user = DB.getUserByCpr(cpr);
 		assertNotNull(user);
 		
@@ -408,13 +400,13 @@ public class TestDB extends Mockito{
 		//Test Update User
 		//Create User
 		String username = "TestUpdateUser";
-		String password = "Test1234";
+		String password = "password";
 		String cpr = "TestUU1234";
 		String userName = "Test Testy Test";
 		String institute = "Test That Institute";
 		String consultant = "";
 		//Create user
-		assertTrue(DB.createUser(username, password, cpr, userName, institute, consultant));
+		assertTrue(DB.createUser(username, cpr, userName, institute, consultant));
 		User user = DB.getUserByCpr(cpr);
 		assertNotNull(user);
 		
@@ -456,12 +448,11 @@ public class TestDB extends Mockito{
 		
 		//Update User 
 		String newnewusername = "TestNewNewUpdateUser";
-		String newnewpassword = "TestNN1234";
 		String newnewcpr = "TestUUNN1234";
 		String newnewuserName = "New Moo Testy Test";
 		String newnewinstitute = "New Moo That Institute";
 		String newnewconsultant = "Tommy the 2rd";
-		assertTrue(DB.updateUser(user.getId(), newnewusername, newnewpassword, newnewcpr, newnewuserName, newnewinstitute, newnewconsultant));
+		assertTrue(DB.updateUser(user.getId(), newnewusername, newnewcpr, newnewuserName, newnewinstitute, newnewconsultant));
 		//Assertion
 		User updatedUpdatedUser = DB.getUser(user.getId());
 		assertEquals(user.getId(), updatedUpdatedUser.getId());
@@ -471,9 +462,7 @@ public class TestDB extends Mockito{
 		assertEquals(newnewuserName, updatedUpdatedUser.getName());
 		assertEquals(newnewusername, updatedUpdatedUser.getUsername());
 		assertFalse(0 < DB.checkLogin(newusername, newpassword));
-		assertFalse(0 < DB.checkLogin(newnewusername, newpassword));
-		assertFalse(0 < DB.checkLogin(newusername, newnewpassword));
-		assertTrue(0 < DB.checkLogin(newnewusername, newnewpassword));
+		assertTrue(0 < DB.checkLogin(newnewusername, newpassword));
 	}
 	
 	@Test
@@ -481,12 +470,11 @@ public class TestDB extends Mockito{
 		//Test Delete User
 		//Create user
 		String username = "TestDeleteUserByCpr";
-		String password = "Test1234";
 		String cpr = "TestDUBC1234";
 		String userName = "DUBC Test Testy Test";
 		String institute = "Test That Institute";
 		String consultant = "";
-		assertTrue(DB.createUser(username, password, cpr, userName, institute, consultant));
+		assertTrue(DB.createUser(username, cpr, userName, institute, consultant));
 		User user = DB.getUserByCpr(cpr);
 		assertNotNull(user);
 		
@@ -515,12 +503,11 @@ public class TestDB extends Mockito{
 		
 		//Create User
 		String username2 = "TestDeleteUser";
-		String password2 = "Test1234";
 		String cpr2 = "TestDU1234";
 		String userName2 = "DU Test Testy Test";
 		String institute2 = "Test That Institute";
 		String consultant2 = "";
-		assertTrue(DB.createUser(username2, password2, cpr2, userName2, institute2, consultant2));
+		assertTrue(DB.createUser(username2, cpr2, userName2, institute2, consultant2));
 		User user2 = DB.getUserByCpr(cpr2);
 		assertNotNull(user2);
 		
@@ -555,23 +542,21 @@ public class TestDB extends Mockito{
 		//Test Get Archive
 		//Create user
 		String username = "TestGetArchive1";
-		String password = "Test1234";
 		String cpr = "TestGAR11234";
 		String userName = "GAR1 Test Testy Test";
 		String institute = "Test That Institute";
 		String consultant = "";
-		assertTrue(DB.createUser(username, password, cpr, userName, institute, consultant));
+		assertTrue(DB.createUser(username, cpr, userName, institute, consultant));
 		User user1 = DB.getUserByCpr(cpr);
 		assertNotNull(user1);
 		
 		//Create User
 		String username2 = "TestGetArchive2";
-		String password2 = "Test1234";
 		String cpr2 = "TestGAR21234";
 		String userName2 = "GAR2 Test Testy Test";
 		String institute2 = "Test That Institute";
 		String consultant2 = "";
-		assertTrue(DB.createUser(username2, password2, cpr2, userName2, institute2, consultant2));
+		assertTrue(DB.createUser(username2, cpr2, userName2, institute2, consultant2));
 		User user2 = DB.getUserByCpr(cpr2);
 		assertNotNull(user2);
 		
@@ -668,12 +653,11 @@ public class TestDB extends Mockito{
 		//Test Get Archive
 		//Create user
 		String username = "TestGetArchive1";
-		String password = "Test1234";
 		String cpr = "TestGAR11234";
 		String userName = "GAR1 Test Testy Test";
 		String institute = "Test That Institute";
 		String consultant = "";
-		assertTrue(DB.createUser(username, password, cpr, userName, institute, consultant));
+		assertTrue(DB.createUser(username, cpr, userName, institute, consultant));
 		User user1 = DB.getUserByCpr(cpr);
 		assertNotNull(user1);
 		
@@ -708,12 +692,11 @@ public class TestDB extends Mockito{
 		//Test Create and Get Messages.
 		//Create user
 		String username = "TestCreateGetMessage";
-		String password = "Test1234";
 		String cpr = "TestCGM1234";
 		String userName = "CGM Test Testy Test";
 		String institute = "Test That Institute";
 		String consultant = "";
-		assertTrue(DB.createUser(username, password, cpr, userName, institute, consultant));
+		assertTrue(DB.createUser(username, cpr, userName, institute, consultant));
 		User user = DB.getUserByCpr(cpr);
 		assertNotNull(user);
 		//Get Empty Messages list
@@ -734,12 +717,11 @@ public class TestDB extends Mockito{
 		//Test Create Deposit
 		//Create user
 		String username = "TestCreateDeposit";
-		String password = "Test1234";
 		String cpr = "TestCD1234";
 		String userName = "CD Test Testy Test";
 		String institute = "Test That Institute";
 		String consultant = "";
-		assertTrue(DB.createUser(username, password, cpr, userName, institute, consultant));
+		assertTrue(DB.createUser(username, cpr, userName, institute, consultant));
 		User user1 = DB.getUserByCpr(cpr);
 		assertNotNull(user1);
 		
@@ -777,12 +759,11 @@ public class TestDB extends Mockito{
 		//Test Create Withdrawal
 		//Create User
 		String username = "TestCreateWithdrawal";
-		String password = "Test1234";
 		String cpr = "TestCW1234";
 		String userName = "CW Test Testy Test";
 		String institute = "Test That Institute";
 		String consultant = "";
-		assertTrue(DB.createUser(username, password, cpr, userName, institute, consultant));
+		assertTrue(DB.createUser(username, cpr, userName, institute, consultant));
 		User user = DB.getUserByCpr(cpr);
 		assertNotNull(user);
 		

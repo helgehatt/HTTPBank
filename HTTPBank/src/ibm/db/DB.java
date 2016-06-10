@@ -2,7 +2,6 @@ package ibm.db;
 
 import ibm.resource.Account;
 import ibm.resource.DatabaseException;
-import ibm.resource.InputException;
 import ibm.resource.Message;
 import ibm.resource.Transaction;
 import ibm.resource.User;
@@ -642,7 +641,7 @@ public class DB {
 	 * @return The new user as a User object with all fields, if successfully created.
 	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static boolean createUser(String username, String password, String cpr, String name, String institute, String consultant) throws DatabaseException {
+	public static boolean createUser(String username, String cpr, String name, String institute, String consultant) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				PreparedStatement statement = connection.prepareStatement("INSERT INTO DTUGRP07.USERS "
@@ -650,7 +649,7 @@ public class DB {
 						+ "(?, ?, ?, ?, ?, ?);"
 						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
 				statement.setString(1, username);
-				statement.setString(2, password);
+				statement.setString(2, generatePassword());
 				statement.setString(3, cpr);
 				statement.setString(4, name);
 				statement.setString(5, institute);
@@ -667,8 +666,8 @@ public class DB {
 		}
 		return false;
 	}
-	
-	
+
+
 	// UPDATE Methods
 	/**
 	 * Enums to specifying which user attribute to update.
@@ -723,20 +722,41 @@ public class DB {
 	 * @return True if operation was successful.
 	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static boolean updateUser(int userId, String username, String password, String cpr, String name, String institute, String consultant) throws DatabaseException {
+	public static boolean updateUser(int userId, String username, String cpr, String name, String institute, String consultant) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				PreparedStatement statement = connection.prepareStatement("UPDATE DTUGRP07.USERS "
-						+ "SET USERNAME = ?, PASSWORD =?, CPR = ?, NAME = ?, INSTITUTE = ?, CONSULTANT = ? "
+						+ "SET USERNAME = ?, CPR = ?, NAME = ?, INSTITUTE = ?, CONSULTANT = ? "
 						+ "WHERE USER_ID = ?;"
 						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
 				statement.setString(1, username);
-				statement.setString(2, password);
-				statement.setString(3, cpr);
-				statement.setString(4, name);
-				statement.setString(5, institute);
-				statement.setString(6, consultant);
-				statement.setInt(7, userId);
+				statement.setString(2, cpr);
+				statement.setString(3, name);
+				statement.setString(4, institute);
+				statement.setString(5, consultant);
+				statement.setInt(6, userId);
+				
+				statement.execute(); //Attempt to insert new row.
+				statement.close();
+				return true;
+			} catch (SQLException e) {
+				handleSQLException(e, tries);
+				//if no more tries, throw exception.
+			}
+		}
+		return false;
+	}
+	
+	
+	public boolean resetPassword(int userId) throws DatabaseException {
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				PreparedStatement statement = connection.prepareStatement("UPDATE DTUGRP07.USERS "
+						+ "SET PASSWORD = ? "
+						+ "WHERE USER_ID = ?;"
+						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				statement.setString(1, generatePassword());
+				statement.setInt(2, userId);
 				
 				statement.execute(); //Attempt to insert new row.
 				statement.close();
@@ -1032,7 +1052,7 @@ public class DB {
 		Properties properties = new Properties();
 		properties.put("user", "DTU18");
 		properties.put("password", "FAGP2016");
-		properties.put("retreiveMessagesFromServerOnGetMessage", "true");
+		properties.put("retrieveMessagesFromServerOnGetMessage", "true");
 		properties.put("emulateParameterMetaDataForZCalls", "1");
 		return properties;
 	}
@@ -1075,5 +1095,13 @@ public class DB {
 		}
 	}
 
-	
+	/**
+	 * Generates a (possibly) pseudo-random string for use as a password.
+	 * @return A new password as a string.
+	 */
+	private static String generatePassword() {
+		String password = "password";
+		//Could randomly generate a password.
+		return password;
+	}
 }
