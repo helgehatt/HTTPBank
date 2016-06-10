@@ -179,7 +179,7 @@ public class DB2Test {
 
 	private static void testCreateUser(String username, String password, String cpr, String name, String institute, String consultant) throws SQLException {
 		long start = System.currentTimeMillis();
-		boolean user = DB.createUser(username, password, cpr, name, institute, consultant);
+		boolean user = DB.createUser(username, cpr, name, institute, consultant);
 		System.out.println("Create User "+user+", Query Time: " + (System.currentTimeMillis()-start));
 	}
 

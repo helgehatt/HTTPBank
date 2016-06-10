@@ -19,6 +19,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Properties;
 
+import javax.annotation.Resource;
+import javax.sql.DataSource;
+
 /**
  * A class for handling all Database queries required by the HTTPBank.
  * Class uses PreparedStatements for easy implementation and efficiency.
@@ -31,6 +34,7 @@ public class DB {
 				getConnection();
 			} catch (SQLException e) {
 				// A Database access error occurred. Can't really do anything about it at this point.
+				e.printStackTrace();
 			}
 		}
 	}
@@ -1060,6 +1064,9 @@ public class DB {
 		return connection.createStatement().executeQuery(query);
 	}
 	
+	@Resource(name = "jdbc/exampleDS")
+	static DataSource ds1;
+	
 	/**
 	 * Checks if there is a current connection to the database and if not attempts to connect to it.
 	 * Temporary solution to creating connections and allow troubleshooting till a connection pool is integrated that can be handled reliably.
@@ -1077,7 +1084,7 @@ public class DB {
 	 * @throws SQLException If connection fails or driver is missing.
 	 */
 	public static void getConnection(boolean forceNew) throws SQLException {
-		if (forceNew || connection == null){
+		/*if (forceNew || connection == null){
 			try {
 	            Class.forName("com.ibm.db2.jcc.DB2Driver");
 	        } catch (ClassNotFoundException e) {
@@ -1100,7 +1107,8 @@ public class DB {
 				} catch (SQLException e){}
 			}
 			connection = DriverManager.getConnection(url, getProperties());
-		}
+		}*/
+		connection = ds1.getConnection();
 	}
 	
 	/**

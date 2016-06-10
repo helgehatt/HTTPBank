@@ -215,7 +215,6 @@ public class TestDB extends Mockito {
 			assertNotNull(user.getId());
 			assertNotNull(user.getCpr());
 			assertNotNull(user.getName());
-			assertNotNull(user.getUsername());
 		}
 	}
 
@@ -707,7 +706,7 @@ public class TestDB extends Mockito {
 		//Assertion
 		ArrayList<Message> messages = DB.getMessages(user.getId());
 		assertFalse(messages.isEmpty());
-		assertEquals(messages.get(0).getMessage(), message);
+		assertEquals(messages.get(0).getText(), message);
 		assertEquals(messages.get(0).getSenderName(), user.getName());
 	}
 	
@@ -802,9 +801,9 @@ public class TestDB extends Mockito {
 	public void testLoginServlet() throws Exception {
 		String username = "Lenny";
 		String password = "check";
-		HttpServletRequest request = mock(HttpServletRequest.class);       
+		HttpServletRequest request = mock(HttpServletRequest.class);
 	    HttpServletResponse response = mock(HttpServletResponse.class);
-	    PrintWriter writer = new PrintWriter(new StringWriter()); 
+	    PrintWriter writer = new PrintWriter(new StringWriter());
 	    when(request.getParameter("username")).thenReturn(username);
 	    when(request.getParameter("password")).thenReturn(password);
 	    when(response.getWriter()).thenReturn(writer);
