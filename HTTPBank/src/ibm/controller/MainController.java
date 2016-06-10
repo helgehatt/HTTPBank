@@ -20,7 +20,7 @@ import javax.servlet.http.HttpSession;
 		"/admin/accountinfo", "/admin/transactions", 
 		"/admin/editaccount", "/admin/closeaccount", "/admin/archive",
 		"/admin/transfer", "/admin/international", "/admin/depositwithdrawal", 
-		"/admin/userinfo", "/admin/edituser" })
+		"/admin/userinfo", "/admin/edituser", "/admin/deleteuser" })
 
 public class MainController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -112,6 +112,9 @@ public class MainController extends HttpServlet {
 			break;
 		case "/admin/edituser":
 			request.getRequestDispatcher("../WEB-INF/jsp/admin/edit-user.jsp").forward(request, response);
+			break;
+		case "/admin/deleteuser":
+			request.getRequestDispatcher("../WEB-INF/jsp/admin/delete-user.jsp").forward(request, response);
 			break;
 		case "/admin/archive": 
 			request.getRequestDispatcher("../WEB-INF/jsp/admin/archive.jsp").forward(request, response);

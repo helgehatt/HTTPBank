@@ -41,7 +41,8 @@ public class DatabaseException extends SQLException {
 	}
 	
 	public static void handleException(DatabaseException e, HttpSession session) {		
-		String exception = "Failed to complete the request. " + e.getMessage();
+		String exception = "Failed to complete the request.";
+		System.out.println(e.getMessage());
  		session.setAttribute("exception", exception);
 	}
 	

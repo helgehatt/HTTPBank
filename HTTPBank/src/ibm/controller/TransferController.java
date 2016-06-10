@@ -74,6 +74,10 @@ public class TransferController extends HttpServlet {
 				try {
 					DB.createTransaction(TransBy.IBAN, fromId, to, "Transfer to " + to, "Transfer from " + from, -withdrawn, amount);
 					DatabaseException.success("Transfer to " + to + " completed successfully.", session);
+					if (!message.isEmpty()) {
+				        DB.createMessage(message, fromId, to, TransBy.IBAN);
+						DatabaseException.success("Transfer to " + to + " completed successfully and message sent.", session);
+					}
 				} catch (DatabaseException e) {
 		    		DatabaseException.handleException(e, session);
 				}
@@ -93,6 +97,10 @@ public class TransferController extends HttpServlet {
 				try {
 					DB.createTransaction(TransBy.NUMBER, fromId, to, "Transfer to " + to, "Transfer from " + from, -amount, amount);
 					DatabaseException.success("Transfer to " + to + " completed successfully.", session);
+					if (!message.isEmpty()) {
+				        DB.createMessage(message, fromId, to, TransBy.NUMBER);
+						DatabaseException.success("Transfer to " + to + " completed successfully and message sent.", session);
+					}
 				} catch (DatabaseException e) {
 		    		DatabaseException.handleException(e, session);
 				}
@@ -101,12 +109,6 @@ public class TransferController extends HttpServlet {
 
 			response.sendRedirect("transfer");
 		}  
-        
-//		if (!message.isEmpty())
-//			DB.createMessage(message, senderName, receiverUserID)
-        // TODO: Message objects?
-        // String message = request.getParameter("message"); // Optional
-    	// if (message!=null) toAccount.getUser().getMessages().add(new Message(message));
 	}
 
     @Override

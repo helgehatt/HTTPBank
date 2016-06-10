@@ -13,11 +13,6 @@ public class AttributeChecks {
 			throw new InputException("Please enter a user name without whitespace.");
 	}
 	
-	public static void checkPassword(String password) throws InputException {
-		if (password.length() < 6)
-			throw new InputException("Please enter at least 6 characters.");
-	}
-	
 	/**
 	 * Checks if the given string is a valid cpr-number.
 	 */
@@ -35,7 +30,7 @@ public class AttributeChecks {
 	public static void checkRealName(String name) throws InputException {
 		if (name.length() == 0)
     		throw new InputException("Please enter name.");   
-    	if (!isAlphabetic(name)) 
+    	if (!isAlphabeticWithWhitespace(name)) 
     		throw new InputException("Please enter letters only.");    	
     }
     
@@ -165,6 +160,15 @@ public class AttributeChecks {
 	private static boolean isAlphabetic(String string) {
 		for (int i = 0; i < string.length(); i++) {
 			if (!Character.isAlphabetic(string.charAt(i)))
+				return false;
+		}
+		return true;
+	}
+	
+	private static boolean isAlphabeticWithWhitespace(String string) {
+		for (int i = 0; i < string.length(); i++) {
+			char ch = string.charAt(i);
+			if (!Character.isAlphabetic(ch) && !Character.isWhitespace(ch))
 				return false;
 		}
 		return true;

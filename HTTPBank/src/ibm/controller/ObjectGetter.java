@@ -12,13 +12,21 @@ import javax.servlet.http.HttpSession;
 import ibm.db.DB;
 import ibm.resource.DatabaseException;
 
-@WebServlet(urlPatterns = { "/user/getAccount", "/admin/getAccount", "/admin/getUser" })
+@WebServlet(urlPatterns = { "/user/getAccount", "/admin/getAccount", "/admin/getUser", "/admin/findUsers" })
 public class ObjectGetter extends HttpServlet {
 	private static final long serialVersionUID = 1L;
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		HttpSession session = request.getSession();
+		HttpSession session = request.getSession();        
+        
+		String path = request.getRequestURI().replace(request.getContextPath(), "");
+		
+		if (path.equals("/admin/findUsers")) {
+			String input = request.getParameter("search");
+			// TODO: call DB
+			return;
+		}
 		
         int id = 0;
         
@@ -27,9 +35,7 @@ public class ObjectGetter extends HttpServlet {
 		} catch (NumberFormatException e) {
     		DatabaseException.handleException(new DatabaseException(), session, response, "accounts");
 			return;
-		}        
-        
-		String path = request.getRequestURI().replace(request.getContextPath(), "");
+		}
 		
 		switch(path) {
 		case "/user/getAccount":

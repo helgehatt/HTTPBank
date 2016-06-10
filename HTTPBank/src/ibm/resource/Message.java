@@ -8,22 +8,32 @@ import java.text.SimpleDateFormat;
 public class Message implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
-	private String message;
+	private String text;
+	private String preview;
 	private long date;
 	private String senderName;
 	private int userID;
 	
 	private static final transient SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 	
-	public Message(String message, Date date, String senderName, int userID) {
-		this.message = message;
+	public Message(String text, Date date, String senderName, int userID) {
+		this.text = text;
 		this.date = date.getTime();
 		this.senderName = senderName;
 		this.userID = userID;
+		
+		if (text.length() > 30)
+			preview = text.substring(0, 30);
+		else
+			preview = text;
 	}
 	//getters:
-	public String getMessage() {
-		return message;
+	public String getText() {
+		return text;
+	}
+	
+	public String getPreview() {
+		return preview;
 	}
 	
 	public long getDateRaw() {
@@ -61,7 +71,7 @@ public class Message implements Serializable{
 	}
 	
 	public void setMessage(String message) {
-		this.message = message;
+		this.text = message;
 	}
 	
 	public void setSenderName(String senderName) {

@@ -21,13 +21,16 @@ import java.util.Calendar;
 public class DB2Test {
 	//Main
 	public static void main(String[] args) throws SQLException, ClassNotFoundException, InputException {
-		//testCheckLogin2("Helgo","moo");
+
+		//testCheckLogin("Helgo","moo");
+		//testSearchUsers("Thomas", "01");
 		//System.out.println();
-		testCreateTransaction(28, "New Transaction", -100);
-		//testCreateTransaction2(27, 28, "Should be goooood","Should be great", 300, 3);
+		//testCreateTransaction(1, "New Transaction1", -100);
+		//testSearchArchive("2002-04-04","2014-05-05");
+		//testCreateTransaction(1, 28, "Should be goooood","Should be great", 3000, 3);
 		//testBatchTimer();
-		System.out.println();
-		testCreateMessage("Tak for igår", 1, "DK00002", DB.TransBy.IBAN);
+		//System.out.println();
+		//testCreateMessage("Hej Helge", 1, "DK00002", DB.TransBy.IBAN);
 		//System.out.println();
 		//testGetArchive(1);
 		/*testCheckLogin("Thomas", "1234");
@@ -70,6 +73,26 @@ public class DB2Test {
 		
 		//testArchive();
 		
+	}
+	
+	private static void testSearchUsers(String name, String cpr) throws DatabaseException {
+		ArrayList<User> array = DB.searchUsers(name, cpr);
+		for(User u : array) {
+			printUser(u);
+		}
+		if(array.isEmpty()) {
+			System.out.println("empty");
+		}
+	}
+	
+	private static void testSearchArchive(String dateFrom, String dateTo) throws DatabaseException {		
+		ArrayList<Transaction> array = DB.searchArchive(dateFrom, dateTo);
+		for(Transaction t : array) {
+			printTransaction(t);
+		}
+		if(array.isEmpty()) {
+			System.out.println("empty");
+		}
 	}
 	
 	private static void testGetArchive(int account_id) throws DatabaseException {
