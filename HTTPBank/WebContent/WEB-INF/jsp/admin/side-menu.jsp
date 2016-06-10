@@ -1,8 +1,8 @@
 <div id="side-menu" class="container col-sm-3">
 	<div class="panel panel-default button-panel">
     <div class="panel-heading">
-      <h4 class="panel-title">
-        <a data-toggle="collapse" href="#side-menu-collapse">Collapsible panel</a>
+      <h4 class="panel-title text-center">
+        <a data-toggle="collapse" href="#side-menu-collapse">Menu</a>
       </h4>
     </div>
 		<div id="side-menu-collapse" class="panel-collapse collapse">
@@ -45,6 +45,12 @@
 					<c:if test="${pageScope.menu == 'user'}">
 						<li class="list-group-item" id="edit-user-item">
 							<a class="btn btn-default side-menu-sub-item" href="edituser">Edit</a>
+						</li>
+						<li class="list-group-item" id="reset-password-item">
+							<a class="btn btn-default side-menu-sub-item" href="resetpassword">Reset password</a>
+						</li>
+						<li class="list-group-item" id="delete-user-item">
+							<a class="btn btn-default side-menu-sub-item" href="deleteuser">Delete</a>
 						</li>
 					</c:if>
 				</ul>

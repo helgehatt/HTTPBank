@@ -16,36 +16,43 @@ import ibm.resource.DatabaseException;
 import ibm.resource.InputException;
 import ibm.resource.User;
 
-@WebServlet(urlPatterns = { "/admin/newUser", "/admin/editUser" })
+@WebServlet(urlPatterns = { "/admin/newUser", "/admin/editUser", "/admin/deleteUser" })
 public class UserController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("user");
+
+		String path = request.getRequestURI().replace(request.getContextPath(), "");
+		
+		if (path.equals("/admin/deleteUser")) {
+			try {
+				String username = user.getUsername();
+				DB.deleteUser(username);
+				DatabaseException.success("Successfully deleted user: " + username, session);
+				session.setAttribute("users", null);
+            	response.sendRedirect("users");
+			} catch (DatabaseException e) {
+	    		DatabaseException.handleException(e, session, response, "deleteuser");
+			}
+			return;
+		}
+		
 		
     	HashMap<String, String> errors = new HashMap<String, String>();    	
     	String username = request.getParameter("username");
-    	String password = request.getParameter("password");
         String cpr = request.getParameter("cpr");
         String name = request.getParameter("name");
         String institute = request.getParameter("institute");
         String consultant = request.getParameter("consultant");
 
-		String path = request.getRequestURI().replace(request.getContextPath(), "");
         
         try {
         	AttributeChecks.checkUserName(username);
         } catch (InputException e) {
         	errors.put("username", e.getMessage());
-        }
-        
-        if (path.equals("/admin/newUser") || path.equals("/admin/editUser") && !password.isEmpty()) {
-	        try {
-	        	AttributeChecks.checkPassword(password);
-	        } catch (InputException e) {
-	        	errors.put("password", e.getMessage());
-	        }
         }
         
         try {
@@ -71,6 +78,9 @@ public class UserController extends HttpServlet {
         } catch (InputException e) {
         	errors.put("consultant", e.getMessage());
         }
+        
+        // TODO: Remove
+        String password = "password";
 		
     	switch(path) {
     	case "/admin/newUser":
@@ -91,13 +101,9 @@ public class UserController extends HttpServlet {
     		break;
     	case "/admin/editUser":            
             if (errors.isEmpty()) {
-            	int id = ((User) session.getAttribute("user")).getId();            	
+            	int id = user.getId();            	
             	try {
-            		if (password.isEmpty())
-                		// TODO: Remove password parameter
-            			DB.updateUser(id, username, password, cpr, name, institute, consultant);
-            		else
-            			DB.updateUser(id, username, password, cpr, name, institute, consultant);
+            		DB.updateUser(id, username, password, cpr, name, institute, consultant);
 					DatabaseException.success("Successfully updated user: " + username, session);
 					session.setAttribute("user", DB.getUser(id));
 	    			response.sendRedirect("userinfo");

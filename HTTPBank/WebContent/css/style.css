@@ -143,7 +143,9 @@ body {
 	padding: 0;
 }
 
+
 /* SIDE-MENU */
+
 @media (min-width: 768px) {
 	#side-menu {
 		max-width: 200px;
@@ -159,6 +161,14 @@ body {
 		font-size: 16px;
 		padding: 10px;
 	}
+	
+	#side-menu .panel-heading {
+		display: none;
+	}
+	
+	#side-menu .panel-collapse {
+		display: block;
+	}
 }
 
 @media (max-width: 767px) {
@@ -170,7 +180,11 @@ body {
 	.side-menu-sub-item {
 		font-size: 14px;
 	}
-	
+}
+
+#side-menu .panel-heading {
+	border: 1px solid;
+	border-color: #ccc;
 }
 
 /* CONTAINERS */
