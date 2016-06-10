@@ -22,15 +22,15 @@ public class User implements Serializable {
 	private ArrayList<Message> messages = null; 
 
 	/* CONSTRUCTORS */
-	public User(int userId, String username, String cpr, String name) {
+	public User(int userId, String cpr, String name) {
 		this.userId = userId;
-		this.username = username;
 		this.cpr = cpr;
 		this.name = name;
 	}
 	
 	public User(int userId, String username, String cpr, String name, String institute, String consultant) {
-		this(userId, username, cpr, name);
+		this(userId, cpr, name);
+		this.username = username;
 		this.institute = institute;
 		this.consultant = consultant;
 	}
