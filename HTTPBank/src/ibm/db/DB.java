@@ -1064,9 +1064,6 @@ public class DB {
 		return connection.createStatement().executeQuery(query);
 	}
 	
-	@Resource(name = "jdbc/exampleDS")
-	static DataSource ds1;
-	
 	/**
 	 * Checks if there is a current connection to the database and if not attempts to connect to it.
 	 * Temporary solution to creating connections and allow troubleshooting till a connection pool is integrated that can be handled reliably.
@@ -1084,7 +1081,7 @@ public class DB {
 	 * @throws SQLException If connection fails or driver is missing.
 	 */
 	public static void getConnection(boolean forceNew) throws SQLException {
-		/*if (forceNew || connection == null){
+		if (forceNew || connection == null){
 			try {
 	            Class.forName("com.ibm.db2.jcc.DB2Driver");
 	        } catch (ClassNotFoundException e) {
@@ -1107,8 +1104,23 @@ public class DB {
 				} catch (SQLException e){}
 			}
 			connection = DriverManager.getConnection(url, getProperties());
-		}*/
+		}
+	}
+	
+	@Resource(name = "jdbc/exampleDS")
+	static DataSource ds1;
+	
+	public static void getConnection2() throws SQLException {
 		connection = ds1.getConnection();
+	}
+	
+	public static void close(){
+		if (connection != null)
+			try {
+				connection.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 	}
 	
 	/**
