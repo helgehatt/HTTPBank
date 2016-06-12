@@ -13,7 +13,6 @@ import ibm.resource.User;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -794,8 +793,27 @@ public class TestDB extends Mockito {
 		assertEquals(transactions1.get(0).getDescription(), description1);
 	}
 	
-	public void testExceptionHandling() throws DatabaseException{
+	@Test
+	public void testExceptionHandling() throws SQLException {
 		//Test Exception Handling
+		Connection connection = mock(Connection.class);
+		String message = "A mocking exception...";
+		int errorCode = 1337;
+		String sqlState = "2E000";
+		when(connection.prepareStatement(anyString(), anyInt(), anyInt(), anyInt())).thenThrow(new DatabaseException(message, errorCode, sqlState));
+		when(connection.prepareCall(anyString(), anyInt(), anyInt(), anyInt())).thenThrow(new DatabaseException(message, errorCode, sqlState));
+		DB.setConnection(connection);
+		
+		//Instant failure exception.
+		try {
+			DB.checkLogin("admin", "");
+			fail("Should throw exception.");
+		} catch(DatabaseException e){
+			assertEquals(message, e.getMessage());
+			assertEquals(errorCode, e.getErrorCode());
+			assertEquals(sqlState, e.getSQLState());
+		}
+		
 	}
 	
 	public void testLoginServlet() throws Exception {

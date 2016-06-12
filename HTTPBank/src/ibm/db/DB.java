@@ -24,9 +24,12 @@ import javax.sql.DataSource;
 
 /**
  * A class for handling all Database queries required by the HTTPBank.
- * Class uses PreparedStatements for easy implementation and efficiency.
+ * Class uses PreparedStatements for easy implementation, greater efficiency and security.
  */
 public class DB {
+	@Resource(name = "jdbc/exampleDS")
+	static DataSource ds1;
+	
 	//Static Constructor
 	static {
 		for (int tries = 2; 0 < tries; tries--){
@@ -1031,7 +1034,6 @@ public class DB {
 	/**
 	 * Queries a request for user information and checks for correct password. Returns the 'userId' of the user only if user exists and correct password is given as argument, else returns -1.
 	 * Uses a PreparedStatement to query.
-	 * TODO: This would be better to have as a stored procedure on the database.
 	 * @throws DatabaseException If a database error occurs.
 	 */
 	
@@ -1107,11 +1109,12 @@ public class DB {
 		}
 	}
 	
-	@Resource(name = "jdbc/exampleDS")
-	static DataSource ds1;
-	
 	public static void getConnection2() throws SQLException {
 		connection = ds1.getConnection();
+	}
+	
+	public static void setConnection(Connection connection){
+		DB.connection = connection;
 	}
 	
 	public static void close(){
