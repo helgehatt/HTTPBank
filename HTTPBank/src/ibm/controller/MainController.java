@@ -30,14 +30,14 @@ public class MainController extends HttpServlet {
 
 		String path = request.getRequestURI().replace(request.getContextPath(), "");
 
-		if (session.getAttribute("admin") == null) {			
-			response.sendRedirect(request.getContextPath());
+		if (session.getAttribute("admin") == null) {
+			response.sendError(401);
 			return;
 		} else {
 			boolean isAdmin = (boolean) session.getAttribute("admin");
 			String prefix = path.substring(0, path.lastIndexOf("/"));
 			if (prefix.equals("/user") && isAdmin || prefix.equals("/admin") && !isAdmin) {
-				response.sendError(419);
+				response.sendError(403);
 				return;
 			}
 		}		

@@ -18,9 +18,6 @@
 						<li class="list-group-item" id="transaction-list-item">
 							<a class="btn btn-default side-menu-sub-item" href="transactions">Transactions</a>
 						</li>
-						<li class="list-group-item" id="archive-item">
-							<a class="btn btn-default side-menu-sub-item" href="archive">Archive</a>
-						</li>
 						<li class="list-group-item" id="edit-account-item">
 							<a class="btn btn-default side-menu-sub-item" href="editaccount">Edit</a>
 						</li>			
@@ -38,6 +35,9 @@
 					</c:if>
 					<li class="list-group-item" id="deposit-withdrawal-item">
 						<a class="btn btn-default side-menu-item" href="depositwithdrawal">Deposit / <br> Withdrawal</a>
+					</li>
+					<li class="list-group-item" id="archive-item">
+						<a class="btn btn-default side-menu-item" href="archive">Archive</a>
 					</li>
 					<li class="list-group-item" id="user-info-item">
 						<a class="btn btn-default side-menu-item" href="userinfo">User info</a>

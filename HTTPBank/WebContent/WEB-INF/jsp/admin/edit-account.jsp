@@ -1,4 +1,4 @@
-<%@ include file="../head.jsp" %>
+<%@ include file="../content/head.jsp" %>
 
 <script type="text/javascript">
 

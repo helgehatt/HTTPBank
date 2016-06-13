@@ -39,6 +39,21 @@ public class DB {
 	private static Connection connection;
 	private static final String url = "jdbc:db2://192.86.32.54:5040/DALLASB";
 	
+	//Comparators
+	private static final Comparator<Transaction> transactionComparator = new Comparator<Transaction>(){
+		@Override
+		public int compare(Transaction o1, Transaction o2) {
+			return Long.compare(o2.getDateRaw(), o1.getDateRaw());
+		}
+	};
+	
+	private static final Comparator<Message> messageComparator = new Comparator<Message>(){
+		@Override
+		public int compare(Message o1, Message o2) {
+			return Long.compare(o2.getDateRaw(), o1.getDateRaw());
+		}
+	};
+	
 	//Methods
 	// GET Methods
 	/**
@@ -67,12 +82,7 @@ public class DB {
 				statement.close();
 				
 				//Sorts all Transactions by Date.
-				Collections.sort(resultList, new Comparator<Transaction>(){
-					@Override
-					public int compare(Transaction o1, Transaction o2) {
-						return o1.getDateRaw() < o2.getDateRaw() ? -1 : o1.getDateRaw() > o2.getDateRaw() ? 1 : 0;
-					}
-				});
+				Collections.sort(resultList, transactionComparator);
 				
 				return resultList;
 			} catch (SQLException e) {
@@ -297,12 +307,7 @@ public class DB {
 				statement.close();
 				
 				//Sorts all Transactions by Date.
-				Collections.sort(resultList, new Comparator<Transaction>(){
-					@Override
-					public int compare(Transaction o1, Transaction o2) {
-						return Long.compare(o2.getDateRaw(), o1.getDateRaw());
-					}
-				});
+				Collections.sort(resultList, transactionComparator);
 				
 				return resultList;
 				
@@ -333,12 +338,7 @@ public class DB {
 				statement.close();
 				
 				//Sorts all Transactions by Date.
-				Collections.sort(resultList, new Comparator<Message>(){
-					@Override
-					public int compare(Message o1, Message o2) {
-						return Long.compare(o2.getDateRaw(), o1.getDateRaw());
-					}
-				});
+				Collections.sort(resultList, messageComparator);
 				
 				return resultList;
 				
@@ -983,12 +983,7 @@ public class DB {
 					
 				}
 				statement.close();
-				Collections.sort(resultList, new Comparator<Transaction>(){
-					@Override
-					public int compare(Transaction o1, Transaction o2) {
-						return Long.compare(o2.getDateRaw(), o1.getDateRaw());
-					}
-				});				
+				Collections.sort(resultList, transactionComparator);				
 				return resultList;
 			} catch (SQLException e) {
 				//handleSQLException(e, tries);

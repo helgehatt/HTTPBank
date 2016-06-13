@@ -23,7 +23,7 @@ public class Message implements Serializable{
 		this.userID = userID;
 		
 		if (text.length() > 30)
-			preview = text.substring(0, 30);
+			preview = text.substring(0, 30) + "...";
 		else
 			preview = text;
 	}

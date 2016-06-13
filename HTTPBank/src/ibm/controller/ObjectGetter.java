@@ -10,9 +10,13 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import ibm.db.DB;
+import ibm.resource.AttributeChecks;
 import ibm.resource.DatabaseException;
+import ibm.resource.InputException;
 
-@WebServlet(urlPatterns = { "/user/getAccount", "/admin/getAccount", "/admin/getUser", "/admin/findUsers" })
+@WebServlet(urlPatterns = { "/user/getAccount", "/user/getArchive",
+							"/admin/getAccount", "/admin/getArchive", 
+							"/admin/getUser", "/admin/findUsers" })
 public class ObjectGetter extends HttpServlet {
 	private static final long serialVersionUID = 1L;
     
@@ -22,9 +26,28 @@ public class ObjectGetter extends HttpServlet {
         
 		String path = request.getRequestURI().replace(request.getContextPath(), "");
 		
-		if (path.equals("/admin/findUsers")) {
+		switch(path) {
+		case "/admin/findUsers":
 			String input = request.getParameter("search");
-			// TODO: call DB
+			try {
+				session.setAttribute("users", DB.searchUsers(input, input));
+			} catch (DatabaseException e) {
+	    		DatabaseException.handleException(e, session);
+			}
+			response.sendRedirect("users");
+			return;
+		case "/admin/getArchive":
+		case "/user/getArchive":
+			try {
+				long from = AttributeChecks.checkDate(request.getParameter("from"));
+				long to = AttributeChecks.checkDate(request.getParameter("to"));
+				session.setAttribute("archive", DB.searchArchive("" + from, "" + to));
+			} catch (InputException e) {
+	        	session.setAttribute("error", e.getMessage());
+			} catch (DatabaseException e) {
+	    		DatabaseException.handleException(e, session);	
+			}
+			response.sendRedirect("archive");
 			return;
 		}
 		
@@ -33,7 +56,11 @@ public class ObjectGetter extends HttpServlet {
         try {
         	id = Integer.parseInt(request.getParameter("id"));
 		} catch (NumberFormatException e) {
-    		DatabaseException.handleException(new DatabaseException(), session, response, "accounts");
+    		DatabaseException.handleException(new DatabaseException(), session);
+    		if (path.equals("/admin/getUser"))
+    			response.sendRedirect("users");
+    		else
+    			response.sendRedirect("accounts");
 			return;
 		}
 		

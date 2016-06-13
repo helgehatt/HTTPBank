@@ -707,7 +707,7 @@ public class TestDB extends Mockito {
 		//Assertion
 		ArrayList<Message> messages = DB.getMessages(user.getId());
 		assertFalse(messages.isEmpty());
-		assertEquals(messages.get(0).getMessage(), message);
+		assertEquals(messages.get(0).getText(), message);
 		assertEquals(messages.get(0).getSenderName(), user.getName());
 	}
 	

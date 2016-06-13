@@ -1,5 +1,4 @@
-<%@ page import="ibm.resource.User" %>
-<%@ include file="../head.jsp" %>
+<%@ include file="../content/head.jsp" %>
 
 <style>
 

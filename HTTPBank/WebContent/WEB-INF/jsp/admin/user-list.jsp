@@ -1,5 +1,4 @@
-<%@ page import="ibm.resource.User" %>
-<%@ include file="../head.jsp" %>
+<%@ include file="../content/head.jsp" %>
 
 <style>
 
@@ -15,6 +14,16 @@
 		display: block;
 		text-align: center;
 	}
+	
+	#div-newuser {
+		border-bottom: 1px solid #ddd;
+	}
+}
+
+@media (min-width: 768px) {
+	#div-newuser {
+		border-right: 1px solid #ddd;
+	}
 }
 
 </style>
@@ -27,14 +36,14 @@
 	  	<ul class="list-group">
    			<li class="list-group-item">
    				<div class="container-fluid">
-   				<div class="col-sm-6" style="padding: 0">
+   				<div id="div-newuser" class="col-sm-6" style="padding: 0">
 	     			<form action="newuser" method="get">
 	     				<button class="btn btn-default">
 		    				<h4>New user</h4>
 	     				</button>
 	     			</form>   				
    				</div>
-   				<div class="col-sm-6" style="padding: 0">
+   				<div id="div-search" class="col-sm-6" style="padding: 0">
 	     			<form action="findUsers" method="post">
 	     				<div class="form-group">
     						<label class="control-label col-sm-3" id="search-label" for="search-input">Search:</label>
@@ -50,8 +59,8 @@
 	   			<li class="list-group-item">
 	     			<form action="getUser" method="post">
 	     				<button class="btn btn-default" name="id" value="${user.id}">
-		    				<h4 class="alignleft">${user.name}</h4>
-		    				<h4 class="alignright">${user.cpr}</h4>
+		    				<h4 class="alignleft">${user.cpr}</h4>
+		    				<h4 class="alignright">${user.name}</h4>
 	     				</button>
 	     			</form>
 	     		</li>
