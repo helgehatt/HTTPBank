@@ -8,11 +8,11 @@ import ibm.resource.User;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -68,7 +68,7 @@ public class DB {
 					resultList = new ArrayList<Transaction>();
 					ResultSet results = statement.getResultSet();
 					while (results.next()){ //Fetch transaction-id from results and add to resultlist.
-						resultList.add(new Transaction(results.getLong(1), results.getInt(2), results.getDate(3), results.getString(4), results.getDouble(5)));
+						resultList.add(new Transaction(results.getLong(1), results.getInt(2), results.getTimestamp(3), results.getString(4), results.getDouble(5)));
 					}
 				}
 				statement.close();
@@ -297,7 +297,7 @@ public class DB {
 					resultList = new ArrayList<Transaction>();
 					ResultSet results = statement.getResultSet();
 					while(results.next()) {
-						resultList.add(new Transaction(results.getLong(1), results.getInt(2), results.getDate(3), results.getString(4), results.getDouble(5)));
+						resultList.add(new Transaction(results.getLong(1), results.getInt(2), results.getTimestamp(3), results.getString(4), results.getDouble(5)));
 					}
 					
 				}
@@ -425,7 +425,7 @@ public class DB {
 	public static boolean createTransaction(TransBy transBy, int senderId, String receiverId, String senderDescription, String receiverDescription, double senderAmount, double receiverAmount) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
-				Date date = new Date(Calendar.getInstance().getTime().getTime());
+				Timestamp date = new Timestamp(Calendar.getInstance().getTime().getTime());
 				try {
 					connection.setAutoCommit(false);
 					CallableStatement getBalanceStatement = connection.prepareCall("{call DTUGRP07.createTransaction(?,?,?,?,?,?,?,?)}");
@@ -436,7 +436,7 @@ public class DB {
 					getBalanceStatement.setString(4, receiverDescription);
 					getBalanceStatement.setDouble(5, senderAmount);
 					getBalanceStatement.setDouble(6, receiverAmount);
-					getBalanceStatement.setDate(7, date);
+					getBalanceStatement.setTimestamp(7, date);
 					getBalanceStatement.setString(8, transBy.toString());
 					getBalanceStatement.execute();
 					getBalanceStatement.close();
@@ -469,14 +469,14 @@ public class DB {
 	public static boolean createTransaction(int accountId, String description, double amount) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
-				Date date = new Date(Calendar.getInstance().getTime().getTime());
+				Timestamp date = new Timestamp(Calendar.getInstance().getTime().getTime());
 				try {
 					connection.setAutoCommit(false);
 					CallableStatement statement = connection.prepareCall("{call DTUGRP07.createTransactionOne(?,?,?,?)}");
 					statement.setInt(1, accountId);
 					statement.setString(2, description);
 					statement.setDouble(3, amount);
-					statement.setDate(4, date);
+					statement.setTimestamp(4, date);
 					statement.execute();
 					connection.commit();
 					statement.close();
@@ -513,11 +513,11 @@ public class DB {
 	public static boolean createMessage(String message, int senderID, String receiver, TransBy transBy) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
-				Date date = new Date(Calendar.getInstance().getTime().getTime());
+				Timestamp date = new Timestamp(Calendar.getInstance().getTime().getTime());
 				CallableStatement statement = connection.prepareCall("{CALL DTUGRP07.CREATEMESSAGE(?,?,?,?,?)}");
 				
 				statement.setString(1, message);
-				statement.setDate(2, date);
+				statement.setTimestamp(2, date);
 				statement.setInt(3, senderID);
 				statement.setString(4, receiver);
 				statement.setString(5, transBy.toString());
@@ -550,14 +550,14 @@ public class DB {
 	public static Transaction createDeposit(int accountId, String description, double amount) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
-				Date date = new Date(Calendar.getInstance().getTime().getTime());
+				Timestamp date = new Timestamp(Calendar.getInstance().getTime().getTime());
 				
 				PreparedStatement statement = connection.prepareStatement("INSERT INTO DTUGRP07.TRANSACTIONS "
 						+ "(ACCOUNT_ID, \"DATE\", DESCRIPTION, AMOUNT) VALUES "
 						+ "(?, ?, ?, ?);"
 						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
 				statement.setInt(1, accountId);
-				statement.setDate(2, date);
+				statement.setTimestamp(2, date);
 				statement.setString(3, description);
 				statement.setDouble(4, amount);
 				statement.execute(); //Attempt to insert new row.
@@ -589,14 +589,14 @@ public class DB {
 	public static Transaction createWithdrawal(int accountId, String description, double amount) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
-				Date date = new Date(Calendar.getInstance().getTime().getTime());
+				Timestamp date = new Timestamp(Calendar.getInstance().getTime().getTime());
 				
 				PreparedStatement statement = connection.prepareStatement("INSERT INTO DTUGRP07.TRANSACTIONS "
 						+ "(ACCOUNT_ID, \"DATE\", DESCRIPTION, AMOUNT) VALUES "
 						+ "(?, ?, ?, ?);"
 						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
 				statement.setInt(1, accountId);
-				statement.setDate(2, date);
+				statement.setTimestamp(2, date);
 				statement.setString(3, description);
 				statement.setDouble(4, -amount);
 				statement.execute(); //Attempt to insert new row.
@@ -985,7 +985,7 @@ public class DB {
 					resultList = new ArrayList<Transaction>();
 					ResultSet results = statement.getResultSet();
 					while(results.next()) {
-						resultList.add(new Transaction(results.getLong(1), results.getInt(2), results.getDate(4), results.getString(3), results.getInt(5)));
+						resultList.add(new Transaction(results.getLong(1), results.getInt(2), results.getTimestamp(4), results.getString(3), results.getInt(5)));
 					}
 					
 				}
