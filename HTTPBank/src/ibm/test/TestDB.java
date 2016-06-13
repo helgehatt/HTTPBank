@@ -646,7 +646,7 @@ public class TestDB extends Mockito {
 	public void testGetMessages() throws DatabaseException{
 		//Test Get Archive
 		//Create user
-		String username = "TestGetArchive1";
+		String username = "TestGetMessages";
 		String cpr = "TestGAR11234";
 		String userName = "GAR1 Test Testy Test";
 		String institute = "Test That Institute";

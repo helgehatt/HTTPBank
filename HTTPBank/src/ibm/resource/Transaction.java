@@ -2,6 +2,7 @@ package ibm.resource;
 
 import java.io.Serializable;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -20,7 +21,7 @@ public class Transaction implements Serializable {
 	private static final transient SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 	
 	/* CONSTRUCTORS */
-	public Transaction(Long transaction_id, int account_id, Date date, String description, double amount) {
+	public Transaction(Long transaction_id, int account_id, Timestamp date, String description, double amount) {
 		this.transaction_id = transaction_id;
 		this.account_id = account_id;
 		this.date = date.getTime();
