@@ -24,7 +24,7 @@ public class DB2Test {
 		//testSearchUsers("Thomas", "01");
 		//System.out.println();
 		//testCreateTransaction(1, "New Transaction1", -100);
-		//testSearchArchive("2002-04-04","2014-05-05");
+		//testSearchArchive(1,"2015-04-04 00:00:00","2016-06-14 14:00:01");
 		//testCreateTransaction(1, 28, "Should be goooood","Should be great", 3000, 3);
 		//testBatchTimer();
 		//System.out.println();
@@ -73,8 +73,8 @@ public class DB2Test {
 		
 	}
 	
-	private static void testSearchUsers(String name, String cpr) throws DatabaseException {
-		ArrayList<User> array = DB.searchUsers(name, cpr);
+	private static void testSearchUsers(String name) throws DatabaseException {
+		ArrayList<User> array = DB.searchUsers(name);
 		for(User u : array) {
 			printUser(u);
 		}
@@ -83,8 +83,8 @@ public class DB2Test {
 		}
 	}
 	
-	private static void testSearchArchive(String dateFrom, String dateTo) throws DatabaseException {		
-		ArrayList<Transaction> array = DB.searchArchive(dateFrom, dateTo);
+	private static void testSearchArchive(int userID, String dateFrom, String dateTo) throws DatabaseException {		
+		ArrayList<Transaction> array = DB.searchArchive(userID, dateFrom, dateTo);
 		for(Transaction t : array) {
 			printTransaction(t);
 		}
@@ -96,7 +96,7 @@ public class DB2Test {
 	private static void testGetArchive(int account_id) throws DatabaseException {
 		ArrayList<Transaction> array = DB.getArchive(account_id);
 		for(Transaction t : array) {
-			System.out.println(t.getId() + " " + t.getAccountId() + " " + t.getDate() + " " + t.getAmount() + " " + t.getDescription());
+			System.out.println(t.getId() + " " + t.getAccountId() +  " " + t.getAmount() + " " + t.getDescription());
 		}
 	}
 
@@ -233,7 +233,7 @@ public class DB2Test {
 	}
 	
 	private static void printTransaction(Transaction transaction) {
-		System.out.println(transaction.getAccountId() +" : "+ transaction.getId() +" : "+ transaction.getDate() +" : "+ transaction.getDescription() +" : "+ transaction.getAmount());
+		System.out.println(transaction.getAccountId() +" : "+ transaction.getId()  +" : "+ transaction.getDescription() +" : "+ transaction.getAmount());
 	}
 
 	//Fields

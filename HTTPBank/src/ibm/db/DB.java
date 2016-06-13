@@ -977,8 +977,9 @@ public class DB {
 	public static ArrayList<Transaction> searchArchive(int userID, String dateFrom, String dateTo) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--) {
 			try {
-				PreparedStatement statement = connection.prepareStatement("SELECT TRANSACTION_ID, ACCOUNT_ID, DESCRIPTION, DATE, AMOUNT " +
-			"FROM DTUGRP07.ARCHIVE WHERE USER_ID = ? AND DATE > DATE ? AND DATE < DATE ?;");
+				PreparedStatement statement = connection.prepareStatement("SELECT TRANSACTION_ID, DTUGRP07.ARCHIVE.ACCOUNT_ID, DESCRIPTION, DATE, AMOUNT " +
+			"FROM DTUGRP07.ARCHIVE LEFT OUTER JOIN DTUGRP07.ACCOUNTS ON DTUGRP07.ARCHIVE.ACCOUNT_ID=DTUGRP07.ACCOUNTS.ACCOUNT_ID "
+			+ "WHERE DTUGRP07.ACCOUNTS.USER_ID = ? AND DATE > ? AND DATE < ?;");
 				statement.setInt(1, userID);
 				statement.setString(2, dateFrom);
 				statement.setString(3, dateTo);
