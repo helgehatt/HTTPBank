@@ -82,34 +82,5 @@ public class Account implements Serializable {
 		if (transactions == null)
 			transactions = DB.getTransactions(accountId);
 		return transactions;
-	}	
-	
-	/* SETTERS */
-	public void setType(String type) {
-		this.type = type;
-	}
-	
-	public void setNumber(String number) {
-		this.number = number;
-	}
-
-	public void setIban(String iban) {
-		this.iban = iban;
-	}
-
-	public void setCurrency(String currency) {
-		this.currency = currency;
-	}
-	
-	public void setInterest(double interest) {
-		this.interest = interest;
-	}
-	
-	public void setBalance(double balance) {
-		this.balance = balance;
-	}
-
-	public void setTransactions(ArrayList<Transaction> transactions) {
-		this.transactions = transactions;
 	}
 }

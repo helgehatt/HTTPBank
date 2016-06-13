@@ -2,7 +2,6 @@ package ibm.resource;
 
 import java.io.Serializable;
 import java.sql.Date;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 public class Message implements Serializable{
@@ -50,32 +49,5 @@ public class Message implements Serializable{
 	
 	public int getUserID() {
 		return userID;
-	}
-	
-	
-	//Setters:
-	public void setDate(String date) throws ParseException {
-		this.date = FORMAT.parse(date).getTime();
-	}
-	
-	public void setDate(Date date) {
-		this.date = date.getTime();
-	}
-	
-	public void setDate(long date) {
-		this.date = date;
-	}
-	
-	public void setMessage(String message) {
-		this.text = message;
-	}
-	
-	public void setSenderName(String senderName) {
-		this.senderName = senderName;
-	}
-	
-	public void setUserID(int userID) {
-		this.userID = userID;
-	}
-	
+	}	
 }

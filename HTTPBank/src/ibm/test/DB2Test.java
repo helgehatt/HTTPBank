@@ -96,7 +96,7 @@ public class DB2Test {
 	private static void testGetArchive(int account_id) throws DatabaseException {
 		ArrayList<Transaction> array = DB.getArchive(account_id);
 		for(Transaction t : array) {
-			System.out.println(t.getId() + " " + t.getAccountId() + " " + t.getDateAsString() + " " + t.getAmount() + " " + t.getDescription());
+			System.out.println(t.getId() + " " + t.getAccountId() + " " + t.getDate() + " " + t.getAmount() + " " + t.getDescription());
 		}
 	}
 
@@ -233,7 +233,7 @@ public class DB2Test {
 	}
 	
 	private static void printTransaction(Transaction transaction) {
-		System.out.println(transaction.getAccountId() +" : "+ transaction.getId() +" : "+ transaction.getDateAsString() +" : "+ transaction.getDescription() +" : "+ transaction.getAmount());
+		System.out.println(transaction.getAccountId() +" : "+ transaction.getId() +" : "+ transaction.getDate() +" : "+ transaction.getDescription() +" : "+ transaction.getAmount());
 	}
 
 	//Fields

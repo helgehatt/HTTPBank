@@ -75,25 +75,4 @@ public class User implements Serializable {
 			messages = DB.getMessages(userId);
 		return messages;
 	}
-	
-	/* SETTERS */
-	public void setCpr(String cpr) {
-		this.cpr = cpr;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public void setInstitute(String institute) {
-		this.institute = institute;
-	}
-
-	public void setConsultant(String consultant) {
-		this.consultant = consultant;
-	}
-
-	public void setAccounts(ArrayList<Account> accounts) {
-		this.accounts = accounts;
-	}
 }

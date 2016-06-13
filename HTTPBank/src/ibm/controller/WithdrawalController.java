@@ -25,14 +25,15 @@ public class WithdrawalController extends HttpServlet{
     	
 		HashMap<String, String> errors = new HashMap<String, String>();		
 		String type = request.getParameter("type");
-	    String ID = request.getParameter("from");
+		String id = request.getParameter("id");
+	    String from = request.getParameter("from");
 		String amountString = request.getParameter("change");
 		
 		int fromId = 0;
 		double amount = 0;
 		
 		try {
-			fromId = Integer.parseInt(ID);
+			fromId = Integer.parseInt(id);
 		} catch (NumberFormatException e) {
     		DatabaseException.handleException(new DatabaseException(), session, response, "depositwithdrawal");
 			return;
@@ -48,7 +49,7 @@ public class WithdrawalController extends HttpServlet{
 			switch(type) {
 			case "deposit":
 				try {
-					DB.createTransaction(fromId, "Deposited " + amount + " to " + fromId , amount);
+					DB.createTransaction(fromId, "Deposited " + amount + " to " + from , amount);
 					DatabaseException.success("Deposit completed successfully.", session);
 				} catch (DatabaseException e) {
 		    		DatabaseException.handleException(e, session);
@@ -56,7 +57,7 @@ public class WithdrawalController extends HttpServlet{
 				break;
 			case "withdrawal":
 				try {
-					DB.createTransaction(fromId, "Withdrew " + amount + " from " + fromId , -amount);
+					DB.createTransaction(fromId, "Withdrew " + amount + " from " + from , -amount);
 					DatabaseException.success("Withdrawal completed successfully.", session);
 				} catch (DatabaseException e) {
 		    		DatabaseException.handleException(e, session);

@@ -1,10 +1,8 @@
 package ibm.resource;
 
 import java.io.Serializable;
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 public class Transaction implements Serializable {
@@ -60,26 +58,5 @@ public class Transaction implements Serializable {
 	
 	public String getAmount() {
 		return new DecimalFormat("#0.00").format(amount);
-	}
-	
-	/* SETTERS */
-	public void setDate(String date) throws ParseException {
-		this.date = FORMAT.parse(date).getTime();
-	}
-	
-	public void setDate(Date date) {
-		this.date = date.getTime();
-	}
-	
-	public void setDate(long date) {
-		this.date = date;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public void setAmount(double amount) {
-		this.amount = amount;
 	}
 }
