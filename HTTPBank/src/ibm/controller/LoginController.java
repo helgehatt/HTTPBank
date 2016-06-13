@@ -46,13 +46,13 @@ public class LoginController extends HttpServlet {
 				
 			} else if (username.equals("admin") && password.equals("")) {	
 				session.setAttribute("admin", true);
-				request.getSession().setAttribute("users", DB.getUsers());
+				request.getSession().setAttribute("users", DB.getUsers(0));
 				response.sendRedirect("admin/users");				
 			} else {
 				response.sendRedirect(" ?s=0");
 			}
 		} catch(DatabaseException e) {
-    		DatabaseException.handleException(e, session, response, "login");			
+    		DatabaseException.failure("Failed to get the user(s).", session, response, "login");			
 		}
 	}
 

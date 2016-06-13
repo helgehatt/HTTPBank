@@ -41,7 +41,7 @@ public class TransferController extends HttpServlet {
 		try {
 			fromId = Integer.parseInt(id);
 		} catch (NumberFormatException e) {
-    		DatabaseException.handleException(new DatabaseException(), session, response, "accounts");
+    		DatabaseException.failure("Failed parsing the ID.", session, response, "accounts");
 			return;
 		}
 		
@@ -76,11 +76,15 @@ public class TransferController extends HttpServlet {
 					DB.createTransaction(TransBy.IBAN, fromId, to, "Transfer to " + to, "Transfer from " + from, -withdrawn, amount);
 					DatabaseException.success("Transfer to " + to + " completed successfully.", session);
 					if (!message.isEmpty()) {
-				        DB.createMessage(message, fromId, to, TransBy.IBAN);
-						DatabaseException.success("Transfer to " + to + " completed successfully and message sent.", session);
+						try {
+					        DB.createMessage(message, fromId, to, TransBy.IBAN);
+							DatabaseException.success("Transfer to " + to + " completed successfully and message sent.", session);							
+						} catch (DatabaseException e) {
+				    		DatabaseException.failure("Failed to send the message.", session);							
+						}
 					}
 				} catch (DatabaseException e) {
-		    		DatabaseException.handleException(e, session);
+		    		DatabaseException.failure("Failed to complete the transfer.", session);
 				}
 			} else
 	        	session.setAttribute("errors", errors);
@@ -99,11 +103,15 @@ public class TransferController extends HttpServlet {
 					DB.createTransaction(TransBy.NUMBER, fromId, to, "Transfer to " + to, "Transfer from " + from, -amount, amount);
 					DatabaseException.success("Transfer to " + to + " completed successfully.", session);
 					if (!message.isEmpty()) {
-				        DB.createMessage(message, fromId, to, TransBy.NUMBER);
-						DatabaseException.success("Transfer to " + to + " completed successfully and message sent.", session);
+						try {
+					        DB.createMessage(message, fromId, to, TransBy.NUMBER);
+							DatabaseException.success("Transfer to " + to + " completed successfully and message sent.", session);							
+						} catch (DatabaseException e) {
+				    		DatabaseException.failure("Failed to send the message.", session);
+						}
 					}
 				} catch (DatabaseException e) {
-		    		DatabaseException.handleException(e, session);
+		    		DatabaseException.failure("Failed to complete the transfer.", session);
 				}
 			else
 	        	session.setAttribute("errors", errors);

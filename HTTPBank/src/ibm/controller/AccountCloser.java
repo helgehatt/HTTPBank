@@ -31,7 +31,7 @@ public class AccountCloser extends HttpServlet {
     	try {
     		amount = Double.parseDouble(amountString);
     	} catch (NumberFormatException e) {
-    		DatabaseException.handleException(new DatabaseException(), session, response, "cloesaccount");
+    		DatabaseException.failure("Failed to parse the amount.", session, response, "cloesaccount");
     		return;
     	}
     	
@@ -40,7 +40,7 @@ public class AccountCloser extends HttpServlet {
     		try {
     			receiverId = Integer.parseInt(request.getParameter("to"));
     		} catch (NumberFormatException e) {
-	    		DatabaseException.handleException(new DatabaseException(), session, response, "accounts");
+	    		DatabaseException.failure("Failed to parse the ID.", session, response, "accounts");
     			return;
     		}
     		
@@ -48,7 +48,7 @@ public class AccountCloser extends HttpServlet {
 				DB.createTransaction(receiverId, "Closed account: " + account.getNumber(), amount);
 				DatabaseException.success("Transfer completed, but account did not close successfully.", session);
 			} catch (DatabaseException e) {
-	    		DatabaseException.handleException(e, session, response, "cloesaccount");
+	    		DatabaseException.failure("Failed to complete the transfer.", session, response, "cloesaccount");
 	    		return;
 			}
     	}
@@ -58,7 +58,7 @@ public class AccountCloser extends HttpServlet {
 			DatabaseException.success("Successfully closed account: " + account.getNumber(), session);
 	    	response.sendRedirect("accounts");
 		} catch (DatabaseException e) {
-    		DatabaseException.handleException(e, session, response, "cloesaccount");
+    		DatabaseException.failure("Failed to close the account.", session, response, "cloesaccount");
 		}
     	
     	

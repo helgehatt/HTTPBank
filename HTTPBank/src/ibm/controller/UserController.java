@@ -35,7 +35,7 @@ public class UserController extends HttpServlet {
 				session.setAttribute("users", null);
             	response.sendRedirect("users");
 			} catch (DatabaseException e) {
-	    		DatabaseException.handleException(e, session, response, "deleteuser");
+	    		DatabaseException.failure("Failed to delete the user.", session, response, "deleteuser");
 			}
 			return;
 		}
@@ -85,10 +85,10 @@ public class UserController extends HttpServlet {
     			try {
 					DB.createUser(username, cpr, name, institute, consultant);
 					DatabaseException.success("Successfully created new user: " + username, session);
-					session.setAttribute("users", DB.getUsers());
+					session.setAttribute("users", DB.getUsers(0));
 	            	response.sendRedirect("users");
 				} catch (DatabaseException e) {
-		    		DatabaseException.handleException(e, session, response, "newuser");
+		    		DatabaseException.failure("Failed to create the user.", session, response, "newuser");
 				}    			
             } else {
             	request.getSession().setAttribute("errors", errors);            	
@@ -105,7 +105,7 @@ public class UserController extends HttpServlet {
 					session.setAttribute("user", DB.getUser(id));
 	    			response.sendRedirect("userinfo");
 				} catch (DatabaseException e) {
-		    		DatabaseException.handleException(e, session, response, "edituser");
+		    		DatabaseException.failure("Failed to update the user.", session, response, "edituser");
 				}
             } else {
             	session.setAttribute("errors", errors);

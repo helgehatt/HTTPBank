@@ -60,8 +60,8 @@
 	   			<li class="list-group-item">
 	     			<form action="getUser" method="post">
 	     				<button class="btn btn-default" name="id" value="${user.id}">
-		    				<h4 class="alignleft">${user.cpr}</h4>
-		    				<h4 class="alignright">${user.name}</h4>
+		    				<h4 class="alignright">${user.cpr}</h4>
+		    				<h4 class="alignleft">${user.name}</h4>
 	     				</button>
 	     			</form>
 	     		</li>
