@@ -1,3 +1,4 @@
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ include file="../content/head.jsp" %>
 
 <style>
@@ -55,7 +56,7 @@
    				</div>
    				</div>
      		</li>
-	    	<c:forEach var="user" items="${sessionScope.users}">
+	    	<c:forEach var="user" items="${users}">
 	   			<li class="list-group-item">
 	     			<form action="getUser" method="post">
 	     				<button class="btn btn-default" name="id" value="${user.id}">
@@ -65,6 +66,16 @@
 	     			</form>
 	     		</li>
 	    	</c:forEach>
+	    	<c:set var="size" scope="page" value="${fn:length(users)}"/>
+	    	<c:if test="${size % 10 == 0}">
+	   			<li class="list-group-item">
+	     			<form action="getMoreUsers" method="post">
+	     				<button class="btn btn-default" name="id" value="${size / 10}">
+		    				<h4>...</h4>
+	     				</button>
+	     			</form>
+	     		</li>
+     		</c:if>
 	   	</ul>
 	  </div>
 	</div>

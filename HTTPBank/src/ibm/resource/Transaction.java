@@ -18,7 +18,7 @@ public class Transaction implements Serializable {
 	private String description; // Required
 	private double amount; // Required
 	
-	private static final transient SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+	private static final transient SimpleDateFormat FORMAT = new SimpleDateFormat("dd.MM.yyyy");
 	
 	/* CONSTRUCTORS */
 	public Transaction(Long transaction_id, int account_id, Timestamp date, String description, double amount) {
@@ -50,11 +50,7 @@ public class Transaction implements Serializable {
 		return date;
 	}
 	
-	public Date getDate() {
-		return new Date(date);
-	}
-	
-	public String getDateAsString() {
+	public String getDate() {
 		return FORMAT.format(date);
 	}
 	

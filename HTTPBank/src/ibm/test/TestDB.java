@@ -135,7 +135,7 @@ public class TestDB extends Mockito {
 		//Assertion
 		assertEquals(transaction.get(0).getAccountId(), accountId);
 		assertEquals(transaction.get(0).getAmount(), new DecimalFormat("#0.00").format(amount));
-		assertEquals(transaction.get(0).getDateAsString(), new SimpleDateFormat("yyyy-MM-dd").format(date));
+		assertEquals(transaction.get(0).getDate(), new SimpleDateFormat("dd.MM.yyyy").format(date));
 		assertEquals(transaction.get(0).getDescription(), description);
 		
 		//Archive transactions
@@ -256,7 +256,6 @@ public class TestDB extends Mockito {
 			assertNotNull(transaction.getAmount());
 			assertNotNull(transaction.getDate());
 			assertNotNull(transaction.getDateRaw());
-			assertNotNull(transaction.getDateAsString());
 			assertNotNull(transaction.getDescription());
 		}
 	}

@@ -65,12 +65,14 @@ public class User implements Serializable {
 	 * Should query whenever accounts are updated.
 	 */
 	public ArrayList<Account> getAccounts() throws DatabaseException {
-		accounts = DB.getAccounts(userId);
+		if (accounts == null)
+			accounts = DB.getAccounts(userId);
 		return accounts;
 	}
 	
 	public ArrayList<Message> getMessages() throws DatabaseException {
-		messages = DB.getMessages(userId);
+		if (messages == null)
+			messages = DB.getMessages(userId);
 		return messages;
 	}
 	
