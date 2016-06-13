@@ -198,11 +198,12 @@ public class TestDB extends Mockito {
 		String institute = "Test That Institute";
 		String consultant = "";
 		//Create user
-		assertTrue(DB.createUser(username, cpr, userName, institute, consultant));
-		User newUser = DB.getUserByCpr(cpr);
-		assertNotNull(newUser);
+		for (int i = 1; i < 15; i++){
+			assertTrue(DB.createUser(username+i, cpr+i, userName+i, institute, consultant));
+			assertNotNull(DB.getUserByCpr(cpr+i));
+		}
 		//Get Users
-		ArrayList<User> users = DB.getUsers();
+		ArrayList<User> users = DB.getUsers(0);
 		assertFalse(users.isEmpty());
 		//Assertion
 		for (User user : users){
@@ -210,6 +211,17 @@ public class TestDB extends Mockito {
 			assertNotNull(user.getCpr());
 			assertNotNull(user.getName());
 		}
+		assertTrue(users.size() == 10);
+		//Get Users
+		users = DB.getUsers(10);
+		assertFalse(users.isEmpty());
+		//Assertion
+		for (User user : users){
+			assertNotNull(user.getId());
+			assertNotNull(user.getCpr());
+			assertNotNull(user.getName());
+		}
+		assertTrue(users.size() > 1);
 	}
 
 	@Test
@@ -606,6 +618,10 @@ public class TestDB extends Mockito {
 		assertTrue(DB.createTransaction(TransBy.IBAN, account1.getId(), account2.getIban(), description11, description22, -amount2, amount2));
 		//Assertion (Note: First transaction should always be the most recent.)
 		ArrayList<Transaction> transactions11 = DB.getTransactions(account1.getId());
+		
+		for (Transaction trans : transactions11)
+			System.out.println(trans.getDescription()+" : "+trans.getDateRaw());
+		
 		assertFalse(transactions11.isEmpty());
 		assertEquals(transactions11.get(0).getAccountId(), account1.getId());
 		assertEquals(transactions11.get(0).getAmount(), new DecimalFormat("#0.00").format(-amount2));
