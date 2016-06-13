@@ -35,7 +35,7 @@ public class WithdrawalController extends HttpServlet{
 		try {
 			fromId = Integer.parseInt(id);
 		} catch (NumberFormatException e) {
-    		DatabaseException.handleException(new DatabaseException(), session, response, "depositwithdrawal");
+    		DatabaseException.failure("Failed parsing the ID", session, response, "depositwithdrawal");
 			return;
 		}
 		
@@ -52,7 +52,7 @@ public class WithdrawalController extends HttpServlet{
 					DB.createTransaction(fromId, "Deposited " + amount + " to " + from , amount);
 					DatabaseException.success("Deposit completed successfully.", session);
 				} catch (DatabaseException e) {
-		    		DatabaseException.handleException(e, session);
+		    		DatabaseException.failure("Failed to complete the deposit.", session);
 				}
 				break;
 			case "withdrawal":
@@ -60,7 +60,7 @@ public class WithdrawalController extends HttpServlet{
 					DB.createTransaction(fromId, "Withdrew " + amount + " from " + from , -amount);
 					DatabaseException.success("Withdrawal completed successfully.", session);
 				} catch (DatabaseException e) {
-		    		DatabaseException.handleException(e, session);
+		    		DatabaseException.failure("Failed to complete the withdrawal.", session);
 				}
 				break;
 			}

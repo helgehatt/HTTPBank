@@ -40,14 +40,12 @@ public class DatabaseException extends SQLException {
 		session.setAttribute("confirmation", confirmation);
 	}
 	
-	public static void handleException(DatabaseException e, HttpSession session) {		
-		String exception = "Failed to complete the request.";
-		System.out.println(e.getMessage());
+	public static void failure(String exception, HttpSession session) {
  		session.setAttribute("exception", exception);
 	}
 	
-	public static void handleException(DatabaseException e, HttpSession session, HttpServletResponse response, String redirectUrl) throws IOException {
-		handleException(e, session);
+	public static void failure(String exception, HttpSession session, HttpServletResponse response, String redirectUrl) throws IOException {
+		failure(exception, session);
  		response.sendRedirect(redirectUrl);
 	}
 }

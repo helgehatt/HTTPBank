@@ -85,7 +85,7 @@ public class AccountController extends HttpServlet {
 					DatabaseException.success("Successfully created new account: " + number, session);
 					response.sendRedirect("accounts");
 				} catch (DatabaseException e) {
-		    		DatabaseException.handleException(e, session, response, "newaccount");
+		    		DatabaseException.failure("Failed to create the account.", session, response, "newaccount");
 				}				
 	        } else {
 	        	session.setAttribute("errors", errors);
@@ -101,7 +101,7 @@ public class AccountController extends HttpServlet {
 					DB.updateAccount(id, accountName, type, number, iban, currency, interest, balance);
 					DatabaseException.success("Successfully updated account: " + number, session);
 				} catch (DatabaseException e) {
-		    		DatabaseException.handleException(e, session, response, "editaccount");
+		    		DatabaseException.failure("Failed to update the account.", session, response, "editaccount");
 		    		return;
 				}
 				
@@ -109,7 +109,7 @@ public class AccountController extends HttpServlet {
 					session.setAttribute("account", DB.getAccountByNumber(number));
 					response.sendRedirect("accountinfo");
 				} catch (DatabaseException e) {
-		    		DatabaseException.handleException(e, session, response, "editaccount");
+		    		DatabaseException.failure("Failed to get the account.", session, response, "editaccount");
 				}
 	        } else {
 	        	session.setAttribute("errors", errors);
