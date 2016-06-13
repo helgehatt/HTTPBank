@@ -16,7 +16,8 @@
 <div id="forbidden-access" class="container">
 	  <h2>Unauthorized access</h2>
 	  <br>
-	  <h4>Your session has expired. Please log in again. Redirecting in 5 seconds.</h4>
+	  <h4>You are not logged in, or your session has expired.</h4>
+	  <h4>Redirecting to login page in 5 seconds.</h4>
 </div>
 
 </body>

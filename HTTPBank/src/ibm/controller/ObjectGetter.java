@@ -17,7 +17,8 @@ import ibm.resource.InputException;
 
 @WebServlet(urlPatterns = { "/user/getAccount", "/user/getArchive",
 							"/admin/getAccount", "/admin/getArchive", 
-							"/admin/getUser", "/admin/findUsers" })
+							"/admin/getUser", "/admin/getMoreUsers",
+							"/admin/findUsers" })
 public class ObjectGetter extends HttpServlet {
 	private static final long serialVersionUID = 1L;
     
@@ -89,7 +90,16 @@ public class ObjectGetter extends HttpServlet {
 	    		response.sendRedirect("accounts");
 			} catch (DatabaseException e) {
 	    		DatabaseException.handleException(e, session, response, "users");
-			}    		
+			}
+    		break;
+		case "/admin/getMoreUsers":
+    		try {
+				request.getSession().setAttribute("user", DB.getUsers());
+	    		response.sendRedirect("users");
+			} catch (DatabaseException e) {
+	    		DatabaseException.handleException(e, session, response, "users");
+			}
+    		break;
 		}
     }
 

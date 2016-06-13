@@ -14,7 +14,7 @@ public class Message implements Serializable{
 	private String senderName;
 	private int userID;
 	
-	private static final transient SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+	private static final transient SimpleDateFormat FORMAT = new SimpleDateFormat("dd.MM.yyyy");
 	
 	public Message(String text, Date date, String senderName, int userID) {
 		this.text = text;
@@ -40,11 +40,7 @@ public class Message implements Serializable{
 		return date;
 	}
 	
-	public Date getDate() {
-		return new Date(date);
-	}
-	
-	public String getDateAsString() {
+	public String getDate() {
 		return FORMAT.format(date);
 	}
 	
