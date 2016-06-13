@@ -947,13 +947,14 @@ public class DB {
 		return false;
 	}
 	
-	public static ArrayList<User> searchUsers(String name, String cpr) throws DatabaseException {
+	public static ArrayList<User> searchUsers(String nameOrCpr) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--) {
 			try {
 				PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, NAME, CPR " +
 			"FROM DTUGRP07.USERS WHERE NAME LIKE ? OR CPR LIKE ?;");
-				statement.setString(1, "%"+name+"%");
-				statement.setString(2, "%"+cpr+"%");
+				nameOrCpr.toLowerCase();
+				statement.setString(1, "%"+nameOrCpr+"%");
+				statement.setString(2, "%"+nameOrCpr+"%");
 				ArrayList<User> resultList = null;
 				if(statement.execute()) {
 					resultList = new ArrayList<User>();
