@@ -161,12 +161,20 @@ public class DB {
 	 * @return ArrayList containing all current database users. Returns null if database query fails.
 	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static ArrayList<User> getUsers() throws DatabaseException {
+	public static ArrayList<User> getUsers(int offset) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
-				PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, USERNAME, CPR, NAME "
-						+ "FROM DTUGRP07.USERS;"
+				//"SELECT USER_ID, CPR, NAME " + "FROM DTUGRP07.USERS;"
+				PreparedStatement statement = connection.prepareStatement(
+								"SELECT *"
+								+" FROM ("
+								+" SELECT USER_ID, CPR, NAME, ROW_NUMBER() OVER(ORDER BY NAME) AS rownumber"
+								+" FROM DTUGRP07.USERS"
+								+") AS xxx"
+								+" WHERE rownumber BETWEEN ? AND ? ORDER BY NAME;"
 						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				statement.setInt(1, offset);
+				statement.setInt(2, offset+10);
 				
 				ArrayList<User> resultList = null;
 				if (statement.execute()){ //If query is successful, create list of users.
