@@ -1110,10 +1110,18 @@ public class DB {
 	}
 	
 	public static void getConnection2() throws SQLException {
+		if (connection != null)
+			try {
+				connection.close();
+			} catch(SQLException e){}
 		connection = ds1.getConnection();
 	}
 	
 	public static void setConnection(Connection connection){
+		if (DB.connection != null)
+			try {
+				DB.connection.close();
+			} catch(SQLException e){}
 		DB.connection = connection;
 	}
 	
