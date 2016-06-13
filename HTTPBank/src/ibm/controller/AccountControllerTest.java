@@ -57,6 +57,7 @@ public class AccountControllerTest {
 	}
 	
 	@Test
+
 	public void testNewAccountFailed() throws ServletException, IOException, DatabaseException {
 		//Note this expects the database to be up...
 		session.setAttribute("user", DB.getUser(1));
@@ -101,7 +102,6 @@ session.setAttribute("user", DB.getUser(1));
 		
 		mockThatServlet.setUrlPattern("/admin/newAccount");
 		
-		new AccountController().doPost(request, response);
 		
 		mockThatServlet.setUrlPattern("/admin/editAccount");
 		
