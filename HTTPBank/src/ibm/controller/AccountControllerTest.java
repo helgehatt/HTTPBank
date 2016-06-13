@@ -55,4 +55,32 @@ public class AccountControllerTest {
 
 		System.out.println(mockThatServlet.printInfo());
 	}
+	
+	@Test
+	public void testEditAccount() throws ServletException, IOException, DatabaseException {
+		//Note this expects the database to be up...
+		session.setAttribute("user", DB.getUser(1));
+		
+		String number = "Number1234";
+		
+		mockThatServlet.putParameter("name", "The Account Name");
+		mockThatServlet.putParameter("type", "The Account Type");
+		mockThatServlet.putParameter("number", number);
+		mockThatServlet.putParameter("iban", "IBAN12345678");
+		mockThatServlet.putParameter("currency", "DKK");
+		mockThatServlet.putParameter("interest", "0.02");
+		mockThatServlet.putParameter("balance", "0");
+		
+		mockThatServlet.setUrlPattern("/admin/editAccount");
+		
+		new AccountController().doPost(request, response);
+		
+		assertNotNull(mockThatServlet.getRedirectedTo());
+		assertEquals(mockThatServlet.getRedirectedTo(), "accountinfo");
+		
+		assertNotNull(session.getAttribute("confirmation"));
+		assertEquals(session.getAttribute("confirmation"), "Successfully updated account: " + number);
+
+		System.out.println(mockThatServlet.printInfo());
+	}
 }
