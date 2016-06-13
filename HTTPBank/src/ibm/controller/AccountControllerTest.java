@@ -33,12 +33,12 @@ public class AccountControllerTest {
 		//Note this expects the database to be up...
 		session.setAttribute("user", DB.getUser(1));
 		
-		String number = "Number1234";
+		String number = "123456789";
 		
 		mockThatServlet.putParameter("name", "The Account Name");
 		mockThatServlet.putParameter("type", "The Account Type");
 		mockThatServlet.putParameter("number", number);
-		mockThatServlet.putParameter("iban", "IBAN12345678");
+		mockThatServlet.putParameter("iban", "IB12345678");
 		mockThatServlet.putParameter("currency", "DKK");
 		mockThatServlet.putParameter("interest", "0.02");
 		mockThatServlet.putParameter("balance", "0");
@@ -57,19 +57,51 @@ public class AccountControllerTest {
 	}
 	
 	@Test
-	public void testEditAccount() throws ServletException, IOException, DatabaseException {
+	public void testNewAccountFailed() throws ServletException, IOException, DatabaseException {
 		//Note this expects the database to be up...
 		session.setAttribute("user", DB.getUser(1));
 		
-		String number = "Number1234";
+		String number = "1234589";
+		
+		mockThatServlet.putParameter("name", "The Acc&%#¤");
+		mockThatServlet.putParameter("type", "The Accoun#¤pe");
+		mockThatServlet.putParameter("number", number);
+		mockThatServlet.putParameter("iban", "IBsnsns12345678");
+		mockThatServlet.putParameter("currency", "DKR");
+		mockThatServlet.putParameter("interest", "ABC");
+		mockThatServlet.putParameter("balance", "0PT");
+		
+		mockThatServlet.setUrlPattern("/admin/newAccount");
+		
+		new AccountController().doPost(request, response);
+		
+		assertNotNull(mockThatServlet.getRedirectedTo());
+		assertEquals(mockThatServlet.getRedirectedTo(), "newaccount");
+		
+		assertNotNull(session.getAttribute("confirmation"));
+		assertEquals(session.getAttribute("confirmation"), "Failed to create the account: " + number);
+
+		System.out.println(mockThatServlet.printInfo());
+	}
+	
+	@Test
+	public void testEditAccount() throws ServletException, IOException, DatabaseException {
+		//Note this expects the database to be up...
+session.setAttribute("user", DB.getUser(1));
+		
+		String number = "123456789";
 		
 		mockThatServlet.putParameter("name", "The Account Name");
 		mockThatServlet.putParameter("type", "The Account Type");
 		mockThatServlet.putParameter("number", number);
-		mockThatServlet.putParameter("iban", "IBAN12345678");
+		mockThatServlet.putParameter("iban", "IB12345678");
 		mockThatServlet.putParameter("currency", "DKK");
 		mockThatServlet.putParameter("interest", "0.02");
 		mockThatServlet.putParameter("balance", "0");
+		
+		mockThatServlet.setUrlPattern("/admin/newAccount");
+		
+		new AccountController().doPost(request, response);
 		
 		mockThatServlet.setUrlPattern("/admin/editAccount");
 		
