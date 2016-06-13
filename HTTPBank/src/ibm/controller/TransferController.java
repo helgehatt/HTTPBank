@@ -26,6 +26,7 @@ public class TransferController extends HttpServlet {
 		
     	HashMap<String, String> errors = new HashMap<String, String>();    	
 		boolean international = request.getParameter("international") != null;
+        String id = request.getParameter("id");
         String from = request.getParameter("from");
         String to = request.getParameter("to");
         String bic = request.getParameter("bic");
@@ -38,7 +39,7 @@ public class TransferController extends HttpServlet {
 		double withdrawn = 0;
 		
 		try {
-			fromId = Integer.parseInt(from);
+			fromId = Integer.parseInt(id);
 		} catch (NumberFormatException e) {
     		DatabaseException.handleException(new DatabaseException(), session, response, "accounts");
 			return;

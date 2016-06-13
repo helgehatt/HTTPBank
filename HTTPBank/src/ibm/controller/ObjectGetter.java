@@ -30,9 +30,8 @@ public class ObjectGetter extends HttpServlet {
 		
 		switch(path) {
 		case "/admin/findUsers":
-			String input = request.getParameter("search");
 			try {
-				session.setAttribute("users", DB.searchUsers(input, input));
+				session.setAttribute("users", DB.searchUsers(request.getParameter("search")));
 			} catch (DatabaseException e) {
 	    		DatabaseException.handleException(e, session);
 			}
