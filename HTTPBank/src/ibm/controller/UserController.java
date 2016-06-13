@@ -56,7 +56,7 @@ public class UserController extends HttpServlet {
         }
         
         try {
-        	AttributeChecks.checkCpr(cpr);
+        	cpr = AttributeChecks.checkCpr(cpr);
         } catch (InputException e) {
         	errors.put("cpr", e.getMessage());
         }
@@ -78,9 +78,6 @@ public class UserController extends HttpServlet {
         } catch (InputException e) {
         	errors.put("consultant", e.getMessage());
         }
-        
-        // TODO: Remove
-        String password = "password";
 		
     	switch(path) {
     	case "/admin/newUser":
@@ -116,10 +113,7 @@ public class UserController extends HttpServlet {
             }
     		
     		break;
-    	}
-    	
-    	
-	
+    	}	
     }
 
     @Override

@@ -12,11 +12,15 @@
     <location>/WEB-INF/jsp/error/not-found.jsp</location>
   </error-page>
   <error-page>
-    <error-code>418</error-code>
-    <location>/WEB-INF/jsp/error/lost-connection.jsp</location>
+    <error-code>403</error-code>
+    <location>/WEB-INF/jsp/error/forbidden-access.jsp</location>
   </error-page>
   <error-page>
-    <error-code>419</error-code>
+    <error-code>401</error-code>
     <location>/WEB-INF/jsp/error/unauthorized-access.jsp</location>
+  </error-page>
+  <error-page>
+    <error-code>500</error-code>
+    <location>/WEB-INF/jsp/error/server-error.jsp</location>
   </error-page>
 </web-app>

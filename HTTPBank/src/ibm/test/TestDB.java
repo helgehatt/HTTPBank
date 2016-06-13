@@ -28,7 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -36,8 +35,8 @@ public class TestDB extends Mockito {
 	
 	private static Connection connection;
 	
-	@BeforeClass
-	public static void getConnection() throws SQLException {
+	@AfterClass
+	public static void cleanUp() throws SQLException{
 		Properties properties = new Properties();
 		properties.put("user", "DTU18");
 		properties.put("password", "FAGP2016");
@@ -49,10 +48,6 @@ public class TestDB extends Mockito {
             throw new SQLException(e);
         }
 		connection = DriverManager.getConnection("jdbc:db2://192.86.32.54:5040/DALLASB", properties);
-	}
-	
-	@AfterClass
-	public static void cleanUp() throws SQLException{
 		//Delete everything!
 		Statement updateBalance = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
 		updateBalance.executeUpdate("UPDATE DTUGRP07.ACCOUNTS "
@@ -647,6 +642,7 @@ public class TestDB extends Mockito {
 		assertFalse(archive.isEmpty());
 	}
 	
+	@Test
 	public void testGetMessages() throws DatabaseException{
 		//Test Get Archive
 		//Create user
@@ -806,7 +802,7 @@ public class TestDB extends Mockito {
 		
 		//Instant failure exception.
 		try {
-			DB.checkLogin("admin", "");
+			DB.checkLogin("Thomas", "1234");
 			fail("Should throw exception.");
 		} catch(DatabaseException e){
 			assertEquals(message, e.getMessage());
@@ -815,6 +811,7 @@ public class TestDB extends Mockito {
 		}
 		
 	}
+	
 	
 	public void testLoginServlet() throws Exception {
 		String username = "Lenny";

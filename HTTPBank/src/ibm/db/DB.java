@@ -46,6 +46,21 @@ public class DB {
 	private static Connection connection;
 	private static final String url = "jdbc:db2://192.86.32.54:5040/DALLASB";
 	
+	//Comparators
+	private static final Comparator<Transaction> transactionComparator = new Comparator<Transaction>(){
+		@Override
+		public int compare(Transaction o1, Transaction o2) {
+			return Long.compare(o2.getDateRaw(), o1.getDateRaw());
+		}
+	};
+	
+	private static final Comparator<Message> messageComparator = new Comparator<Message>(){
+		@Override
+		public int compare(Message o1, Message o2) {
+			return Long.compare(o2.getDateRaw(), o1.getDateRaw());
+		}
+	};
+	
 	//Methods
 	// GET Methods
 	/**
@@ -74,12 +89,7 @@ public class DB {
 				statement.close();
 				
 				//Sorts all Transactions by Date.
-				Collections.sort(resultList, new Comparator<Transaction>(){
-					@Override
-					public int compare(Transaction o1, Transaction o2) {
-						return o1.getDateRaw() < o2.getDateRaw() ? -1 : o1.getDateRaw() > o2.getDateRaw() ? 1 : 0;
-					}
-				});
+				Collections.sort(resultList, transactionComparator);
 				
 				return resultList;
 			} catch (SQLException e) {
@@ -304,12 +314,7 @@ public class DB {
 				statement.close();
 				
 				//Sorts all Transactions by Date.
-				Collections.sort(resultList, new Comparator<Transaction>(){
-					@Override
-					public int compare(Transaction o1, Transaction o2) {
-						return Long.compare(o2.getDateRaw(), o1.getDateRaw());
-					}
-				});
+				Collections.sort(resultList, transactionComparator);
 				
 				return resultList;
 				
@@ -340,12 +345,7 @@ public class DB {
 				statement.close();
 				
 				//Sorts all Transactions by Date.
-				Collections.sort(resultList, new Comparator<Message>(){
-					@Override
-					public int compare(Message o1, Message o2) {
-						return Long.compare(o2.getDateRaw(), o1.getDateRaw());
-					}
-				});
+				Collections.sort(resultList, messageComparator);
 				
 				return resultList;
 				
@@ -973,13 +973,14 @@ public class DB {
 	}
 	
 	//Change date to timestamp!! when db works
-	public static ArrayList<Transaction> searchArchive(String dateFrom, String dateTo) throws DatabaseException {
+	public static ArrayList<Transaction> searchArchive(int userID, String dateFrom, String dateTo) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--) {
 			try {
 				PreparedStatement statement = connection.prepareStatement("SELECT TRANSACTION_ID, ACCOUNT_ID, DESCRIPTION, DATE, AMOUNT " +
-			"FROM DTUGRP07.ARCHIVE WHERE DATE > DATE ? AND DATE < DATE ?;");
-				statement.setString(1, dateFrom);
-				statement.setString(2, dateTo);
+			"FROM DTUGRP07.ARCHIVE WHERE USER_ID = ? AND DATE > DATE ? AND DATE < DATE ?;");
+				statement.setInt(1, userID);
+				statement.setString(2, dateFrom);
+				statement.setString(3, dateTo);
 				ArrayList<Transaction> resultList = null;
 				if(statement.execute()) {
 					resultList = new ArrayList<Transaction>();
@@ -990,12 +991,7 @@ public class DB {
 					
 				}
 				statement.close();
-				Collections.sort(resultList, new Comparator<Transaction>(){
-					@Override
-					public int compare(Transaction o1, Transaction o2) {
-						return Long.compare(o2.getDateRaw(), o1.getDateRaw());
-					}
-				});				
+				Collections.sort(resultList, transactionComparator);				
 				return resultList;
 			} catch (SQLException e) {
 				//handleSQLException(e, tries);
@@ -1110,10 +1106,18 @@ public class DB {
 	}
 	
 	public static void getConnection2() throws SQLException {
+		if (connection != null)
+			try {
+				connection.close();
+			} catch(SQLException e){}
 		connection = ds1.getConnection();
 	}
 	
 	public static void setConnection(Connection connection){
+		if (DB.connection != null)
+			try {
+				DB.connection.close();
+			} catch(SQLException e){}
 		DB.connection = connection;
 	}
 	

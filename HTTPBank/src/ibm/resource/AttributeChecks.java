@@ -1,5 +1,7 @@
 package ibm.resource;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -7,8 +9,8 @@ public class AttributeChecks {
 	//User Methods
 	
 	public static void checkUserName(String userName) throws InputException {
-		if (userName.length() < 5)
-			throw new InputException("Please enter at least 5 characters.");
+		if (userName.length() < 4)
+			throw new InputException("Please enter at least 4 characters.");
 		if (hasWhitespace(userName))
 			throw new InputException("Please enter a user name without whitespace.");
 	}
@@ -16,19 +18,20 @@ public class AttributeChecks {
 	/**
 	 * Checks if the given string is a valid cpr-number.
 	 */
-	public static void checkCpr(String cpr) throws InputException {
+	public static String checkCpr(String cpr) throws InputException {
     	cpr = cpr.replace("-", "");
 		if (cpr.length() != 10)
     		throw new InputException("Please enter 10 digits.");
     	if (!isNumerous(cpr))
     		throw new InputException("Please enter numbers only.");
+    	return cpr.substring(0, 6) + "-" + cpr.substring(6, 9);
     }
     
 	/**
 	 * Checks if the given string is a valid name.
 	 */
 	public static void checkRealName(String name) throws InputException {
-		if (name.length() == 0)
+		if (name.isEmpty())
     		throw new InputException("Please enter name.");   
     	if (!isAlphabeticWithWhitespace(name)) 
     		throw new InputException("Please enter letters only.");    	
@@ -56,7 +59,7 @@ public class AttributeChecks {
 	 * @throws InputException
 	 */
 	public static void checkAccountName(String accountName) throws InputException {
-		if (!isAlphabetic(accountName))
+		if (!isAlphabeticWithWhitespace(accountName))
 			throw new InputException("Please enter letters only.");
 	}
 	
@@ -64,7 +67,7 @@ public class AttributeChecks {
 	 * Checks if the given string is a valid type.
 	 */
 	public static void checkType(String type) throws InputException {
-		if (type.length() == 0)
+		if (type.isEmpty())
 			throw new InputException("Please enter type.");
     }
     
@@ -109,17 +112,13 @@ public class AttributeChecks {
 	 * @return The string parsed to double.
 	 */
 	public static double checkInterest(String interest) throws InputException {
-		if (interest.length() == 0)
+		if (interest.isEmpty())
 			throw new InputException("Please enter interest rate.");
-		double value;
     	try {
-    		interest = interest.replace("%", "");
-    		interest = interest.replace(",", ".");
-    		value = Double.parseDouble(interest);
+    		return Double.parseDouble(interest.replace(",", ".").replace("%", ""));
     	} catch (NumberFormatException e) {
     		throw new InputException("Please enter a number.");
     	}
-    	return value;
     }
     
 	/**
@@ -127,16 +126,13 @@ public class AttributeChecks {
 	 * @return The string parsed to double.
 	 */
 	public static double checkBalance(String balance) throws InputException {
-		if (balance.length() == 0)
+		if (balance.isEmpty())
 			balance = "0";
-		double value;
     	try {
-    		balance = balance.replace(",", ".");
-    		value = Double.parseDouble(balance);
+    		return Double.parseDouble(balance.replace(",", "."));
     	} catch (NumberFormatException e) {
     		throw new InputException("Please enter a number.");
     	}
-    	return value;
     }
 	/**
 	 * Checks if the given string is a valid amount.
@@ -145,17 +141,31 @@ public class AttributeChecks {
 	 * @throws InputException
 	 */
 	public static double checkAmount(String amount) throws InputException {
-		if (amount.length() == 0)
+		if (amount.isEmpty())
 			throw new InputException("Please enter an amount.");
-		double value;
     	try {
-    		amount = amount.replace(",", ".");
-    		value = Double.parseDouble(amount);
+    		return Double.parseDouble(amount.replace(",", "."));
     	} catch (NumberFormatException e) {
     		throw new InputException("Please enter a number.");
     	}
-    	return value;
     }
+	
+	private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+	
+	/**
+	 * Checks if the string is a valid date.
+	 * @param date
+	 * @return The string parsed to long.
+	 * @throws InputException
+	 */
+	public static long checkDate(String date) throws InputException {
+		try {
+			return FORMAT.parse(date).getTime();
+		} catch (ParseException e) {
+			throw new InputException("Please enter both dates.");
+		}
+		
+	}
 	
 	private static boolean isAlphabetic(String string) {
 		for (int i = 0; i < string.length(); i++) {

@@ -1,5 +1,12 @@
 package ibm.test;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
 import ibm.db.DB;
 import ibm.db.DB.ACCOUNT;
 import ibm.db.DB.USER;
@@ -8,15 +15,6 @@ import ibm.resource.DatabaseException;
 import ibm.resource.InputException;
 import ibm.resource.Transaction;
 import ibm.resource.User;
-
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Calendar;
 
 public class DB2Test {
 	//Main
@@ -177,7 +175,7 @@ public class DB2Test {
 		System.out.println("Created Account "+account+", Query Time: " + (System.currentTimeMillis()-start));
 	}
 
-	private static void testCreateUser(String username, String password, String cpr, String name, String institute, String consultant) throws SQLException {
+	private static void testCreateUser(String username, String cpr, String name, String institute, String consultant) throws SQLException {
 		long start = System.currentTimeMillis();
 		boolean user = DB.createUser(username, cpr, name, institute, consultant);
 		System.out.println("Create User "+user+", Query Time: " + (System.currentTimeMillis()-start));

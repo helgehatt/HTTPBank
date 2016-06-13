@@ -1,8 +1,8 @@
-<%@ include file="../head.jsp" %>
+<%@ include file="../content/head.jsp" %>
 
 <style>
 
-#archive-item a {
+#archive-item {
 	background-color:#e6e6e6;
 }
 
@@ -10,35 +10,19 @@
 
 <%@ include file="navbar.jsp" %>
 
+<c:set var="error" scope="page" value="${sessionScope.error}"/>
+<c:remove var="error" scope="session"/>
+
 <div class="container-fluid">
-	
-	<c:set var="menu" scope="page" value="account"/>
+
 	<%@ include file="side-menu.jsp" %>
 	
 	<div id="archive" class="container container-lg col-sm-9">
-		<div class="panel panel-default">
-			<div class="panel-body">
-		    <table class="table table-striped">
-		      <thead>
-		        <tr>
-		          <th>Date</th>
-		          <th>Description</th>
-		          <th class="text-right">Amount (${account.currency})</th>
-		        </tr>
-		      </thead>
-		      <tbody>
-		      	<c:forEach var="transaction" items="${account.archive}">
-		        	<tr>
-		        		<td>${transaction.date}</td>
-		        		<td>${transaction.description}</td>
-		        		<td class="text-right">${transaction.amount}</td>
-		        	</tr>
-		        </c:forEach>
-		      </tbody>
-		  	</table>
-			</div>
-		</div>
+	
+	<%@ include file="../content/archive.jsp" %>
+	
 	</div>
+	
 	
 </div>
 

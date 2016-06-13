@@ -5,6 +5,7 @@
 <head>
 	<title>HTTP Bank</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+	<meta http-equiv="refresh" content="<%= session.getMaxInactiveInterval() %>; url=${pageContext.request.contextPath}/login"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/style.css">

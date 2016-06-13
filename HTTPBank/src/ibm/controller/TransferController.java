@@ -82,7 +82,7 @@ public class TransferController extends HttpServlet {
 		    		DatabaseException.handleException(e, session);
 				}
 			} else
-	        	request.getSession().setAttribute("errors", errors);
+	        	session.setAttribute("errors", errors);
 
 			response.sendRedirect("international");
 			
@@ -105,7 +105,7 @@ public class TransferController extends HttpServlet {
 		    		DatabaseException.handleException(e, session);
 				}
 			else
-	        	request.getSession().setAttribute("errors", errors);
+	        	session.setAttribute("errors", errors);
 
 			response.sendRedirect("transfer");
 		}  

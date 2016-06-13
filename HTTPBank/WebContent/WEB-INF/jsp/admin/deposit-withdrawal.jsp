@@ -1,4 +1,4 @@
-<%@ include file="../head.jsp" %>
+<%@ include file="../content/head.jsp" %>
 
 <script src="${pageContext.request.contextPath}/js/transfer-int-script.js"></script>
 

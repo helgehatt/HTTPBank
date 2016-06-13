@@ -1,15 +1,15 @@
-<%@ include file="../head.jsp" %>
+<%@ include file="../content/head.jsp" %>
 
 <script type="text/javascript">
 $(function(){
 	$('.message').click(function() {
-		var expanded = this.data('expanded');
+		var expanded = $(this).data('expanded');
 		if (expanded === false) {
-			this.val(this.data('text'))
-			this.data('expanded').val('true');
+			$(this).text($(this).data('text'));
+			$(this).data('expanded', true);
 		} else {
-			this.val(this.data('preview'))
-			this.data('expanded').val('false');
+			$(this).text($(this).data('preview'));
+			$(this).data('expanded', false);
 		}
 		return false;
 	});
@@ -28,17 +28,21 @@ $(function(){
 		    <table class="table table-striped">
 		      <thead>
 		        <tr>
-		          <th>Date</th>
+		          <th class="column-hide">Date</th>
 		          <th>Message</th>
-		          <th>From</th>		      		       
+		          <th class="column-hide">From</th>		      		       
 		        </tr>
 		      </thead>
 		      <tbody>
 		      	<c:forEach var="message" items="${user.messages}">
 		        	<tr>
-		        		<td>${message.date}</td>
-		        		<td><a class="message" href="#" data-preview="${message.preview}"data-text="${message.text}" data-expanded="false">${message.preview}</a></td>
-		        		<td>${message.senderName}</td>
+		        		<td class="column-hide" style="white-space:nowrap">${message.date}</td>
+		        		<td>
+		        			<p class="column-show">${message.date}</p>
+		        			<a class="message" href="#" data-preview="${message.preview}"data-text="${message.text}" data-expanded="false">${message.preview}</a>
+		        			<p class="column-show">${message.senderName}</p>
+		        		</td>
+		        		<td class="column-hide" style="white-space:nowrap">${message.senderName}</td>
 		        	</tr>
 		        </c:forEach>
 		      </tbody>

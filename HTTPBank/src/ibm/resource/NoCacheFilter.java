@@ -16,23 +16,10 @@ import javax.servlet.http.HttpServletResponse;
 @WebFilter("/*")
 public class NoCacheFilter implements Filter {
 
-    /**
-     * Default constructor. 
-     */
-    public NoCacheFilter() {
-        // TODO Auto-generated constructor stub
-    }
-
-	/**
-	 * @see Filter#destroy()
-	 */
 	public void destroy() {
-		// TODO Auto-generated method stub
+		
 	}
 
-	/**
-	 * @see Filter#doFilter(ServletRequest, ServletResponse, FilterChain)
-	 */
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
         HttpServletResponse response = (HttpServletResponse) res;
 
@@ -43,11 +30,8 @@ public class NoCacheFilter implements Filter {
         chain.doFilter(req, res);
     }
 
-	/**
-	 * @see Filter#init(FilterConfig)
-	 */
 	public void init(FilterConfig fConfig) throws ServletException {
-		// TODO Auto-generated method stub
+		
 	}
 
 }
