@@ -47,4 +47,41 @@ public class LoginControllerTest {
 
 		System.out.println(mockThatServlet.printInfo());
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testLoginUserSucces() throws ServletException, IOException {
+		mockThatServlet.putParameter("username", "Helge");
+		mockThatServlet.putParameter("password", "hatt");
+		
+		new LoginController().doPost(request, response);
+		
+		assertNotNull(mockThatServlet.getRedirectedTo());
+		assertEquals(mockThatServlet.getRedirectedTo(), "user/accounts");
+		
+		assertNotNull(session.getAttribute("user"));
+		assertNotNull(session.getAttribute("admin"));
+		assertFalse((boolean)session.getAttribute("admin"));
+		assertNotNull(session.getAttribute("currencies"));
+		assertFalse(((ArrayList<String>)session.getAttribute("currencies")).isEmpty());
+
+		System.out.println(mockThatServlet.printInfo());
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testLoginUserFail() throws ServletException, IOException {
+		mockThatServlet.putParameter("username", "Helge");
+		mockThatServlet.putParameter("password", "ht");
+		
+		new LoginController().doPost(request, response);
+		
+		assertNotNull(mockThatServlet.getRedirectedTo());
+		assertEquals(mockThatServlet.getRedirectedTo(), " ?s=0");
+
+		assertNotNull(session.getAttribute("currencies"));
+		assertFalse(((ArrayList<String>)session.getAttribute("currencies")).isEmpty());
+		
+		System.out.println(mockThatServlet.printInfo());
+	}
 }
