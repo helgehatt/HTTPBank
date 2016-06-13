@@ -13,7 +13,6 @@ import ibm.resource.User;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -29,7 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -37,8 +35,8 @@ public class TestDB extends Mockito {
 	
 	private static Connection connection;
 	
-	@BeforeClass
-	public static void getConnection() throws SQLException {
+	@AfterClass
+	public static void cleanUp() throws SQLException{
 		Properties properties = new Properties();
 		properties.put("user", "DTU18");
 		properties.put("password", "FAGP2016");
@@ -50,10 +48,6 @@ public class TestDB extends Mockito {
             throw new SQLException(e);
         }
 		connection = DriverManager.getConnection("jdbc:db2://192.86.32.54:5040/DALLASB", properties);
-	}
-	
-	@AfterClass
-	public static void cleanUp() throws SQLException{
 		//Delete everything!
 		Statement updateBalance = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
 		updateBalance.executeUpdate("UPDATE DTUGRP07.ACCOUNTS "
@@ -215,7 +209,6 @@ public class TestDB extends Mockito {
 			assertNotNull(user.getId());
 			assertNotNull(user.getCpr());
 			assertNotNull(user.getName());
-			assertNotNull(user.getUsername());
 		}
 	}
 
@@ -649,6 +642,7 @@ public class TestDB extends Mockito {
 		assertFalse(archive.isEmpty());
 	}
 	
+	@Test
 	public void testGetMessages() throws DatabaseException{
 		//Test Get Archive
 		//Create user
@@ -795,16 +789,36 @@ public class TestDB extends Mockito {
 		assertEquals(transactions1.get(0).getDescription(), description1);
 	}
 	
-	public void testExceptionHandling() throws DatabaseException{
+	@Test
+	public void testExceptionHandling() throws SQLException {
 		//Test Exception Handling
+		Connection connection = mock(Connection.class);
+		String message = "A mocking exception...";
+		int errorCode = 1337;
+		String sqlState = "2E000";
+		when(connection.prepareStatement(anyString(), anyInt(), anyInt(), anyInt())).thenThrow(new DatabaseException(message, errorCode, sqlState));
+		when(connection.prepareCall(anyString(), anyInt(), anyInt(), anyInt())).thenThrow(new DatabaseException(message, errorCode, sqlState));
+		DB.setConnection(connection);
+		
+		//Instant failure exception.
+		try {
+			DB.checkLogin("Thomas", "1234");
+			fail("Should throw exception.");
+		} catch(DatabaseException e){
+			assertEquals(message, e.getMessage());
+			assertEquals(errorCode, e.getErrorCode());
+			assertEquals(sqlState, e.getSQLState());
+		}
+		
 	}
+	
 	
 	public void testLoginServlet() throws Exception {
 		String username = "Lenny";
 		String password = "check";
-		HttpServletRequest request = mock(HttpServletRequest.class);       
+		HttpServletRequest request = mock(HttpServletRequest.class);
 	    HttpServletResponse response = mock(HttpServletResponse.class);
-	    PrintWriter writer = new PrintWriter(new StringWriter()); 
+	    PrintWriter writer = new PrintWriter(new StringWriter());
 	    when(request.getParameter("username")).thenReturn(username);
 	    when(request.getParameter("password")).thenReturn(password);
 	    when(response.getWriter()).thenReturn(writer);

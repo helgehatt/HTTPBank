@@ -19,11 +19,17 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Properties;
 
+import javax.annotation.Resource;
+import javax.sql.DataSource;
+
 /**
  * A class for handling all Database queries required by the HTTPBank.
- * Class uses PreparedStatements for easy implementation and efficiency.
+ * Class uses PreparedStatements for easy implementation, greater efficiency and security.
  */
 public class DB {
+	@Resource(name = "jdbc/exampleDS")
+	static DataSource ds1;
+	
 	//Static Constructor
 	static {
 		for (int tries = 2; 0 < tries; tries--){
@@ -31,6 +37,7 @@ public class DB {
 				getConnection();
 			} catch (SQLException e) {
 				// A Database access error occurred. Can't really do anything about it at this point.
+				e.printStackTrace();
 			}
 		}
 	}
@@ -1023,7 +1030,6 @@ public class DB {
 	/**
 	 * Queries a request for user information and checks for correct password. Returns the 'userId' of the user only if user exists and correct password is given as argument, else returns -1.
 	 * Uses a PreparedStatement to query.
-	 * TODO: This would be better to have as a stored procedure on the database.
 	 * @throws DatabaseException If a database error occurs.
 	 */
 	
@@ -1097,6 +1103,31 @@ public class DB {
 			}
 			connection = DriverManager.getConnection(url, getProperties());
 		}
+	}
+	
+	public static void getConnection2() throws SQLException {
+		if (connection != null)
+			try {
+				connection.close();
+			} catch(SQLException e){}
+		connection = ds1.getConnection();
+	}
+	
+	public static void setConnection(Connection connection){
+		if (DB.connection != null)
+			try {
+				DB.connection.close();
+			} catch(SQLException e){}
+		DB.connection = connection;
+	}
+	
+	public static void close(){
+		if (connection != null)
+			try {
+				connection.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 	}
 	
 	/**
