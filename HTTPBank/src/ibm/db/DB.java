@@ -966,13 +966,14 @@ public class DB {
 	}
 	
 	//Change date to timestamp!! when db works
-	public static ArrayList<Transaction> searchArchive(String dateFrom, String dateTo) throws DatabaseException {
+	public static ArrayList<Transaction> searchArchive(int userID, String dateFrom, String dateTo) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--) {
 			try {
 				PreparedStatement statement = connection.prepareStatement("SELECT TRANSACTION_ID, ACCOUNT_ID, DESCRIPTION, DATE, AMOUNT " +
-			"FROM DTUGRP07.ARCHIVE WHERE DATE > DATE ? AND DATE < DATE ?;");
-				statement.setString(1, dateFrom);
-				statement.setString(2, dateTo);
+			"FROM DTUGRP07.ARCHIVE WHERE USER_ID = ? AND DATE > DATE ? AND DATE < DATE ?;");
+				statement.setInt(1, userID);
+				statement.setString(2, dateFrom);
+				statement.setString(3, dateTo);
 				ArrayList<Transaction> resultList = null;
 				if(statement.execute()) {
 					resultList = new ArrayList<Transaction>();

@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import ibm.db.DB;
+import ibm.resource.Account;
 import ibm.resource.AttributeChecks;
 import ibm.resource.DatabaseException;
 import ibm.resource.InputException;
@@ -41,7 +42,8 @@ public class ObjectGetter extends HttpServlet {
 			try {
 				long from = AttributeChecks.checkDate(request.getParameter("from"));
 				long to = AttributeChecks.checkDate(request.getParameter("to"));
-				session.setAttribute("archive", DB.searchArchive("" + from, "" + to));
+				int id = ((Account) session.getAttribute("account")).getId();
+				session.setAttribute("archive", DB.searchArchive(id, "" + from, "" + to));
 			} catch (InputException e) {
 	        	session.setAttribute("error", e.getMessage());
 			} catch (DatabaseException e) {

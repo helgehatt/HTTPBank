@@ -6,8 +6,7 @@
 	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/com.ibm.ws.st.core.runtimeClasspathProvider/WebSphere Application Server Liberty"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.7.0_79"/>
-	<classpathentry kind="lib" path="Mockito_jar/mockito-core-2.0.55-beta-javadoc.jar"/>
-	<classpathentry kind="lib" path="Mockito_jar/mockito-core-2.0.55-beta-sources.jar"/>
-	<classpathentry kind="lib" path="Mockito_jar/mockito-core-2.0.55-beta.jar"/>
+	<classpathentry kind="lib" path="Mockito_jar/mockito-all-1.9.1-20110911-sources.jar"/>
+	<classpathentry kind="lib" path="Mockito_jar/mockito-all-1.9.1-20110911.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
