@@ -1017,8 +1017,9 @@ public class DB {
 	 */
 	public static Account updateAccount(int accountId, String name, String type, String number, String iban, String currency, double interest, double balance) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
+			PreparedStatement statement = null;
 			try {
-				PreparedStatement statement = connection.prepareStatement(
+				statement = connection.prepareStatement(
 						"SELECT USER_ID, ACCOUNT_ID, NAME, TYPE, NUMBER, IBAN, CURRENCY, INTEREST, BALANCE "
 						+ "FROM FINAL TABLE("
 						+ "UPDATE DTUGRP07.ACCOUNTS "
@@ -1026,7 +1027,6 @@ public class DB {
 						+ "WHERE ACCOUNT_ID = ?"
 						+ ");"
 						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-				
 				statement.setString(1, name);
 				statement.setString(2, type);
 				statement.setString(3, number);
@@ -1047,6 +1047,12 @@ public class DB {
 			} catch (SQLException e) {
 				handleSQLException(e, tries);
 				//if no more tries, throw exception.
+			} finally {
+				try {
+					if (statement != null) statement.close();
+				} catch(SQLException e){
+					e.printStackTrace();
+				}
 			}
 		}
 		return null;
@@ -1061,18 +1067,25 @@ public class DB {
 	 */
 	public static boolean deleteAccount(int accountId) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
+			PreparedStatement statement = null;
 			try {
-				PreparedStatement statement = connection.prepareStatement("DELETE FROM DTUGRP07.ACCOUNTS "
+				statement = connection.prepareStatement("DELETE FROM DTUGRP07.ACCOUNTS "
 						+ "WHERE ACCOUNT_ID = ?;"
 						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
 				statement.setInt(1, accountId);
 				
 				statement.execute(); //Attempt to delete row.
-				statement.close();
+				
 				return true;
 			} catch (SQLException e) {
 				handleSQLException(e, tries);
 				//if no more tries, throw exception.
+			} finally {
+				try {
+					if (statement != null) statement.close();
+				} catch(SQLException e){
+					e.printStackTrace();
+				}
 			}
 		}
 		return false;
@@ -1085,18 +1098,25 @@ public class DB {
 	 */
 	public static boolean deleteAccountByNumber(String number) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
+			PreparedStatement statement = null;
 			try {
-				PreparedStatement statement = connection.prepareStatement("DELETE FROM DTUGRP07.ACCOUNTS "
+				statement = connection.prepareStatement("DELETE FROM DTUGRP07.ACCOUNTS "
 						+ "WHERE NUMBER = ?;"
 						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
 				statement.setString(1, number);
 				
 				statement.execute(); //Attempt to delete row.
-				statement.close();
+				
 				return true;
 			} catch (SQLException e) {
 				handleSQLException(e, tries);
 				//if no more tries, throw exception.
+			} finally {
+				try {
+					if (statement != null) statement.close();
+				} catch(SQLException e){
+					e.printStackTrace();
+				}
 			}
 		}
 		return false;
@@ -1109,18 +1129,25 @@ public class DB {
 	 */
 	public static boolean deleteUser(String username) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
+			PreparedStatement statement = null;
 			try {
-				PreparedStatement statement = connection.prepareStatement("DELETE FROM DTUGRP07.USERS "
+				statement = connection.prepareStatement("DELETE FROM DTUGRP07.USERS "
 						+ "WHERE USERNAME = ?;"
 						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
 				statement.setString(1, username);
 				
 				statement.execute(); //Attempt to delete row.
-				statement.close();
+				
 				return true;
 			} catch (SQLException e) {
 				handleSQLException(e, tries);
 				//if no more tries, throw exception.
+			} finally {
+				try {
+					if (statement != null) statement.close();
+				} catch(SQLException e){
+					e.printStackTrace();
+				}
 			}
 		}
 		return false;
