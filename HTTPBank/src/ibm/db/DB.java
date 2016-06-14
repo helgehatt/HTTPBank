@@ -972,7 +972,7 @@ public class DB {
 	public static ArrayList<User> searchUsers(String nameOrCpr) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--) {
 			try {
-				PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, NAME, CPR " +
+				PreparedStatement statement = connection.prepareStatement("SELECT USER_ID, CPR, NAME " +
 			"FROM DTUGRP07.USERS WHERE NAME LIKE ? OR CPR LIKE ?;");
 				nameOrCpr.toLowerCase();
 				statement.setString(1, "%"+nameOrCpr+"%");
