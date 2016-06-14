@@ -31,7 +31,10 @@ public class TransferControllerTest {
 	public void testAdminTransfer() throws ServletException, IOException, DatabaseException {
 		mockThatServlet.setUrlPattern("/admin/doTransfer");
 	
-	
+		
+		
+		
+	}
 	
 	
 	
