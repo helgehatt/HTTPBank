@@ -13,6 +13,7 @@ import javax.servlet.http.HttpSession;
 import ibm.db.DB;
 import ibm.resource.DatabaseException;
 import ibm.resource.ExceptionHandler;
+import ibm.resource.User;
 
 @WebServlet("/checkLogin")
 public class LoginController extends HttpServlet {
@@ -47,8 +48,12 @@ public class LoginController extends HttpServlet {
 				
 			} else if (username.equals("admin") && password.equals("")) {	
 				session.setAttribute("admin", true);
-				request.getSession().setAttribute("users", DB.getUsers(0));
-				response.sendRedirect("admin/users");				
+				session.setAttribute("users", new ArrayList<User>());
+				session.setAttribute("moreUsers", true);
+				
+				ObjectGetter.getUsers(session, response, 0);
+	    		response.sendRedirect("admin/users");
+				
 			} else {
 				response.sendRedirect(" ?s=0");
 			}

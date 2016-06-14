@@ -2,25 +2,23 @@
 
 <style>
 
-@media(min-width: 768px) {
-	#delete-user {
-		max-width: 350px;
-	}
+#reset-password {
+	text-align: center;
 }
 
-#delete-user .panel-body {
+#reset-password form {
+	padding-top: 20px;
+}
+
+#reset-password button {
+	margin-right: 10px;
+}
+
+#reset-password .panel-body {
 	padding: 15px;
 }
 
-#delete-user button {
-}
-
-#delete-user form {
-	margin-top: 10px;
-	margin-left: 70px;
-}
-
-#delete-user-item a {
+#reset-password-item a {
 	background-color:#e6e6e6;
 }
 
@@ -33,7 +31,7 @@
 	<c:set var="menu" scope="page" value="user"/>
 	<%@ include file="side-menu.jsp" %>
 	
-	<div id="delete-user" class="container container-sm col-sm-9">
+	<div id="reset-password" class="container container-sm col-sm-9">
 		<div class="panel panel-default">
 			<div class="panel-body">
 				Are you sure you want to reset ${user.username}'s password?

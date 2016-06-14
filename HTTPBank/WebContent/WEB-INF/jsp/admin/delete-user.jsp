@@ -2,22 +2,20 @@
 
 <style>
 
-@media(min-width: 768px) {
-	#delete-user {
-		max-width: 350px;
-	}
+#delete-user {
+	text-align: center;
+}
+
+#delete-user form {
+	padding-top: 20px;
+}
+
+#delete-user button {
+	margin-right: 10px;
 }
 
 #delete-user .panel-body {
 	padding: 15px;
-}
-
-#delete-user button {
-}
-
-#delete-user form {
-	margin-top: 10px;
-	margin-left: 70px;
 }
 
 #delete-user-item a {

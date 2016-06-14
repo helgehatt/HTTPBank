@@ -9,7 +9,7 @@
 
 </style>
 
-<%@ include file="navbar.jsp" %>
+<%@ include file="navbar-logout.jsp" %>
 
 <div id="not-found" class="container">
 	  <h2>Sorry, this page isn't available</h2>

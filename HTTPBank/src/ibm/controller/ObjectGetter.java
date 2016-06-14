@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import ibm.db.DB;
-import ibm.resource.Account;
 import ibm.resource.AttributeChecks;
 import ibm.resource.DatabaseException;
 import ibm.resource.ExceptionHandler;
@@ -45,8 +44,8 @@ public class ObjectGetter extends HttpServlet {
 			try {
 				long from = AttributeChecks.checkDate(request.getParameter("from"));
 				long to = AttributeChecks.checkDate(request.getParameter("to"));
-				int id = ((Account) session.getAttribute("account")).getId();
-				session.setAttribute("archive", DB.searchArchive(id, "" + from, "" + to));
+				int id = ((User) session.getAttribute("user")).getId();
+				session.setAttribute("archive", DB.searchArchive(id, from, to));
 			} catch (InputException e) {
 	        	session.setAttribute("error", e.getMessage());
 			} catch (DatabaseException e) {
@@ -94,16 +93,9 @@ public class ObjectGetter extends HttpServlet {
 				ExceptionHandler.failure(e, "Failed getting the user.", session, response, "users");
 			}
     		break;
-		case "/admin/getMoreUsers":
-    		try {
-    			@SuppressWarnings("unchecked")
-				ArrayList<User> users = (ArrayList<User>) session.getAttribute("users");
-    			users.addAll(DB.getUsers(id));
-				session.setAttribute("users", users);
-	    		response.sendRedirect("users");
-			} catch (DatabaseException e) {
-				ExceptionHandler.failure(e, "Failed getting more users.", session, response, "users");
-			}
+		case "/admin/getMoreUsers": // id is the offset
+			getUsers(session, response, id);
+    		response.sendRedirect("users");
     		break;
 		}
     }
@@ -111,5 +103,19 @@ public class ObjectGetter extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     	response.sendRedirect(request.getContextPath());
+    }
+    
+    protected static void getUsers(HttpSession session, HttpServletResponse response, int offset) throws IOException {
+		try {
+			@SuppressWarnings("unchecked")
+			ArrayList<User> users = (ArrayList<User>) session.getAttribute("users");
+			ArrayList<User> newUsers = DB.getUsers(offset);
+			if (newUsers.size() < 10)
+				session.setAttribute("moreUsers", false);
+			users.addAll(newUsers);
+			session.setAttribute("users", users);
+		} catch (DatabaseException e) {
+			ExceptionHandler.failure(e, "Failed getting users.", session);
+		}
     }
 }

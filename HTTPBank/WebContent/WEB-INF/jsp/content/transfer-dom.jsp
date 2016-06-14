@@ -33,7 +33,7 @@
 	<div class="form-group">
     <label class="control-label col-sm-3" for="message">Message:</label>
     <div class="col-sm-9">
-      <textarea name="message" class="form-control" rows="5" id="message" placeholder="Optional"></textarea>
+      <textarea name="message" class="form-control" rows="5" id="message" placeholder="Optional" maxlength="200"></textarea>
     </div>
   </div>
   <button class="btn btn-default btn-submit">Submit</button>

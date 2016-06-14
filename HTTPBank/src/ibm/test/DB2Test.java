@@ -71,6 +71,16 @@ public class DB2Test {
 		
 		//testArchive();
 		
+//		User user = DB.getUserByCpr("840345-5887");
+//		for (Account account : user.getAccounts())
+//			for (int i = 0; i < 10; i++)
+//				DB.createTransaction(account.getId(), "Opsparing", 5.37);
+//		
+//		DB.archiveTransactions();
+		
+		String string = "Sender lige en laaaaang beskedSender lige en laaaaang beskedSender lige en laaaaang beskedSender lige en laaaaang beskedSender lige en laaaaang beskedSender lige en laaaaang beskedSender lige en laaaaang beskedSender lige en laaaaang beskedSender lige en laaaaang beskedSender lige en laaaaang besked";
+		System.out.println(string.length());
+		
 	}
 	
 	private static void testSearchUsers(String name) throws DatabaseException {
@@ -83,7 +93,7 @@ public class DB2Test {
 		}
 	}
 	
-	private static void testSearchArchive(int userID, String dateFrom, String dateTo) throws DatabaseException {		
+	private static void testSearchArchive(int userID, long dateFrom, long dateTo) throws DatabaseException {		
 		ArrayList<Transaction> array = DB.searchArchive(userID, dateFrom, dateTo);
 		for(Transaction t : array) {
 			printTransaction(t);
