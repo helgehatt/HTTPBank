@@ -2,6 +2,8 @@ package ibm.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 
 import javax.servlet.ServletException;
@@ -18,9 +20,17 @@ import ibm.resource.ExceptionHandler;
 import ibm.resource.InputException;
 import ibm.resource.User;
 
-@WebServlet(urlPatterns = { "/admin/newUser", "/admin/editUser", "/admin/deleteUser" })
+@WebServlet(urlPatterns = { "/admin/newUser", "/admin/editUser", "/admin/deleteUser", "/admin/resetPassword" })
 public class UserController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	
+	private static final transient Comparator<User> userComparator = new Comparator<User>() {		
+		@Override
+		public int compare(User o1, User o2) {
+			// TODO Auto-generated method stub
+			return 1;
+		}
+	};
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -28,15 +38,32 @@ public class UserController extends HttpServlet {
 
 		String path = request.getRequestURI().replace(request.getContextPath(), "");
 		
-		if (path.equals("/admin/deleteUser")) {
+		switch (path) {
+		case "/admin/deleteUser":
 			try {
 				User user = (User) session.getAttribute("user");
 				DB.deleteUser(user.getId());
 				ExceptionHandler.success("Successfully deleted the user: " + user.getUsername(), session);
-				session.setAttribute("users", null);
+				session.setAttribute("user", null);
+				
+				@SuppressWarnings("unchecked")
+				ArrayList<User> users = (ArrayList<User>) session.getAttribute("users");
+				users.remove(user);
+				session.setAttribute("users", users);
+				
             	response.sendRedirect("users");
 			} catch (DatabaseException e) {
-				ExceptionHandler.failure("Failed to delete the user.", session, response, "deleteuser");
+				ExceptionHandler.failure(e, "Failed to delete the user.", session, response, "deleteuser");
+			}
+			return;
+		case "/admin/resetPassword":
+			try {
+				User user = (User) session.getAttribute("user");
+				DB.resetPassword(user.getId());
+				ExceptionHandler.success("Successfully reset " + user.getUsername() + "'s password.", session);
+            	response.sendRedirect("userinfo");
+			} catch (DatabaseException e) {
+				ExceptionHandler.failure(e, "Failed to reset the user's password.", session, response, "resetpassword");
 			}
 			return;
 		}
@@ -90,11 +117,12 @@ public class UserController extends HttpServlet {
     				@SuppressWarnings("unchecked")
 					ArrayList<User> users = (ArrayList<User>) session.getAttribute("users");
 					users.add(user);
+//					Collections.sort(users, );
 					session.setAttribute("users", users);
 					
 	            	response.sendRedirect("users");
 				} catch (DatabaseException e) {
-					ExceptionHandler.failure("Failed to create the user.", session, response, "newuser");
+					ExceptionHandler.failure(e, "Failed to create the user.", session, response, "newuser");
 				}    			
             } else {
             	request.getSession().setAttribute("errors", errors);            	
@@ -111,7 +139,7 @@ public class UserController extends HttpServlet {
 					session.setAttribute("user", user);
 	    			response.sendRedirect("userinfo");
 				} catch (DatabaseException e) {
-					ExceptionHandler.failure("Failed to update the user.", session, response, "edituser");
+					ExceptionHandler.failure(e, "Failed to update the user.", session, response, "edituser");
 				}
             } else {
             	session.setAttribute("errors", errors);

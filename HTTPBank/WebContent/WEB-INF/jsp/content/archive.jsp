@@ -31,7 +31,7 @@
         		<td>
         			<p class="column-show">${transaction.date}</p>
         			${transaction.description}
-        			<p class="column-show">${transaction.amount} ${account.currency}</p>
+        			<p class="column-show">${transaction.amount}</p>
         		</td>
         		<td class="text-right column-hide" style="white-space:nowrap">${transaction.amount}</td>
         	</tr>

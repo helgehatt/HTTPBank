@@ -6,6 +6,8 @@ import ibm.resource.DatabaseException;
 import ibm.test.MockThatServlet;
 
 import java.io.IOException;
+import java.util.HashMap;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -46,6 +48,15 @@ public class AccountControllerTest {
 		mockThatServlet.setUrlPattern("/admin/newAccount");
 		
 		new AccountController().doPost(request, response);
+		
+		HashMap<String, String> map = (HashMap<String, String>) session.getAttribute("errors");
+		System.out.println(map.get("name"));
+		System.out.println(map.get("type"));
+		System.out.println(map.get("number"));
+		System.out.println(map.get("iban"));
+		System.out.println(map.get("currency"));
+		System.out.println(map.get("interest"));
+		System.out.println(map.get("balance"));
 		
 		assertNotNull(mockThatServlet.getRedirectedTo());
 		assertEquals(mockThatServlet.getRedirectedTo(), "accounts");

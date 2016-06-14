@@ -19,4 +19,14 @@ public class ExceptionHandler {
 		failure(exception, session);
  		response.sendRedirect(redirectUrl);
 	}
+	
+	public static void failure(DatabaseException e, String exception, HttpSession session) {
+		e.printStackTrace();
+		failure(exception, session);
+	}
+	
+	public static void failure(DatabaseException e, String exception, HttpSession session, HttpServletResponse response, String redirectUrl) throws IOException {
+		e.printStackTrace();
+		failure(e, exception, session, response, redirectUrl);
+	}
 }

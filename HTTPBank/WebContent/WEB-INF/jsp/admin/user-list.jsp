@@ -66,11 +66,10 @@
 	     			</form>
 	     		</li>
 	    	</c:forEach>
-	    	<c:set var="size" scope="page" value="${fn:length(users)}"/>
-	    	<c:if test="${size % 10 == 0}">
+	    	<c:if test="${moreUsers == true}">
 	   			<li class="list-group-item">
 	     			<form action="getMoreUsers" method="post">
-	     				<button class="btn btn-default" name="id" value="${size}">
+	     				<button class="btn btn-default" name="id" value="${fn:length(users)}">
 		    				<h4>...</h4>
 	     				</button>
 	     			</form>

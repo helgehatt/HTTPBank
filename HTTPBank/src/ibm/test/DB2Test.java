@@ -1,5 +1,8 @@
 package ibm.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -19,7 +22,27 @@ import ibm.resource.User;
 public class DB2Test {
 	//Main
 	public static void main(String[] args) throws SQLException, ClassNotFoundException, InputException {
-
+		
+		String username = "TestGetUser";
+		String cpr = "TestGS1234";
+		String name = "Test Testy Test";
+		String institute = "Test That Institute";
+		String consultant = "";
+		DB.deleteUserByCpr(cpr);
+		//Create a user to get
+		User user = DB.createUser(username, cpr, name, institute, consultant);
+		assertNotNull(user);
+		//Get user
+		User sameUser = DB.getUser(user.getId());
+		assertNotNull(sameUser);
+		//Assert
+		System.out.println(user.getId() +","+ sameUser.getId());
+		System.out.println(user.getConsultant() +","+ sameUser.getConsultant());
+		System.out.println(user.getCpr() +","+ sameUser.getCpr());
+		System.out.println(user.getInstitute() +","+ sameUser.getInstitute());
+		System.out.println(user.getName() +","+ sameUser.getName());
+		System.out.println(user.getUsername() +","+ sameUser.getUsername());
+		
 		//testCheckLogin("Helgo","moo");
 		//testSearchUsers("Thomas", "01");
 		//System.out.println();
@@ -71,6 +94,16 @@ public class DB2Test {
 		
 		//testArchive();
 		
+//		User user = DB.getUserByCpr("840345-5887");
+//		for (Account account : user.getAccounts())
+//			for (int i = 0; i < 10; i++)
+//				DB.createTransaction(account.getId(), "Opsparing", 5.37);
+//		
+//		DB.archiveTransactions();
+		
+		String string = "Sender lige en laaaaang beskedSender lige en laaaaang beskedSender lige en laaaaang beskedSender lige en laaaaang beskedSender lige en laaaaang beskedSender lige en laaaaang beskedSender lige en laaaaang beskedSender lige en laaaaang beskedSender lige en laaaaang beskedSender lige en laaaaang besked";
+		System.out.println(string.length());
+		
 	}
 	
 	private static void testSearchUsers(String name) throws DatabaseException {
@@ -83,7 +116,7 @@ public class DB2Test {
 		}
 	}
 	
-	private static void testSearchArchive(int userID, String dateFrom, String dateTo) throws DatabaseException {		
+	private static void testSearchArchive(int userID, long dateFrom, long dateTo) throws DatabaseException {		
 		ArrayList<Transaction> array = DB.searchArchive(userID, dateFrom, dateTo);
 		for(Transaction t : array) {
 			printTransaction(t);
@@ -178,7 +211,8 @@ public class DB2Test {
 	private static void testCreateUser(String username, String cpr, String name, String institute, String consultant) throws SQLException {
 		long start = System.currentTimeMillis();
 		User user = DB.createUser(username, cpr, name, institute, consultant);
-		System.out.println("Create User "+user.getName()+", Query Time: " + (System.currentTimeMillis()-start));
+
+		System.out.println("Create User "+user+", Query Time: " + (System.currentTimeMillis()-start));
 	}
 
 	public static ArrayList<Transaction> testGetTransactions(int id) throws SQLException{

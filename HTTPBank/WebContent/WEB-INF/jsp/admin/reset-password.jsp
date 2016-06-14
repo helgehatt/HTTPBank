@@ -2,23 +2,23 @@
 
 <style>
 
-#delete-user {
+#reset-password {
 	text-align: center;
 }
 
-#delete-user form {
+#reset-password form {
 	padding-top: 20px;
 }
 
-#delete-user button {
+#reset-password button {
 	margin-right: 10px;
 }
 
-#delete-user .panel-body {
+#reset-password .panel-body {
 	padding: 15px;
 }
 
-#delete-user-item a {
+#reset-password-item a {
 	background-color:#e6e6e6;
 }
 
@@ -31,11 +31,11 @@
 	<c:set var="menu" scope="page" value="user"/>
 	<%@ include file="side-menu.jsp" %>
 	
-	<div id="delete-user" class="container container-sm col-sm-9">
+	<div id="reset-password" class="container container-sm col-sm-9">
 		<div class="panel panel-default">
 			<div class="panel-body">
-				Are you sure you want to delete ${user.username}?
-		    <form class="form-horizontal" role="form" action="deleteUser" method="post">
+				Are you sure you want to reset ${user.username}'s password?
+		    <form class="form-horizontal" role="form" action="resetPassword" method="post">
 		    	<button class="btn btn-default" type="submit">Yes</button>
 		    	<a class="btn btn-default" type="button" href="userinfo">No</a>
 		    </form>

@@ -9,7 +9,7 @@
 
 </style>
 
-<%@ include file="navbar.jsp" %>
+<%@ include file="navbar-logout.jsp" %>
 
 <div id="forbidden-access" class="container">
 	  <h2>Forbidden access</h2>

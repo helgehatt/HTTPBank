@@ -1,7 +1,6 @@
 package ibm.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.servlet.ServletException;
@@ -85,15 +84,10 @@ public class AccountController extends HttpServlet {
 				try {
 					Account account = DB.createAccount(user.getId(), "", type, number, iban, currency, interest, balance);
 					ExceptionHandler.success("Successfully created new account: " + number, session);
-					
-					@SuppressWarnings("unchecked")
-					ArrayList<Account> accounts = (ArrayList<Account>) session.getAttribute("accounts");
-					accounts.add(account);
-					session.setAttribute("accounts", accounts);
-					
+					user.getAccounts().add(account);					
 					response.sendRedirect("accounts");
 				} catch (DatabaseException e) {
-					ExceptionHandler.failure("Failed to create the account.", session, response, "newaccount");
+					ExceptionHandler.failure(e, "Failed to create the account.", session, response, "newaccount");
 				}				
 	        } else {
 	        	session.setAttribute("errors", errors);
@@ -111,7 +105,7 @@ public class AccountController extends HttpServlet {
 					session.setAttribute("account", account);
 					response.sendRedirect("accountinfo");
 				} catch (DatabaseException e) {
-					ExceptionHandler.failure("Failed to update the account.", session, response, "editaccount");
+					ExceptionHandler.failure(e, "Failed to update the account.", session, response, "editaccount");
 		    		return;
 				}
 	        } else {

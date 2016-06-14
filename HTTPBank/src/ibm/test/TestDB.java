@@ -43,28 +43,44 @@ public class TestDB extends Mockito {
 		properties.put("retreiveMessagesFromServerOnGetMessage", "true");
 		properties.put("emulateParameterMetaDataForZCalls", "1");
 		try {
-            Class.forName("com.ibm.db2.jcc.DB2Driver");
-        } catch (ClassNotFoundException e) {
-            throw new SQLException(e);
-        }
-		connection = DriverManager.getConnection("jdbc:db2://192.86.32.54:5040/DALLASB", properties);
-		//Delete everything!
-		Statement updateBalance = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		updateBalance.executeUpdate("UPDATE DTUGRP07.ACCOUNTS "
-				+ "SET BALANCE = '0' "
-				+ "WHERE NAME LIKE 'Test%';");
-		updateBalance.close();
-		Statement deleteAccount = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		deleteAccount.executeUpdate("DELETE FROM DTUGRP07.ACCOUNTS "
-				+ "WHERE NAME LIKE 'Test%';");
-		deleteAccount.close();
-		Statement deleteUser = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-		deleteUser.executeUpdate("DELETE FROM DTUGRP07.USERS "
-				+ "WHERE USERNAME LIKE 'Test%';");
-		deleteUser.close();
-		
-		//Close connection.
-		connection.close();
+			Class.forName("com.ibm.db2.jcc.DB2Driver");
+		} catch (ClassNotFoundException e) {
+			throw new SQLException(e);
+		}
+		try {
+			connection = DriverManager.getConnection("jdbc:db2://192.86.32.54:5040/DALLASB", properties);
+
+			//Delete everything!
+			Statement updateBalance = null;
+			try {
+				updateBalance = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				updateBalance.executeUpdate("UPDATE DTUGRP07.ACCOUNTS "
+						+ "SET BALANCE = '0' "
+						+ "WHERE NAME LIKE 'Test%';");
+			} finally {
+				if (updateBalance != null) updateBalance.close();
+			}
+			Statement deleteAccount = null;
+			try {
+				deleteAccount = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				deleteAccount.executeUpdate("DELETE FROM DTUGRP07.ACCOUNTS "
+						+ "WHERE NAME LIKE 'Test%';");
+			} finally {
+				if (deleteAccount != null) deleteAccount.close();
+			}
+			Statement deleteUser = null;
+			try {
+				deleteUser = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				deleteUser.executeUpdate("DELETE FROM DTUGRP07.USERS "
+						+ "WHERE USERNAME LIKE 'Test%';");
+			} finally {
+				if (deleteUser != null) deleteUser.close();
+			}
+
+		} finally {
+			//Close connection.
+			if (connection != null) connection.close();
+		}
 	}
 	
 	@Test
@@ -79,8 +95,8 @@ public class TestDB extends Mockito {
 		User nullUser = DB.getUserByCpr(cpr);
 		assertNull(nullUser);
 		//Create user
-		assertNotNull(DB.createUser(username, cpr, userName, institute, consultant));
-		User user = DB.getUserByCpr(cpr);
+		User user = DB.createUser(username, cpr, userName, institute, consultant);
+		assertNotNull(user);
 		//Get the newly created user
 		User sameUser = DB.getUserByCpr(cpr);
 		assertNotNull(sameUser);
@@ -106,8 +122,8 @@ public class TestDB extends Mockito {
 		Account nullAccount = DB.getAccountByNumber(number);
 		assertNull(nullAccount);
 		//Create Account
-		assertNotNull(DB.createAccount(userId, accountName, type, number, iban, currency, interest, balance));
-		Account account = DB.getAccountByNumber(number);
+		Account account = DB.createAccount(userId, accountName, type, number, iban, currency, interest, balance);
+		assertNotNull(account);
 		//Get newly created account
 		Account sameAccount = DB.getAccountByNumber(number);
 		//Assertion
@@ -137,13 +153,6 @@ public class TestDB extends Mockito {
 		assertEquals(transaction.get(0).getAmount(), new DecimalFormat("#0.00").format(amount));
 		assertEquals(transaction.get(0).getDate(), new SimpleDateFormat("dd.MM.yyyy").format(date));
 		assertEquals(transaction.get(0).getDescription(), description);
-		
-		//Archive transactions
-		DB.archiveTransactions();
-		
-		//Get Archive
-		ArrayList<Transaction> archive = DB.getArchive(account.getId());
-		assertFalse(archive.isEmpty());
 	}
 	
 	@Test
@@ -159,8 +168,8 @@ public class TestDB extends Mockito {
 		User nullUser = DB.getUserByCpr(cpr);
 		assertNull(nullUser);
 		//Create user
-		assertNotNull(DB.createUser(username, cpr, name, institute, consultant));
-		User user = DB.getUserByCpr(cpr);
+		User user = DB.createUser(username, cpr, name, institute, consultant);
+		assertNotNull(user);
 		//Check login
 		int id = DB.checkLogin(username, password);
 		//Assert Id is equal
@@ -176,10 +185,11 @@ public class TestDB extends Mockito {
 		String institute = "Test That Institute";
 		String consultant = "";
 		//Create a user to get
-		assertNotNull(DB.createUser(username, cpr, name, institute, consultant));
-		User user = DB.getUserByCpr(cpr);
+		User user = DB.createUser(username, cpr, name, institute, consultant);
+		assertNotNull(user);
 		//Get user
 		User sameUser = DB.getUser(user.getId());
+		assertNotNull(sameUser);
 		//Assert
 		assertEquals(user.getId(), sameUser.getId());
 		assertEquals(user.getConsultant(), sameUser.getConsultant());
@@ -200,7 +210,6 @@ public class TestDB extends Mockito {
 		//Create user
 		for (int i = 1; i < 15; i++){
 			assertNotNull(DB.createUser(username+i, cpr+i, userName+i, institute, consultant));
-			assertNotNull(DB.getUserByCpr(cpr+i));
 		}
 		//Get Users
 		ArrayList<User> users = DB.getUsers(0);
@@ -213,7 +222,7 @@ public class TestDB extends Mockito {
 		}
 		assertTrue(users.size() == 10);
 		//Get Users
-		users = DB.getUsers(10);
+		users.addAll(DB.getUsers(10));
 		assertFalse(users.isEmpty());
 		//Assertion
 		for (User user : users){
@@ -222,6 +231,10 @@ public class TestDB extends Mockito {
 			assertNotNull(user.getName());
 		}
 		assertTrue(users.size() > 1);
+		
+		for (User user : users){
+			System.out.println(user.getName()+" : "+user.getCpr());
+		}
 	}
 
 	@Test
@@ -234,10 +247,8 @@ public class TestDB extends Mockito {
 		String institute = "Test That Institute";
 		String consultant = "";
 		//Create user
-		assertNotNull(DB.createUser(username, cpr, userName, institute, consultant));
-		User user = DB.getUserByCpr(cpr);
-		assertNotNull(user);
-		
+		User user = DB.createUser(username, cpr, userName, institute, consultant);
+		assertNotNull(user);		
 		//Create Account
 		int userId = user.getId();
 		String accountName = "TestGetTrans";
@@ -248,10 +259,8 @@ public class TestDB extends Mockito {
 		double interest = 0.05;
 		double balance = 0;
 		//Create Account
-		assertNotNull(DB.createAccount(userId, accountName, type, number, iban, currency, interest, balance));
-		Account account = DB.getAccountByNumber(number);
+		Account account = DB.createAccount(userId, accountName, type, number, iban, currency, interest, balance);
 		assertNotNull(account);
-		
 		//Create Transaction
 		int accountId = account.getId();
 		String description = "TestDecription is this, test-test, moo..."; 
@@ -282,10 +291,8 @@ public class TestDB extends Mockito {
 		String institute = "Test That Institute";
 		String consultant = "";
 		//Create user
-		assertNotNull(DB.createUser(username, cpr, userName, institute, consultant));
-		User user = DB.getUserByCpr(cpr);
+		User user = DB.createUser(username, cpr, userName, institute, consultant);
 		assertNotNull(user);
-		
 		//Create Account
 		int userId = user.getId();
 		String accountName = "TestGetAccount";
@@ -296,8 +303,7 @@ public class TestDB extends Mockito {
 		double interest = 0.05;
 		double balance = 0;
 		//Create Account
-		assertNotNull(DB.createAccount(userId, accountName, type, number, iban, currency, interest, balance));
-		Account newAccount = DB.getAccountByNumber(number);
+		Account newAccount = DB.createAccount(userId, accountName, type, number, iban, currency, interest, balance);
 		assertNotNull(newAccount);
 		//Get Accounts
 		ArrayList<Account> accounts = DB.getAccounts(userId);
@@ -330,8 +336,8 @@ public class TestDB extends Mockito {
 		String institute = "Test That Institute";
 		String consultant = "";
 		//Create user
-		assertNotNull(DB.createUser(username, cpr, userName, institute, consultant));
-		User user = DB.getUserByCpr(cpr);
+
+		User user = DB.createUser(username, cpr, userName, institute, consultant);
 		assertNotNull(user);
 		
 		//Create Account
@@ -344,8 +350,8 @@ public class TestDB extends Mockito {
 		double interest = 0.05;
 		double balance = 0;
 		//Create Account
-		assertNotNull(DB.createAccount(userId, accountName, type, number, iban, currency, interest, balance));
-		Account newAccount = DB.getAccountByNumber(number);
+
+		Account newAccount = DB.createAccount(userId, accountName, type, number, iban, currency, interest, balance);
 		assertNotNull(newAccount);
 		int accountId = newAccount.getId();
 		//Assert original values.
@@ -410,8 +416,8 @@ public class TestDB extends Mockito {
 		String institute = "Test That Institute";
 		String consultant = "";
 		//Create user
-		assertNotNull(DB.createUser(username, cpr, userName, institute, consultant));
-		User user = DB.getUserByCpr(cpr);
+
+		User user = DB.createUser(username, cpr, userName, institute, consultant);
 		assertNotNull(user);
 		
 		//Assert original values.
@@ -478,8 +484,8 @@ public class TestDB extends Mockito {
 		String userName = "DUBC Test Testy Test";
 		String institute = "Test That Institute";
 		String consultant = "";
-		assertNotNull(DB.createUser(username, cpr, userName, institute, consultant));
-		User user = DB.getUserByCpr(cpr);
+
+		User user = DB.createUser(username, cpr, userName, institute, consultant);
 		assertNotNull(user);
 		
 		//Create Account
@@ -491,8 +497,8 @@ public class TestDB extends Mockito {
 		String currency = "EUR"; 
 		double interest = 0.05;
 		double balance = 0;
-		assertNotNull(DB.createAccount(userId, accountName, type, number, iban, currency, interest, balance));
-		Account account = DB.getAccountByNumber(number);
+
+		Account account = DB.createAccount(userId, accountName, type, number, iban, currency, interest, balance);
 		assertNotNull(account);
 		
 		//Delete Account
@@ -511,8 +517,8 @@ public class TestDB extends Mockito {
 		String userName2 = "DU Test Testy Test";
 		String institute2 = "Test That Institute";
 		String consultant2 = "";
-		assertNotNull(DB.createUser(username2, cpr2, userName2, institute2, consultant2));
-		User user2 = DB.getUserByCpr(cpr2);
+
+		User user2 = DB.createUser(username2, cpr2, userName2, institute2, consultant2);
 		assertNotNull(user2);
 		
 		//Create Account
@@ -524,8 +530,8 @@ public class TestDB extends Mockito {
 		String currency2 = "EUR"; 
 		double interest2 = 0.05;
 		double balance2 = 0;
-		assertNotNull(DB.createAccount(userId2, accountName2, type2, number2, iban2, currency2, interest2, balance2));
-		Account account2 = DB.getAccountByNumber(number2);
+
+		Account account2 = DB.createAccount(userId2, accountName2, type2, number2, iban2, currency2, interest2, balance2);
 		assertNotNull(account2);
 		
 		//Delete Account
@@ -542,7 +548,155 @@ public class TestDB extends Mockito {
 	}
 	
 	@Test
-	public void testCreateTransactionAndGetArchive() throws DatabaseException {
+	public void testCreateTransaction() throws DatabaseException {
+		//Test Get Archive
+		//Create user
+		String username = "TestCreateTransaction1";
+		String cpr = "TestCTT11234";
+		String userName = "CTT1 Test Testy Test";
+		String institute = "Test That Institute";
+		String consultant = "";
+		assertNotNull(DB.createUser(username, cpr, userName, institute, consultant));
+		User user1 = DB.getUserByCpr(cpr);
+		assertNotNull(user1);
+		
+		//Create User
+		String username2 = "TestCreatetransaction2";
+		String cpr2 = "TestCTT21234";
+		String userName2 = "CTT2 Test Testy Test";
+		String institute2 = "Test That Institute";
+		String consultant2 = "";
+		assertNotNull(DB.createUser(username2, cpr2, userName2, institute2, consultant2));
+		User user2 = DB.getUserByCpr(cpr2);
+		assertNotNull(user2);
+		
+		//Create Account
+		int userId = user1.getId();
+
+		String accountName1 = "TestAccount1IsTest";
+		String type1 = "TestTypeForTestAccount";
+		String number1 = "TestCTT1123456789"; 
+		String iban1 = "TestCTT1123456IBAN";
+		String currency1 = "EUR"; 
+		double interest1 = 0.1;
+		double balance1 = 200;
+		assertNotNull(DB.createAccount(userId, accountName1, type1, number1, iban1, currency1, interest1, balance1));
+		Account account1 = DB.getAccountByNumber(number1);
+		assertNotNull(account1);
+		
+		//Create Account
+		int userId2 = user2.getId();
+		String accountName2 = "TestAccount2IsTest";
+		String type2 = "TestTypeForTestAccount";
+		String number2 = "TestCTT2123456789"; 
+		String iban2 = "TestCTT2123456IBAN";
+		String currency2 = "EUR"; 
+		double interest2 = 0.05;
+		double balance2 = 0;
+		assertNotNull(DB.createAccount(userId2, accountName2, type2, number2, iban2, currency2, interest2, balance2));
+		Account account2 = DB.getAccountByNumber(number2);
+		assertNotNull(account2);
+		
+		//Assert there are no transactions
+		assertTrue(DB.getTransactions(account1.getId()).isEmpty());
+		assertTrue(DB.getTransactions(account2.getId()).isEmpty());
+		
+		//Create transaction (ID)
+		String description1 = "TestDecription1ID is this, test-test, moo...";
+		String description2 = "TestDecription2ID is this, test-test, moo...";
+		double amount = 100;
+		assertNotNull(DB.createTransaction(TransBy.ID, account1.getId(), ""+account2.getId(), description1, description2, -amount, amount));
+		//Assertion
+		ArrayList<Transaction> transactions1 = DB.getTransactions(account1.getId());
+		assertFalse(transactions1.isEmpty());
+		assertEquals(transactions1.get(0).getAccountId(), account1.getId());
+		assertEquals(transactions1.get(0).getAmount(), new DecimalFormat("#0.00").format(-amount));
+		assertEquals(transactions1.get(0).getDescription(), description1);
+		ArrayList<Transaction> transactions2 = DB.getTransactions(account2.getId());
+		assertFalse(transactions2.isEmpty());
+		assertEquals(transactions2.get(0).getAccountId(), account2.getId());
+		assertEquals(transactions2.get(0).getAmount(), new DecimalFormat("#0.00").format(amount));
+		assertEquals(transactions2.get(0).getDescription(), description2);
+		
+		//Check Balance
+		assertTrue(100.0 == Double.parseDouble(DB.getAccountByNumber(number1).getBalance().replace(',', '.')));
+		assertTrue(100.0 == Double.parseDouble(DB.getAccountByNumber(number2).getBalance().replace(',', '.')));
+		
+		//Create transaction (IBAN)
+		String description11 = "TestDecription1IBAN is this, test-test, moo...";
+		String description22 = "TestDecription2IBAN is this, test-test, moo...";
+		double amount2 = 50;
+		assertNotNull(DB.createTransaction(TransBy.IBAN, account1.getId(), account2.getIban(), description11, description22, -amount2, amount2));
+		//Assertion (Note: First transaction should always be the most recent.)
+		ArrayList<Transaction> transactions11 = DB.getTransactions(account1.getId());
+		
+		for (Transaction trans : transactions11)
+			System.out.println(trans.getDescription()+" : "+trans.getDateRaw());
+		
+		assertFalse(transactions11.isEmpty());
+		assertEquals(transactions11.get(0).getAccountId(), account1.getId());
+		assertEquals(transactions11.get(0).getAmount(), new DecimalFormat("#0.00").format(-amount2));
+		assertEquals(transactions11.get(0).getDescription(), description11);
+		ArrayList<Transaction> transactions22 = DB.getTransactions(account2.getId());
+		
+		for (Transaction trans : transactions22)
+			System.out.println(trans.getDescription()+" : "+trans.getDateRaw());
+		
+		assertFalse(transactions22.isEmpty());
+		assertEquals(transactions22.get(0).getAccountId(), account2.getId());
+		assertEquals(transactions22.get(0).getAmount(), new DecimalFormat("#0.00").format(amount2));
+		assertEquals(transactions22.get(0).getDescription(), description22);
+		
+		//Check Balance
+		assertTrue(50.0 == Double.parseDouble(DB.getAccountByNumber(number1).getBalance().replace(',', '.')));
+		assertTrue(150.0 == Double.parseDouble(DB.getAccountByNumber(number2).getBalance().replace(',', '.')));
+		
+		//Create transaction (NUMBER)
+		String description111 = "TestDecription1NUMBER is this, test-test, moo...";
+		String description222 = "TestDecription2NUMBER is this, test-test, moo...";
+		double amount3 = 25;
+		assertNotNull(DB.createTransaction(TransBy.NUMBER, account1.getId(), account2.getNumber(), description111, description222, -amount3, amount3));
+		//Assertion (Note: First transaction should always be the most recent.)
+		ArrayList<Transaction> transactions111 = DB.getTransactions(account1.getId());
+		assertFalse(transactions111.isEmpty());
+		assertEquals(transactions111.get(0).getAccountId(), account1.getId());
+		assertEquals(transactions111.get(0).getAmount(), new DecimalFormat("#0.00").format(-amount3));
+		assertEquals(transactions111.get(0).getDescription(), description111);
+		ArrayList<Transaction> transactions222 = DB.getTransactions(account2.getId());
+		assertFalse(transactions222.isEmpty());
+		assertEquals(transactions222.get(0).getAccountId(), account2.getId());
+		assertEquals(transactions222.get(0).getAmount(), new DecimalFormat("#0.00").format(amount3));
+		assertEquals(transactions222.get(0).getDescription(), description222);
+		
+		//Check Balance
+		assertTrue(25.0 == Double.parseDouble(DB.getAccountByNumber(number1).getBalance().replace(',', '.')));
+		assertTrue(175.0 == Double.parseDouble(DB.getAccountByNumber(number2).getBalance().replace(',', '.')));
+		
+		//Create Transaction (NUMBER) to unknown receiver.
+		String description1111 = "TestDecription1NUMBERunknown is this, test-test, moo...";
+		String description2222 = "TestDecription2NUMBERunknown is this, test-test, moo...";
+		double amount4 = 25;
+		System.out.println(DB.getAccount(account1.getId()));
+		assertNotNull(DB.createTransaction(TransBy.NUMBER, account1.getId(), account2.getNumber(), description111, description222, -amount3, amount3));
+		//Assertion (Note: First transaction should always be the most recent.)
+		ArrayList<Transaction> transactions1111 = DB.getTransactions(account1.getId());
+		assertFalse(transactions1111.isEmpty());
+		assertEquals(transactions1111.get(0).getAccountId(), account1.getId());
+		assertEquals(transactions1111.get(0).getAmount(), new DecimalFormat("#0.00").format(-amount4));
+		assertEquals(transactions1111.get(0).getDescription(), description1111);
+		ArrayList<Transaction> transactions2222 = DB.getTransactions(account2.getId());
+		assertFalse(transactions2222.isEmpty());
+		assertNotEquals(transactions2222.get(0).getAccountId(), account2.getId());
+		assertNotEquals(transactions2222.get(0).getAmount(), new DecimalFormat("#0.00").format(amount4));
+		assertNotEquals(transactions2222.get(0).getDescription(), description2222);
+		
+		//Check Balance
+		assertTrue(0.0 == Double.parseDouble(DB.getAccountByNumber(number1).getBalance().replace(',', '.')));
+		assertTrue(200.0 == Double.parseDouble(DB.getAccountByNumber(number2).getBalance().replace(',', '.')));
+	}
+	
+	
+	public void testGetArchive() throws DatabaseException {
 		//Test Get Archive
 		//Create user
 		String username = "TestGetArchive1";
@@ -611,78 +765,50 @@ public class TestDB extends Mockito {
 		assertEquals(transactions2.get(0).getAmount(), new DecimalFormat("#0.00").format(amount));
 		assertEquals(transactions2.get(0).getDescription(), description2);
 		
-		//Create transaction (IBAN)
-		String description11 = "TestDecription1IBAN is this, test-test, moo...";
-		String description22 = "TestDecription2IBAN is this, test-test, moo...";
-		double amount2 = 50;
-		assertNotNull(DB.createTransaction(TransBy.IBAN, account1.getId(), account2.getIban(), description11, description22, -amount2, amount2));
-		//Assertion (Note: First transaction should always be the most recent.)
-		ArrayList<Transaction> transactions11 = DB.getTransactions(account1.getId());
-		
-		for (Transaction trans : transactions11)
-			System.out.println(trans.getDescription()+" : "+trans.getDateRaw());
-		
-		assertFalse(transactions11.isEmpty());
-		assertEquals(transactions11.get(0).getAccountId(), account1.getId());
-		assertEquals(transactions11.get(0).getAmount(), new DecimalFormat("#0.00").format(-amount2));
-		assertEquals(transactions11.get(0).getDescription(), description11);
-		ArrayList<Transaction> transactions22 = DB.getTransactions(account2.getId());
-		assertFalse(transactions22.isEmpty());
-		assertEquals(transactions22.get(0).getAccountId(), account2.getId());
-		assertEquals(transactions22.get(0).getAmount(), new DecimalFormat("#0.00").format(amount2));
-		assertEquals(transactions22.get(0).getDescription(), description22);
-		
-		//Create transaction (NUMBER)
-		String description111 = "TestDecription1NUMBER is this, test-test, moo...";
-		String description222 = "TestDecription2NUMBER is this, test-test, moo...";
-		double amount3 = 25;
-		assertNotNull(DB.createTransaction(TransBy.NUMBER, account1.getId(), account2.getNumber(), description111, description222, -amount3, amount3));
-		//Assertion (Note: First transaction should always be the most recent.)
-		ArrayList<Transaction> transactions111 = DB.getTransactions(account1.getId());
-		assertFalse(transactions111.isEmpty());
-		assertEquals(transactions111.get(0).getAccountId(), account1.getId());
-		assertEquals(transactions111.get(0).getAmount(), new DecimalFormat("#0.00").format(-amount3));
-		assertEquals(transactions111.get(0).getDescription(), description111);
-		ArrayList<Transaction> transactions222 = DB.getTransactions(account2.getId());
-		assertFalse(transactions222.isEmpty());
-		assertEquals(transactions222.get(0).getAccountId(), account2.getId());
-		assertEquals(transactions222.get(0).getAmount(), new DecimalFormat("#0.00").format(amount3));
-		assertEquals(transactions222.get(0).getDescription(), description222);
-		
 		//Archive transactions
 		DB.archiveTransactions();
 		
 		//Get Archive
 		ArrayList<Transaction> archive = DB.getArchive(account1.getId());
 		assertFalse(archive.isEmpty());
+		
 	}
 	
 	@Test
 	public void testGetMessages() throws DatabaseException{
-		//Test Get Archive
+		//Test Get Messages.
 		//Create user
-		String username = "TestGetMessages";
-		String cpr = "TestGAR11234";
-		String userName = "GAR1 Test Testy Test";
+		String username = "TestGetMessage";
+		String cpr = "TestGMM1234";
+		String userName = "GMM Test Testy Test";
 		String institute = "Test That Institute";
 		String consultant = "";
 		assertNotNull(DB.createUser(username, cpr, userName, institute, consultant));
-		User user1 = DB.getUserByCpr(cpr);
-		assertNotNull(user1);
-		
+		User user = DB.getUserByCpr(cpr);
+		assertNotNull(user);
 		//Create Account
-		int userId = user1.getId();
-		String accountName = "TestAccount1IsTest";
+		int userId = user.getId();
+		String accountName = "TestAccountIsTest";
 		String type = "TestTypeForTestAccount";
-		String number = "TestGAR1123456789"; 
-		String iban = "TestGAR1123456IBAN";
+		String number = "Test123456789"; 
+		String iban = "Test123456IBAN";
 		String currency = "EUR"; 
-		double interest = 0.1;
+		double interest = 0.05;
 		double balance = 0;
+		//Create Account
 		assertNotNull(DB.createAccount(userId, accountName, type, number, iban, currency, interest, balance));
-		Account account1 = DB.getAccountByNumber(number);
-		assertNotNull(account1);
-		
+		Account account = DB.getAccountByNumber(number);
+		//Get Empty Messages list
+		assertTrue(DB.getMessages(user.getId()).isEmpty());
+		//Create Message by ID
+		String messageid = "TestyForYou ID!";
+		assertTrue(DB.createMessage(messageid, user.getId(), ""+account.getId(), TransBy.ID));
+		//Get Messages
+		ArrayList<Message> messages = DB.getMessages(user.getId());
+		//Assertion
+		assertFalse(messages.isEmpty());
+		assertEquals(messages.get(0).getText(), messageid);
+		assertEquals(messages.get(0).getSenderName(), user.getName());
 	}
 	
 	@Test
@@ -708,15 +834,45 @@ public class TestDB extends Mockito {
 		assertNotNull(DB.createUser(username, cpr, userName, institute, consultant));
 		User user = DB.getUserByCpr(cpr);
 		assertNotNull(user);
+		//Create Account
+		int userId = user.getId();
+		String accountName = "TestAccountIsTest";
+		String type = "TestTypeForTestAccount";
+		String number = "Test123456789"; 
+		String iban = "Test123456IBAN";
+		String currency = "EUR"; 
+		double interest = 0.05;
+		double balance = 0;
+		//Create Account
+		assertNotNull(DB.createAccount(userId, accountName, type, number, iban, currency, interest, balance));
+		Account account = DB.getAccountByNumber(number);
 		//Get Empty Messages list
 		assertTrue(DB.getMessages(user.getId()).isEmpty());
-		//Create Message
-		String message = "TestyForYou!";
-		assertTrue(DB.createMessage(message, user.getId(), ""+user.getId(), TransBy.ID));
+		//Create Message by ID
+		String messageid = "TestyForYou ID!";
+		assertTrue(DB.createMessage(messageid, user.getId(), ""+account.getId(), TransBy.ID));
 		//Assertion
 		ArrayList<Message> messages = DB.getMessages(user.getId());
 		assertFalse(messages.isEmpty());
-		assertEquals(messages.get(0).getText(), message);
+		assertEquals(messages.get(0).getText(), messageid);
+		assertEquals(messages.get(0).getSenderName(), user.getName());
+		
+		//Create Message by IBAN
+		String messageiban = "TestyForYou IBAN!";
+		assertTrue(DB.createMessage(messageiban, user.getId(), ""+account.getIban(), TransBy.IBAN));
+		//Assertion
+		messages = DB.getMessages(user.getId());
+		assertFalse(messages.isEmpty());
+		assertEquals(messages.get(0).getText(), messageiban);
+		assertEquals(messages.get(0).getSenderName(), user.getName());
+
+		//Create Message by NUMBER
+		String messagenumber = "TestyForYou NUMBER!";
+		assertTrue(DB.createMessage(messagenumber, user.getId(), ""+account.getNumber(), TransBy.NUMBER));
+		//Assertion
+		messages = DB.getMessages(user.getId());
+		assertFalse(messages.isEmpty());
+		assertEquals(messages.get(0).getText(), messagenumber);
 		assertEquals(messages.get(0).getSenderName(), user.getName());
 	}
 	

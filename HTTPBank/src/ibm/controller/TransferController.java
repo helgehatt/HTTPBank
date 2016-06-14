@@ -83,11 +83,11 @@ public class TransferController extends HttpServlet {
 					        DB.createMessage(message, fromId, to, TransBy.IBAN);
 					        ExceptionHandler.success("Transfer to " + to + " completed successfully and message sent.", session);							
 						} catch (DatabaseException e) {
-							ExceptionHandler.failure("Failed to send the message.", session);							
+							ExceptionHandler.failure(e, "Failed to send the message.", session);							
 						}
 					}
 				} catch (DatabaseException e) {
-					ExceptionHandler.failure("Failed to complete the transfer.", session);
+					ExceptionHandler.failure(e, "Failed to complete the transfer.", session);
 				}
 			} else
 	        	session.setAttribute("errors", errors);
@@ -111,11 +111,11 @@ public class TransferController extends HttpServlet {
 					        DB.createMessage(message, fromId, to, TransBy.NUMBER);
 					        ExceptionHandler.success("Transfer to " + to + " completed successfully and message sent.", session);							
 						} catch (DatabaseException e) {
-							ExceptionHandler.failure("Failed to send the message.", session);
+							ExceptionHandler.failure(e, "Failed to send the message.", session);
 						}
 					}
 				} catch (DatabaseException e) {
-					ExceptionHandler.failure("Failed to complete the transfer.", session);
+					ExceptionHandler.failure(e, "Failed to complete the transfer.", session);
 				}
 			else
 	        	session.setAttribute("errors", errors);

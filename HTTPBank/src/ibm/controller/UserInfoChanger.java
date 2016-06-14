@@ -36,7 +36,7 @@ public class UserInfoChanger extends HttpServlet {
 				errors.put("cpassword", "Incorrect password");
 			}
 		} catch (DatabaseException e) {
-			ExceptionHandler.failure("Failed to check login information.", session, response, "changeinfo");
+			ExceptionHandler.failure(e, "Failed to check login information.", session, response, "changeinfo");
     		return;
 		}
     	
@@ -52,7 +52,7 @@ public class UserInfoChanger extends HttpServlet {
 					DB.updateUser(id, nUsername, USER.USERNAME);
 					ExceptionHandler.success("Successfully changed user name.", session);
 				} catch (DatabaseException e) {
-					ExceptionHandler.failure("Failed to change user name.", session, response, "changeinfo");
+					ExceptionHandler.failure(e, "Failed to change user name.", session, response, "changeinfo");
 		    		return;
 				}
     		}
@@ -62,7 +62,7 @@ public class UserInfoChanger extends HttpServlet {
 					DB.updateUser(id, nPassword, USER.PASSWORD);
 					ExceptionHandler.success("Successfully changed user name and password.", session);
 				} catch (DatabaseException e) {
-					ExceptionHandler.failure("Failed to change password.", session, response, "changeinfo");
+					ExceptionHandler.failure(e, "Failed to change password.", session, response, "changeinfo");
 		    		return;
 				}
     		}
@@ -71,7 +71,7 @@ public class UserInfoChanger extends HttpServlet {
 				session.setAttribute("user", DB.getUser(id));
 	        	response.sendRedirect("userinfo");
 			} catch (DatabaseException e) {
-				ExceptionHandler.failure("Failed to get the user.", session, response, "changeinfo");
+				ExceptionHandler.failure(e, "Failed to get the user.", session, response, "changeinfo");
 	    		return;
 			}
     	} else {

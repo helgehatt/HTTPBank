@@ -9,7 +9,7 @@
 
 </style>
 
-<%@ include file="navbar.jsp" %>
+<%@ include file="navbar-logout.jsp" %>
 
 <div id="server-error" class="container">
 	  <h2>Internal Server Error</h2>
