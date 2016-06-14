@@ -903,7 +903,7 @@ public class DB {
 	}
 	
 	
-	public boolean resetPassword(int userId) throws DatabaseException {
+	public static boolean resetPassword(int userId) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			PreparedStatement statement = null;
 			try {

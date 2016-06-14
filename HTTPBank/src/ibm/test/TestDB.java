@@ -113,7 +113,7 @@ public class TestDB extends Mockito {
 		int userId = user.getId();
 		String accountName = "TestAccountIsTest";
 		String type = "TestTypeForTestAccount";
-		String number = "Test123456789"; 
+		String number = "TestCA123"; 
 		String iban = "Test123456IBAN";
 		String currency = "EUR"; 
 		double interest = 0.05;
@@ -462,9 +462,9 @@ public class TestDB extends Mockito {
 		String newnewuserName = "New Moo Testy Test";
 		String newnewinstitute = "New Moo That Institute";
 		String newnewconsultant = "Tommy the 2rd";
-		assertNotNull(DB.updateUser(user.getId(), newnewusername, newnewcpr, newnewuserName, newnewinstitute, newnewconsultant));
 		//Assertion
-		User updatedUpdatedUser = DB.getUser(user.getId());
+		User updatedUpdatedUser = DB.updateUser(user.getId(), newnewusername, newnewcpr, newnewuserName, newnewinstitute, newnewconsultant);
+		assertNotNull(updatedUpdatedUser);
 		assertEquals(user.getId(), updatedUpdatedUser.getId());
 		assertEquals(newnewconsultant, updatedUpdatedUser.getConsultant());
 		assertEquals(newnewcpr, updatedUpdatedUser.getCpr());
@@ -473,6 +473,12 @@ public class TestDB extends Mockito {
 		assertEquals(newnewusername, updatedUpdatedUser.getUsername());
 		assertFalse(0 < DB.checkLogin(newusername, newpassword));
 		assertTrue(0 < DB.checkLogin(newnewusername, newpassword));
+		
+		//Reset Password
+		DB.resetPassword(user.getId());
+		//Assertion
+		assertFalse(0 < DB.checkLogin(newnewusername, newpassword));
+		assertTrue(0 < DB.checkLogin(newnewusername, "password"));
 	}
 	
 	@Test
@@ -625,17 +631,11 @@ public class TestDB extends Mockito {
 		//Assertion (Note: First transaction should always be the most recent.)
 		ArrayList<Transaction> transactions11 = DB.getTransactions(account1.getId());
 		
-		for (Transaction trans : transactions11)
-			System.out.println(trans.getDescription()+" : "+trans.getDateRaw());
-		
 		assertFalse(transactions11.isEmpty());
 		assertEquals(transactions11.get(0).getAccountId(), account1.getId());
 		assertEquals(transactions11.get(0).getAmount(), new DecimalFormat("#0.00").format(-amount2));
 		assertEquals(transactions11.get(0).getDescription(), description11);
 		ArrayList<Transaction> transactions22 = DB.getTransactions(account2.getId());
-		
-		for (Transaction trans : transactions22)
-			System.out.println(trans.getDescription()+" : "+trans.getDateRaw());
 		
 		assertFalse(transactions22.isEmpty());
 		assertEquals(transactions22.get(0).getAccountId(), account2.getId());
@@ -671,10 +671,13 @@ public class TestDB extends Mockito {
 		String description1111 = "TestDecription1NUMBERunknown is this, test-test, moo...";
 		String description2222 = "TestDecription2NUMBERunknown is this, test-test, moo...";
 		double amount4 = 25;
-		System.out.println(DB.getAccount(account1.getId()));
-		assertTrue(DB.createTransaction(TransBy.NUMBER, account1.getId(), account2.getNumber(), description111, description222, -amount3, amount3));
+		assertTrue(DB.createTransaction(TransBy.NUMBER, account1.getId(), "654456000", description1111, description2222, -amount4, amount4));
 		//Assertion (Note: First transaction should always be the most recent.)
 		ArrayList<Transaction> transactions1111 = DB.getTransactions(account1.getId());
+		
+		for (Transaction trans : transactions1111)
+			System.out.println(trans.getDescription()+" : "+trans.getDateRaw());
+		
 		assertFalse(transactions1111.isEmpty());
 		assertEquals(transactions1111.get(0).getAccountId(), account1.getId());
 		assertEquals(transactions1111.get(0).getAmount(), new DecimalFormat("#0.00").format(-amount4));
@@ -785,7 +788,7 @@ public class TestDB extends Mockito {
 		int userId = user.getId();
 		String accountName = "TestAccountIsTest";
 		String type = "TestTypeForTestAccount";
-		String number = "Test123456789"; 
+		String number = "TestGMM12"; 
 		String iban = "Test123456IBAN";
 		String currency = "EUR"; 
 		double interest = 0.05;
@@ -833,7 +836,7 @@ public class TestDB extends Mockito {
 		int userId = user.getId();
 		String accountName = "TestAccountIsTest";
 		String type = "TestTypeForTestAccount";
-		String number = "Test123456789"; 
+		String number = "TestCGM12"; 
 		String iban = "Test123456IBAN";
 		String currency = "EUR"; 
 		double interest = 0.05;
