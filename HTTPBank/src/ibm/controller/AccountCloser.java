@@ -60,8 +60,7 @@ public class AccountCloser extends HttpServlet {
     			ExceptionHandler.failure("Failed to close the account.", session, response, "cloesaccount");
     		}    		
     	}
-
-    	response.sendRedirect("accounts");    	
+    	response.sendRedirect("accounts");
     }
 
     @Override
