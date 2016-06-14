@@ -21,7 +21,7 @@
         <tr>
           <th class="column-hide">Date</th>
           <th>Description</th>
-          <th class="text-right column-hide">${account.currency}</th>
+          <th class="text-right column-hide">Amount</th>
         </tr>
       </thead>
       <tbody>

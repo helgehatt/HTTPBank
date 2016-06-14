@@ -70,7 +70,7 @@
 	    	<c:if test="${size % 10 == 0}">
 	   			<li class="list-group-item">
 	     			<form action="getMoreUsers" method="post">
-	     				<button class="btn btn-default" name="id" value="${size / 10}">
+	     				<button class="btn btn-default" name="id" value="${size}">
 		    				<h4>...</h4>
 	     				</button>
 	     			</form>

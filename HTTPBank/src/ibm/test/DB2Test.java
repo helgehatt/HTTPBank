@@ -209,7 +209,7 @@ public class DB2Test {
 	
 	public static ArrayList<User> testGetUsers() throws SQLException{
 		long start = System.currentTimeMillis();
-		ArrayList<User> users = DB.getUsers();
+		ArrayList<User> users = DB.getUsers(0);
 		System.out.println("Got Users, Query Time: " + (System.currentTimeMillis()-start));
 		for (User user : users)
 			System.out.println(user.getId()+" : "+user.getUsername());
