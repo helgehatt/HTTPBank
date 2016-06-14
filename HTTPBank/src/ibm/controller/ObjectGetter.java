@@ -36,7 +36,7 @@ public class ObjectGetter extends HttpServlet {
 			try {
 				session.setAttribute("users", DB.searchUsers(request.getParameter("search")));
 			} catch (DatabaseException e) {
-				ExceptionHandler.failure("Failed searching for users.", session);
+				ExceptionHandler.failure(e, "Failed searching for users.", session);
 			}
 			response.sendRedirect("users");
 			return;
@@ -50,7 +50,7 @@ public class ObjectGetter extends HttpServlet {
 			} catch (InputException e) {
 	        	session.setAttribute("error", e.getMessage());
 			} catch (DatabaseException e) {
-				ExceptionHandler.failure("Failed searching the archive.", session);	
+				ExceptionHandler.failure(e, "Failed searching the archive.", session);	
 			}
 			response.sendRedirect("archive");
 			return;
@@ -75,7 +75,7 @@ public class ObjectGetter extends HttpServlet {
 				session.setAttribute("account", DB.getAccount(id));
 				response.sendRedirect("transactions");
 			} catch (DatabaseException e) {
-				ExceptionHandler.failure("Failed getting the account.", session, response, "accounts");
+				ExceptionHandler.failure(e, "Failed getting the account.", session, response, "accounts");
 			}
 			break;
 		case "/admin/getAccount":
@@ -83,7 +83,7 @@ public class ObjectGetter extends HttpServlet {
 				session.setAttribute("account", DB.getAccount(id));
 				response.sendRedirect("accountinfo");
 			} catch (DatabaseException e) {
-				ExceptionHandler.failure("Failed getting the account.", session, response, "accounts");
+				ExceptionHandler.failure(e, "Failed getting the account.", session, response, "accounts");
 			}
 			break;
 		case "/admin/getUser":
@@ -91,7 +91,7 @@ public class ObjectGetter extends HttpServlet {
 				session.setAttribute("user", DB.getUser(id));
 	    		response.sendRedirect("accounts");
 			} catch (DatabaseException e) {
-				ExceptionHandler.failure("Failed getting the user.", session, response, "users");
+				ExceptionHandler.failure(e, "Failed getting the user.", session, response, "users");
 			}
     		break;
 		case "/admin/getMoreUsers":
@@ -102,7 +102,7 @@ public class ObjectGetter extends HttpServlet {
 				session.setAttribute("users", users);
 	    		response.sendRedirect("users");
 			} catch (DatabaseException e) {
-				ExceptionHandler.failure("Failed getting more users.", session, response, "users");
+				ExceptionHandler.failure(e, "Failed getting more users.", session, response, "users");
 			}
     		break;
 		}

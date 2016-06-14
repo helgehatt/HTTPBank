@@ -49,7 +49,7 @@ public class AccountCloser extends HttpServlet {
 				DB.deleteAccountWithTransfer(senderId, receiverId, "Closed account: " + account.getNumber(), amount);
 				ExceptionHandler.success("Transfer completed, but account did not close successfully.", session);
 			} catch (DatabaseException e) {
-				ExceptionHandler.failure("Failed to complete the transfer.", session, response, "cloesaccount");
+				ExceptionHandler.failure(e, "Failed to complete the transfer.", session, response, "cloesaccount");
 	    		return;
 			}
     	} else {
@@ -57,7 +57,7 @@ public class AccountCloser extends HttpServlet {
     			DB.deleteAccount(senderId);
     			ExceptionHandler.success("Successfully closed account: " + account.getNumber(), session);
     		} catch (DatabaseException e) {
-    			ExceptionHandler.failure("Failed to close the account.", session, response, "cloesaccount");
+    			ExceptionHandler.failure(e, "Failed to close the account.", session, response, "cloesaccount");
     		}    		
     	}
     	response.sendRedirect("accounts");

@@ -53,7 +53,7 @@ public class WithdrawalController extends HttpServlet{
 					DB.createTransaction(fromId, "Deposited " + amount + " to " + from , amount);
 					ExceptionHandler.success("Deposit completed successfully.", session);
 				} catch (DatabaseException e) {
-					ExceptionHandler.failure("Failed to complete the deposit.", session);
+					ExceptionHandler.failure(e, "Failed to complete the deposit.", session);
 				}
 				break;
 			case "withdrawal":
@@ -61,7 +61,7 @@ public class WithdrawalController extends HttpServlet{
 					DB.createTransaction(fromId, "Withdrew " + amount + " from " + from , -amount);
 					ExceptionHandler.success("Withdrawal completed successfully.", session);
 				} catch (DatabaseException e) {
-					ExceptionHandler.failure("Failed to complete the withdrawal.", session);
+					ExceptionHandler.failure(e, "Failed to complete the withdrawal.", session);
 				}
 				break;
 			}

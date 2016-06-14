@@ -93,7 +93,7 @@ public class AccountController extends HttpServlet {
 					
 					response.sendRedirect("accounts");
 				} catch (DatabaseException e) {
-					ExceptionHandler.failure("Failed to create the account.", session, response, "newaccount");
+					ExceptionHandler.failure(e, "Failed to create the account.", session, response, "newaccount");
 				}				
 	        } else {
 	        	session.setAttribute("errors", errors);
@@ -111,7 +111,7 @@ public class AccountController extends HttpServlet {
 					session.setAttribute("account", account);
 					response.sendRedirect("accountinfo");
 				} catch (DatabaseException e) {
-					ExceptionHandler.failure("Failed to update the account.", session, response, "editaccount");
+					ExceptionHandler.failure(e, "Failed to update the account.", session, response, "editaccount");
 		    		return;
 				}
 	        } else {
