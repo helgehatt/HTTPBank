@@ -14,6 +14,7 @@ import ibm.db.DB;
 import ibm.resource.Account;
 import ibm.resource.AttributeChecks;
 import ibm.resource.DatabaseException;
+import ibm.resource.ExceptionHandler;
 import ibm.resource.InputException;
 import ibm.resource.User;
 
@@ -35,7 +36,7 @@ public class ObjectGetter extends HttpServlet {
 			try {
 				session.setAttribute("users", DB.searchUsers(request.getParameter("search")));
 			} catch (DatabaseException e) {
-	    		DatabaseException.failure("Failed searching for users.", session);
+				ExceptionHandler.failure("Failed searching for users.", session);
 			}
 			response.sendRedirect("users");
 			return;
@@ -49,7 +50,7 @@ public class ObjectGetter extends HttpServlet {
 			} catch (InputException e) {
 	        	session.setAttribute("error", e.getMessage());
 			} catch (DatabaseException e) {
-	    		DatabaseException.failure("Failed searching the archive.", session);	
+				ExceptionHandler.failure("Failed searching the archive.", session);	
 			}
 			response.sendRedirect("archive");
 			return;
@@ -60,7 +61,7 @@ public class ObjectGetter extends HttpServlet {
         try {
         	id = (int) Double.parseDouble(request.getParameter("id"));
 		} catch (NumberFormatException e) {
-    		DatabaseException.failure("Failed parsing the ID.", session);
+			ExceptionHandler.failure("Failed parsing the ID.", session);
     		if (path.equals("/admin/getUser"))
     			response.sendRedirect("users");
     		else
@@ -74,7 +75,7 @@ public class ObjectGetter extends HttpServlet {
 				session.setAttribute("account", DB.getAccount(id));
 				response.sendRedirect("transactions");
 			} catch (DatabaseException e) {
-	    		DatabaseException.failure("Failed getting the account.", session, response, "accounts");
+				ExceptionHandler.failure("Failed getting the account.", session, response, "accounts");
 			}
 			break;
 		case "/admin/getAccount":
@@ -82,7 +83,7 @@ public class ObjectGetter extends HttpServlet {
 				session.setAttribute("account", DB.getAccount(id));
 				response.sendRedirect("accountinfo");
 			} catch (DatabaseException e) {
-	    		DatabaseException.failure("Failed getting the account.", session, response, "accounts");
+				ExceptionHandler.failure("Failed getting the account.", session, response, "accounts");
 			}
 			break;
 		case "/admin/getUser":
@@ -90,7 +91,7 @@ public class ObjectGetter extends HttpServlet {
 				session.setAttribute("user", DB.getUser(id));
 	    		response.sendRedirect("accounts");
 			} catch (DatabaseException e) {
-	    		DatabaseException.failure("Failed getting the user.", session, response, "users");
+				ExceptionHandler.failure("Failed getting the user.", session, response, "users");
 			}
     		break;
 		case "/admin/getMoreUsers":
@@ -101,7 +102,7 @@ public class ObjectGetter extends HttpServlet {
 				session.setAttribute("users", users);
 	    		response.sendRedirect("users");
 			} catch (DatabaseException e) {
-	    		DatabaseException.failure("Failed getting more users.", session, response, "users");
+				ExceptionHandler.failure("Failed getting more users.", session, response, "users");
 			}
     		break;
 		}

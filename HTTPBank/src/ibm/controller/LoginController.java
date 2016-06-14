@@ -12,6 +12,7 @@ import javax.servlet.http.HttpSession;
 
 import ibm.db.DB;
 import ibm.resource.DatabaseException;
+import ibm.resource.ExceptionHandler;
 
 @WebServlet("/checkLogin")
 public class LoginController extends HttpServlet {
@@ -52,7 +53,7 @@ public class LoginController extends HttpServlet {
 				response.sendRedirect(" ?s=0");
 			}
 		} catch(DatabaseException e) {
-    		DatabaseException.failure("Failed to get the user(s).", session, response, "login");			
+			ExceptionHandler.failure("Failed to get the user(s).", session, response, "login");			
 		}
 	}
 

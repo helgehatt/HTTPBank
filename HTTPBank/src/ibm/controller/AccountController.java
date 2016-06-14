@@ -1,6 +1,7 @@
 package ibm.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.servlet.ServletException;
@@ -14,6 +15,7 @@ import ibm.db.DB;
 import ibm.resource.Account;
 import ibm.resource.AttributeChecks;
 import ibm.resource.DatabaseException;
+import ibm.resource.ExceptionHandler;
 import ibm.resource.InputException;
 import ibm.resource.User;
 
@@ -81,11 +83,17 @@ public class AccountController extends HttpServlet {
 	        if (errors.isEmpty()) {
 		        User user = (User) session.getAttribute("user");
 				try {
-					DB.createAccount(user.getId(), "", type, number, iban, currency, interest, balance);
-					DatabaseException.success("Successfully created new account: " + number, session);
+					Account account = DB.createAccount(user.getId(), "", type, number, iban, currency, interest, balance);
+					ExceptionHandler.success("Successfully created new account: " + number, session);
+					
+					@SuppressWarnings("unchecked")
+					ArrayList<Account> accounts = (ArrayList<Account>) session.getAttribute("accounts");
+					accounts.add(account);
+					session.setAttribute("accounts", accounts);
+					
 					response.sendRedirect("accounts");
 				} catch (DatabaseException e) {
-		    		DatabaseException.failure("Failed to create the account.", session, response, "newaccount");
+					ExceptionHandler.failure("Failed to create the account.", session, response, "newaccount");
 				}				
 	        } else {
 	        	session.setAttribute("errors", errors);
@@ -98,18 +106,13 @@ public class AccountController extends HttpServlet {
 	        if (errors.isEmpty()) {
 		        int id = ((Account) session.getAttribute("account")).getId();		        			
 				try {
-					DB.updateAccount(id, accountName, type, number, iban, currency, interest, balance);
-					DatabaseException.success("Successfully updated account: " + number, session);
-				} catch (DatabaseException e) {
-		    		DatabaseException.failure("Failed to update the account.", session, response, "editaccount");
-		    		return;
-				}
-				
-				try {
-					session.setAttribute("account", DB.getAccountByNumber(number));
+					Account account = DB.updateAccount(id, accountName, type, number, iban, currency, interest, balance);
+					ExceptionHandler.success("Successfully updated account: " + number, session);
+					session.setAttribute("account", account);
 					response.sendRedirect("accountinfo");
 				} catch (DatabaseException e) {
-		    		DatabaseException.failure("Failed to get the account.", session, response, "editaccount");
+					ExceptionHandler.failure("Failed to update the account.", session, response, "editaccount");
+		    		return;
 				}
 	        } else {
 	        	session.setAttribute("errors", errors);

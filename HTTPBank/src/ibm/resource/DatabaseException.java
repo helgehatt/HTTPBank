@@ -1,10 +1,6 @@
 package ibm.resource;
 
-import java.io.IOException;
 import java.sql.SQLException;
-
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 public class DatabaseException extends SQLException {
 	private static final long serialVersionUID = 1L;
@@ -34,18 +30,5 @@ public class DatabaseException extends SQLException {
 	@Override
 	public String getSQLState() {
 		return sqlState;
-	}
-	
-	public static void success(String confirmation, HttpSession session) {
-		session.setAttribute("confirmation", confirmation);
-	}
-	
-	public static void failure(String exception, HttpSession session) {
- 		session.setAttribute("exception", exception);
-	}
-	
-	public static void failure(String exception, HttpSession session, HttpServletResponse response, String redirectUrl) throws IOException {
-		failure(exception, session);
- 		response.sendRedirect(redirectUrl);
 	}
 }
