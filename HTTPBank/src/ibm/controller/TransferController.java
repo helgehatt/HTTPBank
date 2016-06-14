@@ -12,8 +12,10 @@ import javax.servlet.http.HttpSession;
 
 import ibm.db.DB;
 import ibm.db.DB.TransBy;
+import ibm.resource.Account;
 import ibm.resource.AttributeChecks;
 import ibm.resource.DatabaseException;
+import ibm.resource.ExceptionHandler;
 import ibm.resource.InputException;
 
 @WebServlet(urlPatterns = { "/user/doTransfer", "/admin/doTransfer" } )
@@ -41,7 +43,7 @@ public class TransferController extends HttpServlet {
 		try {
 			fromId = Integer.parseInt(id);
 		} catch (NumberFormatException e) {
-    		DatabaseException.failure("Failed parsing the ID.", session, response, "accounts");
+			ExceptionHandler.failure("Failed parsing the ID.", session, response, "accounts");
 			return;
 		}
 		
@@ -73,18 +75,19 @@ public class TransferController extends HttpServlet {
 			
 			if (errors.isEmpty()) {
 				try {
-					DB.createTransaction(TransBy.IBAN, fromId, to, "Transfer to " + to, "Transfer from " + from, -withdrawn, amount);
-					DatabaseException.success("Transfer to " + to + " completed successfully.", session);
+					Account account = DB.createTransaction(TransBy.IBAN, fromId, to, "Transfer to " + to, "Transfer from " + from, -withdrawn, amount);
+					ExceptionHandler.success("Transfer to " + to + " completed successfully.", session);
+					session.setAttribute("account", account);
 					if (!message.isEmpty()) {
 						try {
 					        DB.createMessage(message, fromId, to, TransBy.IBAN);
-							DatabaseException.success("Transfer to " + to + " completed successfully and message sent.", session);							
+					        ExceptionHandler.success("Transfer to " + to + " completed successfully and message sent.", session);							
 						} catch (DatabaseException e) {
-				    		DatabaseException.failure("Failed to send the message.", session);							
+							ExceptionHandler.failure("Failed to send the message.", session);							
 						}
 					}
 				} catch (DatabaseException e) {
-		    		DatabaseException.failure("Failed to complete the transfer.", session);
+					ExceptionHandler.failure("Failed to complete the transfer.", session);
 				}
 			} else
 	        	session.setAttribute("errors", errors);
@@ -100,18 +103,19 @@ public class TransferController extends HttpServlet {
 			
 			if (errors.isEmpty())
 				try {
-					DB.createTransaction(TransBy.NUMBER, fromId, to, "Transfer to " + to, "Transfer from " + from, -amount, amount);
-					DatabaseException.success("Transfer to " + to + " completed successfully.", session);
+					Account account = DB.createTransaction(TransBy.NUMBER, fromId, to, "Transfer to " + to, "Transfer from " + from, -amount, amount);
+					ExceptionHandler.success("Transfer to " + to + " completed successfully.", session);
+					session.setAttribute("account", account);
 					if (!message.isEmpty()) {
 						try {
 					        DB.createMessage(message, fromId, to, TransBy.NUMBER);
-							DatabaseException.success("Transfer to " + to + " completed successfully and message sent.", session);							
+					        ExceptionHandler.success("Transfer to " + to + " completed successfully and message sent.", session);							
 						} catch (DatabaseException e) {
-				    		DatabaseException.failure("Failed to send the message.", session);
+							ExceptionHandler.failure("Failed to send the message.", session);
 						}
 					}
 				} catch (DatabaseException e) {
-		    		DatabaseException.failure("Failed to complete the transfer.", session);
+					ExceptionHandler.failure("Failed to complete the transfer.", session);
 				}
 			else
 	        	session.setAttribute("errors", errors);

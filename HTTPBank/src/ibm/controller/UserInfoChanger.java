@@ -13,6 +13,7 @@ import javax.servlet.http.HttpSession;
 import ibm.db.DB;
 import ibm.db.DB.USER;
 import ibm.resource.DatabaseException;
+import ibm.resource.ExceptionHandler;
 import ibm.resource.User;
 
 @WebServlet("/user/doChangeInfo")
@@ -35,7 +36,7 @@ public class UserInfoChanger extends HttpServlet {
 				errors.put("cpassword", "Incorrect password");
 			}
 		} catch (DatabaseException e) {
-    		DatabaseException.failure("Failed to check login information.", session, response, "changeinfo");
+			ExceptionHandler.failure("Failed to check login information.", session, response, "changeinfo");
     		return;
 		}
     	
@@ -49,9 +50,9 @@ public class UserInfoChanger extends HttpServlet {
     		if (!nUsername.isEmpty()) {
     			try {
 					DB.updateUser(id, nUsername, USER.USERNAME);
-					DatabaseException.success("Successfully changed user name.", session);
+					ExceptionHandler.success("Successfully changed user name.", session);
 				} catch (DatabaseException e) {
-		    		DatabaseException.failure("Failed to change user name.", session, response, "changeinfo");
+					ExceptionHandler.failure("Failed to change user name.", session, response, "changeinfo");
 		    		return;
 				}
     		}
@@ -59,9 +60,9 @@ public class UserInfoChanger extends HttpServlet {
     		if (!nPassword.isEmpty()) {
     			try {
 					DB.updateUser(id, nPassword, USER.PASSWORD);
-					DatabaseException.success("Successfully changed user name and password.", session);
+					ExceptionHandler.success("Successfully changed user name and password.", session);
 				} catch (DatabaseException e) {
-		    		DatabaseException.failure("Failed to change password.", session, response, "changeinfo");
+					ExceptionHandler.failure("Failed to change password.", session, response, "changeinfo");
 		    		return;
 				}
     		}
@@ -70,13 +71,14 @@ public class UserInfoChanger extends HttpServlet {
 				session.setAttribute("user", DB.getUser(id));
 	        	response.sendRedirect("userinfo");
 			} catch (DatabaseException e) {
-	    		DatabaseException.failure("Failed to get the user.", session, response, "changeinfo");
+				ExceptionHandler.failure("Failed to get the user.", session, response, "changeinfo");
 	    		return;
 			}
-    	} else 
+    	} else {
     		session.setAttribute("errors", errors);
+    		response.sendRedirect("changeinfo");
+    	}
     	
-		response.sendRedirect("changeinfo");
     }
 
     @Override

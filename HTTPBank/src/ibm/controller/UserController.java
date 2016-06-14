@@ -1,6 +1,7 @@
 package ibm.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.servlet.ServletException;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpSession;
 import ibm.db.DB;
 import ibm.resource.AttributeChecks;
 import ibm.resource.DatabaseException;
+import ibm.resource.ExceptionHandler;
 import ibm.resource.InputException;
 import ibm.resource.User;
 
@@ -23,19 +25,18 @@ public class UserController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession();
-		User user = (User) session.getAttribute("user");
 
 		String path = request.getRequestURI().replace(request.getContextPath(), "");
 		
 		if (path.equals("/admin/deleteUser")) {
 			try {
-				String username = user.getUsername();
-				DB.deleteUser(username);
-				DatabaseException.success("Successfully deleted user: " + username, session);
+				User user = (User) session.getAttribute("user");
+				DB.deleteUser(user.getId());
+				ExceptionHandler.success("Successfully deleted the user: " + user.getUsername(), session);
 				session.setAttribute("users", null);
             	response.sendRedirect("users");
 			} catch (DatabaseException e) {
-	    		DatabaseException.failure("Failed to delete the user.", session, response, "deleteuser");
+				ExceptionHandler.failure("Failed to delete the user.", session, response, "deleteuser");
 			}
 			return;
 		}
@@ -83,12 +84,17 @@ public class UserController extends HttpServlet {
     	case "/admin/newUser":
             if (errors.isEmpty()) {
     			try {
-					DB.createUser(username, cpr, name, institute, consultant);
-					DatabaseException.success("Successfully created new user: " + username, session);
-					session.setAttribute("users", DB.getUsers(0));
+					User user = DB.createUser(username, cpr, name, institute, consultant);
+					ExceptionHandler.success("Successfully created new user: " + username, session);
+					
+    				@SuppressWarnings("unchecked")
+					ArrayList<User> users = (ArrayList<User>) session.getAttribute("users");
+					users.add(user);
+					session.setAttribute("users", users);
+					
 	            	response.sendRedirect("users");
 				} catch (DatabaseException e) {
-		    		DatabaseException.failure("Failed to create the user.", session, response, "newuser");
+					ExceptionHandler.failure("Failed to create the user.", session, response, "newuser");
 				}    			
             } else {
             	request.getSession().setAttribute("errors", errors);            	
@@ -97,15 +103,15 @@ public class UserController extends HttpServlet {
             
     		break;
     	case "/admin/editUser":            
-            if (errors.isEmpty()) {
-            	int id = user.getId();            	
+            if (errors.isEmpty()) {           	
             	try {
-            		DB.updateUser(id, username, cpr, name, institute, consultant);
-					DatabaseException.success("Successfully updated user: " + username, session);
-					session.setAttribute("user", DB.getUser(id));
+            		int userId = ((User) session.getAttribute("user")).getId();
+            		User user = DB.updateUser(userId, username, cpr, name, institute, consultant);
+            		ExceptionHandler.success("Successfully updated user: " + username, session);
+					session.setAttribute("user", user);
 	    			response.sendRedirect("userinfo");
 				} catch (DatabaseException e) {
-		    		DatabaseException.failure("Failed to update the user.", session, response, "edituser");
+					ExceptionHandler.failure("Failed to update the user.", session, response, "edituser");
 				}
             } else {
             	session.setAttribute("errors", errors);

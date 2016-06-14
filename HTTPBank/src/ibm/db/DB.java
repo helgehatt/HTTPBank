@@ -616,7 +616,7 @@ public class DB {
 	 * @return The new account as an Account object with all fields, if successfully created.
 	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static boolean createAccount(int userId, String name, String type, String number, String iban, String currency, double interest, double balance) throws DatabaseException {
+	public static Account createAccount(int userId, String name, String type, String number, String iban, String currency, double interest, double balance) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				PreparedStatement statement = connection.prepareStatement("INSERT INTO DTUGRP07.ACCOUNTS "
@@ -635,13 +635,13 @@ public class DB {
 				statement.execute(); //Attempt to insert new row.
 				statement.close();
 				
-				return true;
+				return DB.getAccountByNumber(number);
 			} catch (SQLException e) {
 				handleSQLException(e, tries);
 				//if no more tries, throw exception.
 			}
 		}
-		return false;
+		return null;
 	}
 	
 	/**
@@ -649,7 +649,7 @@ public class DB {
 	 * @return The new user as a User object with all fields, if successfully created.
 	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static boolean createUser(String username, String cpr, String name, String institute, String consultant) throws DatabaseException {
+	public static User createUser(String username, String cpr, String name, String institute, String consultant) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				PreparedStatement statement = connection.prepareStatement("INSERT INTO DTUGRP07.USERS "
@@ -666,13 +666,13 @@ public class DB {
 				statement.execute(); //Attempt to insert new row.
 				statement.close();
 				
-				return true;
+				return DB.getUserByCpr(cpr);
 			} catch (SQLException e) {
 				handleSQLException(e, tries);
 				//if no more tries, throw exception.
 			}
 		}
-		return false;
+		return null;
 	}
 
 
@@ -946,17 +946,17 @@ public class DB {
 	}
 	
 	/**
-	 * Queries the database to delete the user with the given username.
+	 * Queries the database to delete the user with the given id.
 	 * @return True if operation was successful.
 	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static boolean deleteUser(String username) throws DatabaseException {
+	public static boolean deleteUser(int userId) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				PreparedStatement statement = connection.prepareStatement("DELETE FROM DTUGRP07.USERS "
-						+ "WHERE USERNAME = ?;"
+						+ "WHERE USER_ID = ?;"
 						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-				statement.setString(1, username);
+				statement.setInt(1, userId);
 				
 				statement.execute(); //Attempt to delete row.
 				statement.close();

@@ -12,6 +12,7 @@ import javax.servlet.http.HttpSession;
 import ibm.db.DB;
 import ibm.resource.Account;
 import ibm.resource.DatabaseException;
+import ibm.resource.ExceptionHandler;
 
 @WebServlet("/admin/closeAccount")
 public class AccountCloser extends HttpServlet {
@@ -23,7 +24,7 @@ public class AccountCloser extends HttpServlet {
     	boolean transfer = request.getParameter("type").equals("transfer");    	
     	
     	Account account = (Account) request.getSession().getAttribute("account");
-    	int accountId = account.getId();
+    	int senderId = account.getId();
     	
     	String amountString = request.getParameter("amount");
     	double amount = 0;
@@ -31,7 +32,7 @@ public class AccountCloser extends HttpServlet {
     	try {
     		amount = Double.parseDouble(amountString);
     	} catch (NumberFormatException e) {
-    		DatabaseException.failure("Failed to parse the amount.", session, response, "cloesaccount");
+    		ExceptionHandler.failure("Failed to parse the amount.", session, response, "cloesaccount");
     		return;
     	}
     	
@@ -40,29 +41,27 @@ public class AccountCloser extends HttpServlet {
     		try {
     			receiverId = Integer.parseInt(request.getParameter("to"));
     		} catch (NumberFormatException e) {
-	    		DatabaseException.failure("Failed to parse the ID.", session, response, "accounts");
+    			ExceptionHandler.failure("Failed to parse the ID.", session, response, "accounts");
     			return;
     		}
     		
     		try {
-				DB.createTransaction(receiverId, "Closed account: " + account.getNumber(), amount);
-				DatabaseException.success("Transfer completed, but account did not close successfully.", session);
+				DB.deleteAccountWithTransfer(senderId, receiverId, "Closed account: " + account.getNumber(), amount);
+				ExceptionHandler.success("Transfer completed, but account did not close successfully.", session);
 			} catch (DatabaseException e) {
-	    		DatabaseException.failure("Failed to complete the transfer.", session, response, "cloesaccount");
+				ExceptionHandler.failure("Failed to complete the transfer.", session, response, "cloesaccount");
 	    		return;
 			}
+    	} else {
+    		try {
+    			DB.deleteAccount(senderId);
+    			ExceptionHandler.success("Successfully closed account: " + account.getNumber(), session);
+    		} catch (DatabaseException e) {
+    			ExceptionHandler.failure("Failed to close the account.", session, response, "cloesaccount");
+    		}    		
     	}
-    	
-		try {
-			DB.deleteAccount(accountId);
-			DatabaseException.success("Successfully closed account: " + account.getNumber(), session);
-	    	response.sendRedirect("accounts");
-		} catch (DatabaseException e) {
-    		DatabaseException.failure("Failed to close the account.", session, response, "cloesaccount");
-		}
-    	
-    	
-    	
+
+    	response.sendRedirect("accounts");    	
     }
 
     @Override

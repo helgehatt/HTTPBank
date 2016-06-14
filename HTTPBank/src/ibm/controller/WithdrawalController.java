@@ -13,6 +13,7 @@ import javax.servlet.http.HttpSession;
 import ibm.db.DB;
 import ibm.resource.AttributeChecks;
 import ibm.resource.DatabaseException;
+import ibm.resource.ExceptionHandler;
 import ibm.resource.InputException;
 
 @WebServlet(urlPatterns = "/admin/doDepositWithdrawal"  )
@@ -35,7 +36,7 @@ public class WithdrawalController extends HttpServlet{
 		try {
 			fromId = Integer.parseInt(id);
 		} catch (NumberFormatException e) {
-    		DatabaseException.failure("Failed parsing the ID", session, response, "depositwithdrawal");
+			ExceptionHandler.failure("Failed parsing the ID", session, response, "depositwithdrawal");
 			return;
 		}
 		
@@ -50,17 +51,17 @@ public class WithdrawalController extends HttpServlet{
 			case "deposit":
 				try {
 					DB.createTransaction(fromId, "Deposited " + amount + " to " + from , amount);
-					DatabaseException.success("Deposit completed successfully.", session);
+					ExceptionHandler.success("Deposit completed successfully.", session);
 				} catch (DatabaseException e) {
-		    		DatabaseException.failure("Failed to complete the deposit.", session);
+					ExceptionHandler.failure("Failed to complete the deposit.", session);
 				}
 				break;
 			case "withdrawal":
 				try {
 					DB.createTransaction(fromId, "Withdrew " + amount + " from " + from , -amount);
-					DatabaseException.success("Withdrawal completed successfully.", session);
+					ExceptionHandler.success("Withdrawal completed successfully.", session);
 				} catch (DatabaseException e) {
-		    		DatabaseException.failure("Failed to complete the withdrawal.", session);
+					ExceptionHandler.failure("Failed to complete the withdrawal.", session);
 				}
 				break;
 			}
