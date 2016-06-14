@@ -430,7 +430,7 @@ public class DB {
 	 * @return The new transaction for the sender as a Transaction object with all fields, excluding 'transaction_id', if successfully created.
 	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static boolean createTransaction(TransBy transBy, int senderId, String receiverId, String senderDescription, String receiverDescription, double senderAmount, double receiverAmount) throws DatabaseException {
+	public static Account createTransaction(TransBy transBy, int senderId, String receiverId, String senderDescription, String receiverDescription, double senderAmount, double receiverAmount) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				Timestamp date = new Timestamp(Calendar.getInstance().getTime().getTime());
@@ -449,7 +449,7 @@ public class DB {
 					getBalanceStatement.execute();
 					getBalanceStatement.close();
 					connection.commit();
-					return true;
+					return DB.getAccount(senderId);
 				} catch (Exception e){
 					//Error, rollback all changes.
 					connection.rollback();
@@ -461,7 +461,7 @@ public class DB {
 				handleSQLException(e, tries);
 			}
 		}
-		return false;
+		return null;
 	}
 	
 	/**
@@ -474,34 +474,26 @@ public class DB {
 	 * @return The new transaction as a Transaction object with all fields, excluding 'transaction_id', if successfully created.
 	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static boolean createTransaction(int accountId, String description, double amount) throws DatabaseException {
+	public static Account createTransaction(int accountId, String description, double amount) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				Timestamp date = new Timestamp(Calendar.getInstance().getTime().getTime());
-				try {
-					connection.setAutoCommit(false);
-					CallableStatement statement = connection.prepareCall("{call DTUGRP07.createTransactionOne(?,?,?,?)}");
-					statement.setInt(1, accountId);
-					statement.setString(2, description);
-					statement.setDouble(3, amount);
-					statement.setTimestamp(4, date);
-					statement.execute();
-					connection.commit();
-					statement.close();
-					return true;
-				} catch (Exception e){
-					//Error, rollback all changes.
-					connection.rollback();
-					throw e;
-				} finally {
-					connection.setAutoCommit(true);
-				}
+				
+				CallableStatement statement = connection.prepareCall("{call DTUGRP07.createTransactionOne(?,?,?,?)}");
+				statement.setInt(1, accountId);
+				statement.setString(2, description);
+				statement.setDouble(3, amount);
+				statement.setTimestamp(4, date);
+				statement.execute();
+				statement.close();
+				return DB.getAccount(accountId);
+				
 			} catch (SQLException e) {
 				handleSQLException(e, tries);
 				//if no more tries, throw exception.
 			}
 		}
-		return false;
+		return null;
 	}
 	
 	public static void archiveTransactions() throws DatabaseException {
@@ -712,7 +704,7 @@ public class DB {
 	 * @return True if operation was successful.
 	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static boolean updateUser(int userId, String value, USER attribute) throws DatabaseException {
+	public static User updateUser(int userId, String value, USER attribute) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				PreparedStatement statement = connection.prepareStatement("UPDATE DTUGRP07.USERS "
@@ -724,13 +716,13 @@ public class DB {
 				
 				statement.execute(); //Attempt to insert new row.
 				statement.close();
-				return true;
+				return DB.getUser(userId);
 			} catch (SQLException e) {
 				handleSQLException(e, tries);
 				//if no more tries, throw exception.
 			}
 		}
-		return false;
+		return null;
 	}
 	
 	/**
@@ -738,7 +730,7 @@ public class DB {
 	 * @return True if operation was successful.
 	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static boolean updateUser(int userId, String username, String cpr, String name, String institute, String consultant) throws DatabaseException {
+	public static User updateUser(int userId, String username, String cpr, String name, String institute, String consultant) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				PreparedStatement statement = connection.prepareStatement("UPDATE DTUGRP07.USERS "
@@ -754,13 +746,13 @@ public class DB {
 				
 				statement.execute(); //Attempt to insert new row.
 				statement.close();
-				return true;
+				return DB.getUser(userId);
 			} catch (SQLException e) {
 				handleSQLException(e, tries);
 				//if no more tries, throw exception.
 			}
 		}
-		return false;
+		return null;
 	}
 	
 	
@@ -813,7 +805,7 @@ public class DB {
 	 * @return True if operation was successful.
 	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static boolean updateAccount(int accountId, String value, ACCOUNT attribute) throws DatabaseException {
+	public static Account updateAccount(int accountId, String value, ACCOUNT attribute) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				PreparedStatement statement = connection.prepareStatement("UPDATE DTUGRP07.ACCOUNTS "
@@ -839,13 +831,13 @@ public class DB {
 				
 				statement.execute(); //Attempt to insert new row.
 				statement.close();
-				return true;
+				return DB.getAccount(accountId);
 			} catch (SQLException e) {
 				handleSQLException(e, tries);
 				//if no more tries, throw exception.
 			}
 		}
-		return false;
+		return null;
 	}
 	
 	/**
@@ -853,7 +845,7 @@ public class DB {
 	 * @return True if operation was successful.
 	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static boolean updateAccount(int accountId, String name, String type, String number, String iban, String currency, double interest, double balance) throws DatabaseException {
+	public static Account updateAccount(int accountId, String name, String type, String number, String iban, String currency, double interest, double balance) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				PreparedStatement statement = connection.prepareStatement("UPDATE DTUGRP07.ACCOUNTS "
@@ -872,13 +864,13 @@ public class DB {
 				
 				statement.execute(); //Attempt to insert new row.
 				statement.close();
-				return true;
+				return DB.getAccount(accountId);
 			} catch (SQLException e) {
 				handleSQLException(e, tries);
 				//if no more tries, throw exception.
 			}
 		}
-		return false;
+		return null;
 	}
 	
 	
@@ -902,6 +894,28 @@ public class DB {
 			} catch (SQLException e) {
 				handleSQLException(e, tries);
 				//if no more tries, throw exception.
+			}
+		}
+		return false;
+	}
+	
+	public static boolean deleteAccountWithTransfer(int senderId, int receiverId, String receiverDescription, double amount) throws DatabaseException {
+		for (int tries = 2; 0 < tries; tries--){
+			try {
+				try {
+					connection.setAutoCommit(false);
+					DB.createTransaction(receiverId, receiverDescription, amount);
+					DB.deleteAccount(senderId);
+					return true;
+				} catch (Exception e){
+					//Error, rollback all changes.
+					connection.rollback();
+					throw e;
+				} finally {
+					connection.setAutoCommit(true);
+				}
+			} catch (SQLException e) {
+				handleSQLException(e, tries);
 			}
 		}
 		return false;

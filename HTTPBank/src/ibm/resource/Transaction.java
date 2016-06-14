@@ -17,6 +17,7 @@ public class Transaction implements Serializable {
 	private double amount; // Required
 	
 	private static final transient SimpleDateFormat FORMAT = new SimpleDateFormat("dd.MM.yyyy");
+	private static final transient DecimalFormat DECIFORMAT = new DecimalFormat("#0.00");
 	
 	/* CONSTRUCTORS */
 	public Transaction(Long transaction_id, int account_id, Timestamp date, String description, double amount) {
@@ -57,6 +58,6 @@ public class Transaction implements Serializable {
 	}
 	
 	public String getAmount() {
-		return new DecimalFormat("#0.00").format(amount);
+		return DECIFORMAT.format(amount);
 	}
 }
