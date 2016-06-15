@@ -231,10 +231,6 @@ public class TestDB extends Mockito {
 			assertNotNull(user.getName());
 		}
 		assertTrue(users.size() > 1);
-		
-		for (User user : users){
-			System.out.println(user.getName()+" : "+user.getCpr());
-		}
 	}
 
 	@Test
@@ -678,11 +674,8 @@ public class TestDB extends Mockito {
 		double amount4 = 25;
 		assertNotNull(DB.createTransaction(TransBy.NUMBER, account1.getId(), "654456000", description1111, description2222, -amount4, amount4));
 		//Assertion (Note: First transaction should always be the most recent.)
+		
 		ArrayList<Transaction> transactions1111 = DB.getTransactions(account1.getId());
-		
-		for (Transaction trans : transactions1111)
-			System.out.println(trans.getDescription()+" : "+trans.getDateRaw());
-		
 		assertFalse(transactions1111.isEmpty());
 		assertEquals(transactions1111.get(0).getAccountId(), account1.getId());
 		assertEquals(transactions1111.get(0).getAmount(), new DecimalFormat("#0.00").format(-amount4));
@@ -1000,7 +993,6 @@ public class TestDB extends Mockito {
 	    new TestServlet().doPost(request, response);
 	    verify(request, atLeast(1)).getParameter(username);
 	    writer.flush();
-	    System.out.println(writer.toString());
 	    //change  osdkf
 	    //assertTrue(writer.toString().contains(""));
 	}
