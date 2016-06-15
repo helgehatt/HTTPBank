@@ -113,7 +113,7 @@ public class TestDB extends Mockito {
 		int userId = user.getId();
 		String accountName = "TestAccountIsTest";
 		String type = "TestTypeForTestAccount";
-		String number = "Test123456789"; 
+		String number = "Test1234567891"; 
 		String iban = "Test123456IBAN";
 		String currency = "EUR"; 
 		double interest = 0.05;
@@ -677,7 +677,7 @@ public class TestDB extends Mockito {
 		String description2222 = "TestDecription2NUMBERunknown is this, test-test, moo...";
 		double amount4 = 25;
 		System.out.println(DB.getAccount(account1.getId()));
-		assertNotNull(DB.createTransaction(TransBy.NUMBER, account1.getId(), account2.getNumber(), description111, description222, -amount3, amount3));
+		assertNotNull(DB.createTransaction(TransBy.NUMBER, account1.getId(), "3857574855", description1111, description2222, -amount4, amount4));
 		//Assertion (Note: First transaction should always be the most recent.)
 		ArrayList<Transaction> transactions1111 = DB.getTransactions(account1.getId());
 		assertFalse(transactions1111.isEmpty());

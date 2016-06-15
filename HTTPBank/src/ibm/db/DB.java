@@ -1152,7 +1152,7 @@ public class DB {
 			PreparedStatement statement = null;
 			try {
 				statement = connection.prepareStatement("DELETE FROM DTUGRP07.USERS "
-						+ "WHERE USERNAME = ?;"
+						+ "WHERE USER_ID = ?;"
 						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
 				statement.setInt(1, userId);
 				
