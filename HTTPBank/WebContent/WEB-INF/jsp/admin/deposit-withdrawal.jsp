@@ -60,7 +60,7 @@ $(function(){
 				   				<option value="${account.number}" data-id="${account.id}" data-balance="${account.balance}" data-currency="${account.currency}">${account.number}</option>
 				   			</c:forEach>
 				  		</select>
-				  		<input name="id" type="hidden" value="${user.accounts[0].id}">
+				  		<input name="id" type="hidden" value="${user.accounts[0].id}" id="id">
 						</div>
 						<div class="col-sm-4">
 							<input class="form-control" id="balance" value="${user.accounts[0].balance} ${user.accounts[0].currency}" readonly>

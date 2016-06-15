@@ -12,7 +12,6 @@ import javax.servlet.http.HttpSession;
 
 import ibm.db.DB;
 import ibm.db.DB.TransBy;
-import ibm.resource.Account;
 import ibm.resource.AttributeChecks;
 import ibm.resource.DatabaseException;
 import ibm.resource.ExceptionHandler;
@@ -75,9 +74,8 @@ public class TransferController extends HttpServlet {
 			
 			if (errors.isEmpty()) {
 				try {
-					Account account = DB.createTransaction(TransBy.IBAN, fromId, to, "Transfer to " + to, "Transfer from " + from, -withdrawn, amount);
+					DB.createTransaction(TransBy.IBAN, fromId, to, "Transfer to " + to, "Transfer from " + from, -withdrawn, amount);
 					ExceptionHandler.success("Transfer to " + to + " completed successfully.", session);
-					session.setAttribute("account", account);
 					if (!message.isEmpty()) {
 						try {
 					        DB.createMessage(message, fromId, to, TransBy.IBAN);
@@ -103,9 +101,8 @@ public class TransferController extends HttpServlet {
 			
 			if (errors.isEmpty())
 				try {
-					Account account = DB.createTransaction(TransBy.NUMBER, fromId, to, "Transfer to " + to, "Transfer from " + from, -amount, amount);
+					DB.createTransaction(TransBy.NUMBER, fromId, to, "Transfer to " + to, "Transfer from " + from, -amount, amount);
 					ExceptionHandler.success("Transfer to " + to + " completed successfully.", session);
-					session.setAttribute("account", account);
 					if (!message.isEmpty()) {
 						try {
 					        DB.createMessage(message, fromId, to, TransBy.NUMBER);

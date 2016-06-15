@@ -11,7 +11,7 @@
   <div class="container-fluid">
     <div class="navbar-header">
     	<a href="accounts">
-     		<img src="${pageContext.request.contextPath}/images/LogoPlain.jpg" alt="HTTP">
+     		<img src="${pageContext.request.contextPath}/images/LogoIcon.jpg" alt="HTTP">
     	</a>
       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
         <span class="icon-bar"></span>
@@ -37,7 +37,7 @@
 	        <ul class="dropdown-menu">
 		        <li><a href="userinfo"><span class="glyphicon glyphicon-user"></span> Info</a></li>
 		        <li><a href="inbox"><span class="glyphicon glyphicon-envelope"></span> Inbox</a></li>
-		        <li><a href="../login"><span class="glyphicon glyphicon-log-out"></span> Log out</a></li>
+		        <li><a href="../logout"><span class="glyphicon glyphicon-log-out"></span> Log out</a></li>
 	        </ul>
 	      </li>
       </ul>

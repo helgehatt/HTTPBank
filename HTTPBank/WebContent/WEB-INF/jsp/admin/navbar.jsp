@@ -11,7 +11,7 @@
   <div class="container-fluid">
     <div class="navbar-header">
     	<a href="users">
-     		<img src="${pageContext.request.contextPath}/images/LogoPlain.jpg" alt="HTTP">
+     		<img src="${pageContext.request.contextPath}/images/LogoIcon.jpg" alt="HTTP">
     	</a>
       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
         <span class="icon-bar"></span>
@@ -27,7 +27,7 @@
         </c:if>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <li><a role="button" class="btn btn-default" href="../login"><span class="glyphicon glyphicon-log-out"></span> Log out</a></li>
+        <li><a role="button" class="btn btn-default" href="../logout"><span class="glyphicon glyphicon-log-out"></span> Log out</a></li>
       </ul>
     </div>
   </div>

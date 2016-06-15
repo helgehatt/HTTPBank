@@ -25,21 +25,20 @@ public class AccountController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
 		
     	HashMap<String, String> errors = new HashMap<String, String>();    	
-        String accountName = request.getParameter("name");
+        String name = request.getParameter("name");
     	String type = request.getParameter("type");
         String number = request.getParameter("number");
         String iban = request.getParameter("iban");
         String currency = request.getParameter("currency");
         String interestString = request.getParameter("interest");
-        String balanceString = request.getParameter("balance");
         
         double interest = 0;
-        double balance = 0;
         
         try {
-        	AttributeChecks.checkAccountName(accountName);
+        	AttributeChecks.checkAccountName(name);
         } catch (InputException e) {
         	errors.put("name", e.getMessage());
         }
@@ -67,12 +66,6 @@ public class AccountController extends HttpServlet {
         } catch (InputException e) {
         	errors.put("interest", e.getMessage());
         }
-        
-        try {
-        	balance = AttributeChecks.checkBalance(balanceString);
-        } catch (InputException e) {
-        	errors.put("balance", e.getMessage());
-        }
 
 		String path = request.getRequestURI().replace(request.getContextPath(), "");
 		
@@ -80,11 +73,9 @@ public class AccountController extends HttpServlet {
 		case "/admin/newAccount":
 	        
 	        if (errors.isEmpty()) {
-		        User user = (User) session.getAttribute("user");
 				try {
-					Account account = DB.createAccount(user.getId(), "", type, number, iban, currency, interest, balance);
+					DB.createAccount(user.getId(), name, type, number, iban, currency, interest);
 					ExceptionHandler.success("Successfully created new account: " + number, session);
-					user.getAccounts().add(account);					
 					response.sendRedirect("accounts");
 				} catch (DatabaseException e) {
 					ExceptionHandler.failure(e, "Failed to create the account.", session, response, "newaccount");
@@ -100,7 +91,7 @@ public class AccountController extends HttpServlet {
 	        if (errors.isEmpty()) {
 		        int id = ((Account) session.getAttribute("account")).getId();		        			
 				try {
-					Account account = DB.updateAccount(id, accountName, type, number, iban, currency, interest, balance);
+					Account account = DB.updateAccount(id, name, type, number, iban, interest);
 					ExceptionHandler.success("Successfully updated account: " + number, session);
 					session.setAttribute("account", account);
 					response.sendRedirect("accountinfo");

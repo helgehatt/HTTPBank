@@ -21,12 +21,14 @@ public class ExceptionHandler {
 	}
 	
 	public static void failure(DatabaseException e, String exception, HttpSession session) {
+		if (e.getSQLState().equals("08008"))
+			exception = "Insufficient funds.";
 		e.printStackTrace();
 		failure(exception, session);
 	}
 	
 	public static void failure(DatabaseException e, String exception, HttpSession session, HttpServletResponse response, String redirectUrl) throws IOException {
-		e.printStackTrace();
-		failure(e, exception, session, response, redirectUrl);
+		failure(e, exception, session);
+ 		response.sendRedirect(redirectUrl);
 	}
 }

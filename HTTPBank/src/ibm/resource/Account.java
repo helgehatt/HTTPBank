@@ -21,7 +21,6 @@ public class Account implements Serializable {
 	private double interest; // Required
 	private double balance; // Default: 0,00
 	private String currency; // Required
-	private ArrayList<Transaction> transactions = null; // Default: None
 	
 	/* CONSTRUCTORS */
 	// Required and balance
@@ -73,15 +72,9 @@ public class Account implements Serializable {
 	public String getBalance() {
 		return FORMAT.format(balance);
 	}
-	
-	/*
-	 * Returns a list of Transactions related to this Account.
-	 * Should query whenever transactions are updated.
-	 */
+
 	public ArrayList<Transaction> getTransactions() throws DatabaseException {
-		if (transactions == null)
-			transactions = DB.getTransactions(accountId);
-		return transactions;
+		return DB.getTransactions(accountId);
 	}
 
 	@Override

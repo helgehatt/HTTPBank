@@ -13,7 +13,6 @@ import ibm.db.DB;
 import ibm.resource.Account;
 import ibm.resource.DatabaseException;
 import ibm.resource.ExceptionHandler;
-import ibm.resource.User;
 
 @WebServlet("/admin/closeAccount")
 public class AccountCloser extends HttpServlet {
@@ -48,7 +47,7 @@ public class AccountCloser extends HttpServlet {
     		
     		try {
 				DB.deleteAccountWithTransfer(senderId, receiverId, "Closed account: " + account.getNumber(), amount);
-				ExceptionHandler.success("Transfer completed, but account did not close successfully.", session);
+				ExceptionHandler.success("Transfer completed and successfully closed account: " + account.getNumber(), session);
 			} catch (DatabaseException e) {
 				ExceptionHandler.failure(e, "Failed to complete the transfer.", session, response, "cloesaccount");
 	    		return;
@@ -62,15 +61,7 @@ public class AccountCloser extends HttpServlet {
     			return;
     		}    		
     	}
-    	
-    	try {
-        	User user = (User) session.getAttribute("user");
-			user.getAccounts().remove(account);
-	    	response.sendRedirect("accounts");
-		} catch (DatabaseException e) {
-			response.sendRedirect("users");
-		}
-		
+    	response.sendRedirect("accounts");		
     }
 
     @Override

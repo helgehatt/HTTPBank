@@ -1,11 +1,5 @@
 package ibm.db;
 
-import ibm.resource.Account;
-import ibm.resource.DatabaseException;
-import ibm.resource.Message;
-import ibm.resource.Transaction;
-import ibm.resource.User;
-
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -15,12 +9,16 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Properties;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
+
+import ibm.resource.Account;
+import ibm.resource.DatabaseException;
+import ibm.resource.Message;
+import ibm.resource.Transaction;
+import ibm.resource.User;
 
 /**
  * A class for handling all Database queries required by the HTTPBank.
@@ -45,21 +43,6 @@ public class DB {
 	//Fields
 	private static Connection connection;
 	private static final String url = "jdbc:db2://192.86.32.54:5040/DALLASB";
-	
-	//Comparators
-	private static final Comparator<Transaction> transactionComparator = new Comparator<Transaction>(){
-		@Override
-		public int compare(Transaction o1, Transaction o2) {
-			return Long.compare(o2.getDateRaw(), o1.getDateRaw());
-		}
-	};
-	
-	private static final Comparator<Message> messageComparator = new Comparator<Message>(){
-		@Override
-		public int compare(Message o1, Message o2) {
-			return Long.compare(o2.getDateRaw(), o1.getDateRaw());
-		}
-	};
 	
 	//Methods
 	// GET Methods
@@ -344,6 +327,7 @@ public class DB {
 		return null;
 	}
 	
+	@Deprecated
 	public static ArrayList<Transaction> getArchive(int account_id) throws DatabaseException {
 		for(int tries = 2; 0 < tries; tries--) {
 			PreparedStatement statement = null;
@@ -360,9 +344,6 @@ public class DB {
 				while(results.next()) {
 					resultList.add(new Transaction(results.getLong(1), results.getInt(2), results.getTimestamp(3), results.getString(4), results.getDouble(5)));
 				}
-				
-				//Sorts all Transactions by Date.
-				Collections.sort(resultList, transactionComparator);
 				
 				return resultList;
 				
@@ -701,7 +682,7 @@ public class DB {
 	 * @return The new account as an Account object with all fields, if successfully created.
 	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static Account createAccount(int userId, String name, String type, String number, String iban, String currency, double interest, double balance) throws DatabaseException {
+	public static Account createAccount(int userId, String name, String type, String number, String iban, String currency, double interest) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			PreparedStatement statement = null;
 			try {
@@ -719,7 +700,7 @@ public class DB {
 				statement.setString(4, number);
 				statement.setString(5, iban);
 				statement.setDouble(6, interest);
-				statement.setDouble(7, balance);
+				statement.setDouble(7, 0); //Balance
 				statement.setString(8, currency);
 				
 				statement.execute(); //Attempt to insert new row.
@@ -1013,14 +994,14 @@ public class DB {
 	 * @return True if operation was successful.
 	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static Account updateAccount(int accountId, String name, String type, String number, String iban, String currency, double interest, double balance) throws DatabaseException {
+	public static Account updateAccount(int accountId, String name, String type, String number, String iban, double interest) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				PreparedStatement statement = connection.prepareStatement(
 						"SELECT USER_ID, ACCOUNT_ID, NAME, TYPE, NUMBER, IBAN, CURRENCY, INTEREST, BALANCE "
 						+ "FROM FINAL TABLE("
 						+ "UPDATE DTUGRP07.ACCOUNTS "
-						+ "SET NAME = ?, TYPE = ?, NUMBER = ?, IBAN = ?, CURRENCY = ?, INTEREST = ?, BALANCE = ? "
+						+ "SET NAME = ?, TYPE = ?, NUMBER = ?, IBAN = ?, INTEREST = ? "
 						+ "WHERE ACCOUNT_ID = ?"
 						+ ");"
 						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
@@ -1029,10 +1010,8 @@ public class DB {
 				statement.setString(2, type);
 				statement.setString(3, number);
 				statement.setString(4, iban);
-				statement.setString(5, currency);
-				statement.setDouble(6, interest);
-				statement.setDouble(7, balance);
-				statement.setInt(8, accountId);
+				statement.setDouble(5, interest);
+				statement.setInt(6, accountId);
 				
 				statement.execute(); //Attempt to insert new row.
 				Account account = null;
@@ -1160,7 +1139,7 @@ public class DB {
 				resultList = new ArrayList<User>();
 				ResultSet results = statement.getResultSet();
 				while(results.next()) {
-					resultList.add(new User(results.getInt(1), results.getString(2), results.getString(3)));
+					resultList.add(new User(results.getInt(1), results.getString(3), results.getString(2)));
 				}
 				
 				return resultList;

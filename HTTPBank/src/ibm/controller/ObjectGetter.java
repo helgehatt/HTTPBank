@@ -2,6 +2,7 @@ package ibm.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -113,6 +114,7 @@ public class ObjectGetter extends HttpServlet {
 			if (newUsers.size() < 10)
 				session.setAttribute("moreUsers", false);
 			users.addAll(newUsers);
+			Collections.sort(users);
 			session.setAttribute("users", users);
 		} catch (DatabaseException e) {
 			ExceptionHandler.failure(e, "Failed getting users.", session);

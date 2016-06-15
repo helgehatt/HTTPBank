@@ -49,8 +49,9 @@ public class UserInfoChanger extends HttpServlet {
     		
     		if (!nUsername.isEmpty()) {
     			try {
-					DB.updateUser(id, nUsername, USER.USERNAME);
+					User newUser = DB.updateUser(id, nUsername, USER.USERNAME);
 					ExceptionHandler.success("Successfully changed user name.", session);
+					session.setAttribute("user", newUser);
 				} catch (DatabaseException e) {
 					ExceptionHandler.failure(e, "Failed to change user name.", session, response, "changeinfo");
 		    		return;
@@ -59,21 +60,15 @@ public class UserInfoChanger extends HttpServlet {
     		
     		if (!nPassword.isEmpty()) {
     			try {
-					DB.updateUser(id, nPassword, USER.PASSWORD);
+					User newUser = DB.updateUser(id, nPassword, USER.PASSWORD);
 					ExceptionHandler.success("Successfully changed user name and password.", session);
+					session.setAttribute("user", newUser);
 				} catch (DatabaseException e) {
 					ExceptionHandler.failure(e, "Failed to change password.", session, response, "changeinfo");
 		    		return;
 				}
     		}
-
-			try {
-				session.setAttribute("user", DB.getUser(id));
-	        	response.sendRedirect("userinfo");
-			} catch (DatabaseException e) {
-				ExceptionHandler.failure(e, "Failed to get the user.", session, response, "changeinfo");
-	    		return;
-			}
+        	response.sendRedirect("userinfo");
     	} else {
     		session.setAttribute("errors", errors);
     		response.sendRedirect("changeinfo");

@@ -24,7 +24,7 @@ public class AttributeChecks {
     		throw new InputException("Please enter 10 digits.");
     	if (!isNumerous(cpr))
     		throw new InputException("Please enter numbers only.");
-    	return cpr.substring(0, 6) + "-" + cpr.substring(6, 9);
+    	return cpr.substring(0, 6) + "-" + cpr.substring(6, 10);
     }
     
 	/**
