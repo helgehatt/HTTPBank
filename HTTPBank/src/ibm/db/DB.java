@@ -518,7 +518,7 @@ public class DB {
 			}
 		}
 	}
-	
+	//change
 	public static String getReceiverCurrency(String receiverID, TransBy transby) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--) {
 			try {

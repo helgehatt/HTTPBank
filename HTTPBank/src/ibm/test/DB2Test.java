@@ -33,7 +33,7 @@ public class DB2Test {
 		//System.out.println();
 		//testGetArchive(1);
 		//testGetReceiverCurrency("0002", DB.TransBy.NUMBER);
-		
+		//changes
 		/*testCheckLogin("Thomas", "1234");
 		System.out.println();
 		
