@@ -518,6 +518,24 @@ public class DB {
 		}
 	}
 	
+	public static String getReceiverCurrency(String receiverID, TransBy transby) throws DatabaseException {
+		for (int tries = 2; 0 < tries; tries--) {
+			try {
+				CallableStatement statement = connection.prepareCall("{CALL DTUGRP07.getReceiverCurrency(?,?,?)}");
+				statement.setString(1, receiverID);
+				statement.setString(2, transby.toString());
+				statement.execute();
+				ResultSet result = statement.getResultSet();
+				statement.close();
+				return result.toString();
+			} catch (SQLException e) {
+				handleSQLException(e, tries);
+			}
+			
+		}
+		return null;
+	}
+	
 	public static boolean createMessage(String message, int senderID, String receiver, TransBy transBy) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {

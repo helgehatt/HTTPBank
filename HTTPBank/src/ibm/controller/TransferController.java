@@ -15,6 +15,7 @@ import ibm.db.DB.TransBy;
 import ibm.resource.AttributeChecks;
 import ibm.resource.DatabaseException;
 import ibm.resource.InputException;
+import ibm.resource.CurrencyConverter;
 
 @WebServlet(urlPatterns = { "/user/doTransfer", "/admin/doTransfer" } )
 public class TransferController extends HttpServlet {
@@ -33,6 +34,9 @@ public class TransferController extends HttpServlet {
 		String amountString = request.getParameter("amount");
 		String withdrawnString = request.getParameter("change");
 		String message = request.getParameter("message");
+		String toCurrency = request.getParameter("to-currency");
+		Double receivedAmount;
+		String receiverCurrency;
 		
 		int fromId = 0;
 		double amount = 0;
@@ -73,7 +77,10 @@ public class TransferController extends HttpServlet {
 			
 			if (errors.isEmpty()) {
 				try {
-					DB.createTransaction(TransBy.IBAN, fromId, to, "Transfer to " + to, "Transfer from " + from, -withdrawn, amount);
+
+					receiverCurrency = DB.getReceiverCurrency(to, TransBy.IBAN);
+					receivedAmount = CurrencyConverter.convert(toCurrency, receiverCurrency, amount);
+					DB.createTransaction(TransBy.IBAN, fromId, to, "Transfer to " + to, "Transfer from " + from, -withdrawn, receivedAmount);
 					DatabaseException.success("Transfer to " + to + " completed successfully.", session);
 					if (!message.isEmpty()) {
 						try {
@@ -100,6 +107,8 @@ public class TransferController extends HttpServlet {
 			
 			if (errors.isEmpty())
 				try {
+					receiverCurrency = DB.getReceiverCurrency(to, TransBy.NUMBER);
+					receivedAmount = CurrencyConverter.convert(toCurrency, receiverCurrency, amount);
 					DB.createTransaction(TransBy.NUMBER, fromId, to, "Transfer to " + to, "Transfer from " + from, -amount, amount);
 					DatabaseException.success("Transfer to " + to + " completed successfully.", session);
 					if (!message.isEmpty()) {
