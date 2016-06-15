@@ -23,11 +23,11 @@
 	<div class="form-group">
   	<label class="control-label col-sm-3" for="amount">Amount:</label>
   	<div class="col-sm-6">          
-    	<input name="amount" type="text" class="form-control" id="amount">
+    	<input name="change" type="text" class="form-control" id="amount">
 			<span class="error">${pageScope.errors.amount}</span>
   	</div>
   	<div class="col-sm-3">
-    	<input name="currency" type="text" class="form-control" id="currency" value="${user.accounts[0].currency}" readonly>	          
+    	<input name="from-currency" type="text" class="form-control" id="currency" value="${user.accounts[0].currency}" readonly>	          
   	</div>
 	</div>
 	<div class="form-group">

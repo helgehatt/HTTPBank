@@ -14,7 +14,9 @@ import java.util.Properties;
 import javax.annotation.Resource;
 import javax.sql.DataSource;
 
+import ibm.db.DB.TransBy;
 import ibm.resource.Account;
+import ibm.resource.CurrencyConverter;
 import ibm.resource.DatabaseException;
 import ibm.resource.Message;
 import ibm.resource.Transaction;
@@ -466,36 +468,30 @@ public class DB {
 	 * @return The new transaction for the sender as a Transaction object with all fields, excluding 'transaction_id', if successfully created.
 	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static Account createTransaction(TransBy transBy, int senderId, String receiverId, String senderDescription, String receiverDescription, double senderAmount, double receiverAmount) throws DatabaseException {
+	public static boolean createTransaction(TransBy transBy, int senderId, String receiver, String senderDescription, String receiverDescription, double senderAmount, String senderCurrency) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
-			CallableStatement getBalanceStatement = null;
 			try {
-				Timestamp date = new Timestamp(Calendar.getInstance().getTime().getTime());
 				
-				getBalanceStatement = connection.prepareCall("{call DTUGRP07.createTransaction(?,?,?,?,?,?,?,?)}");
+				// Note: senderAmount is positive!
+				createTransaction(senderId, senderDescription, senderAmount, senderCurrency);
+				
+				Account account = getAccountBy(transBy, receiver);
 
-				getBalanceStatement.setInt(1,senderId);
-				getBalanceStatement.setString(2, receiverId);	
-				getBalanceStatement.setString(3,senderDescription);
-				getBalanceStatement.setString(4, receiverDescription);
-				getBalanceStatement.setDouble(5, senderAmount);
-				getBalanceStatement.setDouble(6, receiverAmount);
-				getBalanceStatement.setTimestamp(7, date);
-				getBalanceStatement.setString(8, transBy.toString());
-				getBalanceStatement.execute();
-
-				return DB.getAccount(senderId);
+				if (account != null) {
+					
+					String receiverCurrency = account.getCurrency();
+					
+					double receiverAmount = CurrencyConverter.convert(senderCurrency, receiverCurrency, senderAmount);
+					
+					createTransaction(account.getId(), receiverDescription, receiverAmount, receiverCurrency);
+				}
+				
+				return true;
 			} catch (SQLException e) {
 				handleSQLException(e, tries);
-			} finally {
-				try {
-					if (getBalanceStatement != null) getBalanceStatement.close();
-				} catch(SQLException e){
-					e.printStackTrace();
-				}
 			}
 		}
-		return null;
+		return false;
 	}
 	
 	/**
@@ -508,20 +504,21 @@ public class DB {
 	 * @return The new transaction as a Transaction object with all fields, excluding 'transaction_id', if successfully created.
 	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static Account createTransaction(int accountId, String description, double amount) throws DatabaseException {
+	public static boolean createTransaction(int accountId, String description, double amount, String currency) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			CallableStatement statement = null;
 			try {
 				Timestamp date = new Timestamp(Calendar.getInstance().getTime().getTime());
 
-				statement = connection.prepareCall("{call DTUGRP07.createTransactionOne(?,?,?,?)}");
+				statement = connection.prepareCall("{call DTUGRP07.createTransactionOne(?,?,?,?,?)}");
 				statement.setInt(1, accountId);
 				statement.setString(2, description);
 				statement.setDouble(3, amount);
 				statement.setTimestamp(4, date);
+				statement.setString(5, currency);
 				statement.execute();
 
-				return DB.getAccount(accountId);
+				return true;
 			} catch (SQLException e) {
 				handleSQLException(e, tries);
 				//if no more tries, throw exception.
@@ -533,7 +530,7 @@ public class DB {
 				}
 			}
 		}
-		return null;
+		return false;
 	}
 	
 	public static void archiveTransactions() throws DatabaseException {
@@ -555,6 +552,25 @@ public class DB {
 				}
 			}
 		}
+	}
+	//change
+	public static String getReceiverCurrency(String receiverID, TransBy transby) throws DatabaseException {
+		for (int tries = 2; 0 < tries; tries--) {
+			try {
+				CallableStatement statement = connection.prepareCall("{CALL DTUGRP07.getReceiverCurrency(?,?,?)}");
+				statement.setString(1, receiverID);
+				statement.setString(2, transby.toString());
+				statement.registerOutParameter(3, java.sql.Types.VARCHAR);
+				statement.execute();
+				String result = statement.getString(3);
+				statement.close();
+				return result;
+			} catch (SQLException e) {
+				handleSQLException(e, tries);
+			}
+			
+		}
+		return null;
 	}
 	
 	public static boolean createMessage(String message, int senderID, String receiver, TransBy transBy) throws DatabaseException {
@@ -1055,12 +1071,12 @@ public class DB {
 		return false;
 	}
 	
-	public static boolean deleteAccountWithTransfer(int senderId, int receiverId, String receiverDescription, double amount) throws DatabaseException {
+	public static boolean deleteAccountWithTransfer(int senderId, int receiverId, String receiverDescription, double amount, String currency) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				try {
 					connection.setAutoCommit(false);
-					DB.createTransaction(receiverId, receiverDescription, amount);
+					DB.createTransaction(receiverId, receiverDescription, amount, currency);
 					DB.deleteAccount(senderId);
 					return true;
 				} catch (Exception e){
@@ -1384,6 +1400,8 @@ public class DB {
 		case "08007": //transaction resolution unknown
 		case "2D000": //invalid transaction termination
 		case "08008": //insufficient funds
+		case "08009": //Sender does not exist
+		case "08010": //Receiver does not exist
 		default:
 			throw new DatabaseException(e.getMessage(), e.getErrorCode(), e.getSQLState());
 		}

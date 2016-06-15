@@ -31,13 +31,12 @@ public class TransferController extends HttpServlet {
         String from = request.getParameter("from");
         String to = request.getParameter("to");
         String bic = request.getParameter("bic");
-		String amountString = request.getParameter("amount");
-		String withdrawnString = request.getParameter("change");
+		String amountString = request.getParameter("change");
+		String currency = request.getParameter("from-currency");
 		String message = request.getParameter("message");
 		
 		int fromId = 0;
 		double amount = 0;
-		double withdrawn = 0;
 		
 		try {
 			fromId = Integer.parseInt(id);
@@ -66,15 +65,9 @@ public class TransferController extends HttpServlet {
 	        	errors.put("bic", e.getMessage());
 			}
 			
-			try {
-				withdrawn = Double.parseDouble(withdrawnString);
-			} catch (NumberFormatException e) {
-				errors.put("amount", "Please enter only digits.");
-			}
-			
 			if (errors.isEmpty()) {
 				try {
-					DB.createTransaction(TransBy.IBAN, fromId, to, "Transfer to " + to, "Transfer from " + from, -withdrawn, amount);
+					DB.createTransaction(TransBy.IBAN, fromId, to, "Transfer to " + to, "Transfer from " + from, -amount, currency);
 					ExceptionHandler.success("Transfer to " + to + " completed successfully.", session);
 					if (!message.isEmpty()) {
 						try {
@@ -101,7 +94,7 @@ public class TransferController extends HttpServlet {
 			
 			if (errors.isEmpty())
 				try {
-					DB.createTransaction(TransBy.NUMBER, fromId, to, "Transfer to " + to, "Transfer from " + from, -amount, amount);
+					DB.createTransaction(TransBy.NUMBER, fromId, to, "Transfer to " + to, "Transfer from " + from, -amount, currency);
 					ExceptionHandler.success("Transfer to " + to + " completed successfully.", session);
 					if (!message.isEmpty()) {
 						try {
