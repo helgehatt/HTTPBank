@@ -1204,6 +1204,8 @@ public class DB {
 		case "08007": //transaction resolution unknown
 		case "2D000": //invalid transaction termination
 		case "08008": //insufficient funds
+		case "08009": //Sender does not exist
+		case "08010": //Receiver does not exist
 		default:
 			throw new DatabaseException(e.getMessage(), e.getErrorCode(), e.getSQLState());
 		}
