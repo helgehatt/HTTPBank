@@ -2,12 +2,12 @@
   <div class="form-group">
     <label class="control-label col-sm-3" for="from">From:</label>
     <div class="col-sm-5">
-    	<select name="from" class="form-control" id="from">
+    	<select name="from-number" class="form-control" id="from">
     		<c:forEach var="account" items="${user.accounts}">
    				<option value="${account.iban}" data-id="${account.id}" data-balance="${account.balance}" data-currency="${account.currency}">${account.number}</option>
    			</c:forEach>
   		</select>
-  		<input name="id" type="hidden" value="${user.accounts[0].id}" id="id">
+  		<input name="from-id" type="hidden" value="${user.accounts[0].id}" id="id">
 		</div>
 		<div class="col-sm-4">
 			<input class="form-control" id="balance" value="${user.accounts[0].balance} ${user.accounts[0].currency}" readonly>
@@ -16,25 +16,25 @@
   <div class="form-group">
     <label class="control-label col-sm-3" for="to">IBAN:</label>
     <div class="col-sm-9">          
-      <input name="to" type="text" class="form-control" id="to">
-			<span class="error">${pageScope.errors.to}</span>
+      <input name="to-number" type="text" class="form-control" id="to">
+			<span class="error">${pageScope.errors.toNumber}</span>
     </div>
   </div>
   <div class="form-group">
     <label class="control-label col-sm-3" for="bic">BIC:</label>
     <div class="col-sm-9">         
-      <input name="bic" type="text" class="form-control" id="bic">
-			<span class="error">${pageScope.errors.bic}</span>
+      <input name="to-bic" type="text" class="form-control" id="bic">
+			<span class="error">${pageScope.errors.toBic}</span>
     </div>
   </div>
   <div class="form-group">
     <label class="control-label col-sm-3" for="amount">Amount:</label>
     <div class="col-sm-6">          
-      <input name="amount" type="text" class="form-control" id="amount">
-			<span class="error">${pageScope.errors.amount}</span>
+      <input name="input-amount" type="text" class="form-control" id="amount">
+			<span class="error">${pageScope.errors.inputAmount}</span>
     </div>
     <div class="col-sm-3">
-    	<select name="to-currency" class="form-control" id="to-currency">
+    	<select name="input-currency" class="form-control" id="to-currency">
     		<c:forEach var="currency" items="${currencies}">
     			<option value="${currency}">${currency}</option>
     		</c:forEach>
@@ -44,10 +44,10 @@
   <div class="form-group">
     <label class="control-label col-sm-3" for="change">Withdrawn:</label>
     <div class="col-sm-6">          
-      <input name="change" type="text" class="form-control" id="change" readonly>
+      <input name="withdrawn-amount" type="text" class="form-control" id="change" readonly>
     </div>
     <div class="col-sm-3">
-      <input name="from-currency" type="text" class="form-control" id="from-currency" value="${user.accounts[0].currency}" readonly>	          	
+      <input name="withdrawn-currency" type="text" class="form-control" id="from-currency" value="${user.accounts[0].currency}" readonly>	          	
     </div>
   </div>
   <div class="form-group">

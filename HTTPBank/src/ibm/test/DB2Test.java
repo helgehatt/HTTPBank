@@ -49,7 +49,7 @@ public class DB2Test {
 		//System.out.println();
 		//testCreateTransaction(1, "New Transaction1", -100);
 		//testSearchArchive(1,"2015-04-04 00:00:00","2016-06-14 14:00:01");
-		testCreateTransaction(2, "3", "Should be goooood","Should be great", 30, 3, "DKK");
+		testCreateTransaction(2, "3", "Should be goooood","Should be great", 30, "DKK");
 		//testBatchTimer();
 		//System.out.println();
 		//testCreateMessage("Hej Helge", 1, "1", DB.TransBy.ID);
@@ -57,44 +57,44 @@ public class DB2Test {
 		//testGetArchive(1);
 		//testGetReceiverCurrency("0002", DB.TransBy.NUMBER);
 		//changes
-		/*testCheckLogin("Thomas", "1234");
-		System.out.println();
-		
-		
-		
-		testGetUsers();
-		
-		System.out.println();
-		int userId = testCreateUser("NewUser", "user", "123456-7890", "User", "NewInstitute", null).getId();
-		System.out.println();
-		testGetUser(userId);
-		System.out.println();
-		int senderId = testCreateAccount(userId, "New Account", "New Type", "000111222", "000111222", "DKK", 0.50, 100).getId();
-		int receiverId = testCreateAccount(userId, "Moo Account", "New Type", "000111333", "000111333", "DKK", 0.55, 0).getId();
-		System.out.println();
-		testGetAccounts(userId);
-		System.out.println();
-		testCreateTransaction(senderId, receiverId, "New Transaction", 100);
-		System.out.println();
-		testGetTransactions(senderId);
-		testGetTransactions(receiverId);
-		System.out.println();
-		testGetAccounts(userId);
-		System.out.println();
-		testUpdateUser(userId, "New Consultant", USER.CONSULTANT);
-		printUser(DB.getUserByCpr("123456-7890"));
-		System.out.println();
-		testUpdateAccount(receiverId, "New-New Type", ACCOUNT.TYPE);
-		testUpdateAccount(receiverId, "0.2", ACCOUNT.INTEREST);
-		printAccount(DB.getAccountByNumber("000111222"));
-		System.out.println();
-		testDeleteAccount(receiverId);
-		System.out.println();
-		testDeleteAccountByNumber("000111222");
-		System.out.println();
-		testDeleteUser("NewUser");
-		System.out.println();
-		testDeleteUserByCpr("123456-7890"); */
+//		testCheckLogin("Thomas", "1234");
+//		System.out.println();
+//		
+//		
+//		
+//		testGetUsers();
+//		
+//		System.out.println();
+//		int userId = testCreateUser("NewUser", "user", "123456-7890", "User", "NewInstitute", "").getId();
+//		System.out.println();
+//		testGetUser(userId);
+//		System.out.println();
+//		int senderId = testCreateAccount(userId, "New Account", "New Type", "000111222", "000111222", "DKK", 0.50, 100).getId();
+//		int receiverId = testCreateAccount(userId, "Moo Account", "New Type", "000111333", "000111333", "DKK", 0.55, 0).getId();
+//		System.out.println();
+//		testGetAccounts(userId);
+//		System.out.println();
+//		testCreateTransaction(senderId, receiverId, "New Transaction", 100);
+//		System.out.println();
+//		testGetTransactions(senderId);
+//		testGetTransactions(receiverId);
+//		System.out.println();
+//		testGetAccounts(userId);
+//		System.out.println();
+//		testUpdateUser(userId, "New Consultant", USER.CONSULTANT);
+//		printUser(DB.getUserByCpr("123456-7890"));
+//		System.out.println();
+//		testUpdateAccount(receiverId, "New-New Type", ACCOUNT.TYPE);
+//		testUpdateAccount(receiverId, "0.2", ACCOUNT.INTEREST);
+//		printAccount(DB.getAccountByNumber("000111222"));
+//		System.out.println();
+//		testDeleteAccount(receiverId);
+//		System.out.println();
+//		testDeleteAccountByNumber("000111222");
+//		System.out.println();
+//		testDeleteUser("NewUser");
+//		System.out.println();
+//		testDeleteUserByCpr("123456-7890");
 		//System.out.println();
 		
 		//testArchive();
@@ -197,7 +197,7 @@ public class DB2Test {
 		System.out.println("Created Transaction "+ account +", Query Time: " + (System.currentTimeMillis()-start));
 	}
 	
-	private static void testCreateTransaction(int senderId, String receiverId, String senderDescription, String receiverDescription, double senderAmount, double receiverAmount, String currency) throws SQLException {
+	private static void testCreateTransaction(int senderId, String receiverId, String senderDescription, String receiverDescription, double senderAmount, String currency) throws SQLException {
 		long start = System.currentTimeMillis();
 
 		boolean transaction = DB.createTransaction(DB.TransBy.ID, senderId, ""+receiverId, senderDescription, receiverDescription, -senderAmount, currency);

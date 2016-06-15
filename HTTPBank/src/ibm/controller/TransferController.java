@@ -27,52 +27,65 @@ public class TransferController extends HttpServlet {
 		
     	HashMap<String, String> errors = new HashMap<String, String>();    	
 		boolean international = request.getParameter("international") != null;
-        String id = request.getParameter("id");
-        String from = request.getParameter("from");
-        String to = request.getParameter("to");
-        String bic = request.getParameter("bic");
-		String amountString = request.getParameter("change");
-		String currency = request.getParameter("from-currency");
+        String formIdString = request.getParameter("from-id");
+        String fromNumber = request.getParameter("from-number");
+        String toNumber = request.getParameter("to-number");
+        String inputAmount = request.getParameter("input-amount");
+		String withdrawnCurrency = request.getParameter("withdrawn-currency");
 		String message = request.getParameter("message");
 		
 		int fromId = 0;
-		double amount = 0;
+		double input = 0;
 		
 		try {
-			fromId = Integer.parseInt(id);
+			fromId = Integer.parseInt(formIdString);
 		} catch (NumberFormatException e) {
 			ExceptionHandler.failure("Failed parsing the ID.", session, response, "accounts");
 			return;
 		}
 		
 		try {
-			amount = AttributeChecks.checkAmount(amountString);
+			input = AttributeChecks.checkAmount(inputAmount);
 		} catch (InputException e) {
-        	errors.put("amount", e.getMessage());
-		}
-		
+        	errors.put("inputAmount", e.getMessage());
+		}		
 		
 		if (international) {
+			String withdrawnAmount = request.getParameter("withdrawn-amount");
+	        String inputCurrency = request.getParameter("input-currency");
+	        String bic = request.getParameter("to-bic");
+	        
+	        double withdrawn = 0;
+	        
+	        try {
+	        	withdrawn = AttributeChecks.checkAmount(withdrawnAmount);
+	        } catch (InputException e) {
+	        	errors.put("withdrawnAmount", e.getMessage());
+	        }
+	        
 			try {
-				AttributeChecks.checkIban(to);
+				AttributeChecks.checkIban(toNumber);
 			} catch (InputException e) {
-	        	errors.put("to", e.getMessage());
+	        	errors.put("toNumber", e.getMessage());
 			}
 			
 			try {
 				AttributeChecks.checkBic(bic);
 			} catch (InputException e) {
-	        	errors.put("bic", e.getMessage());
+	        	errors.put("toBic", e.getMessage());
 			}
 			
 			if (errors.isEmpty()) {
 				try {
-					DB.createTransaction(TransBy.IBAN, fromId, to, "Transfer to " + to, "Transfer from " + from, -amount, currency);
-					ExceptionHandler.success("Transfer to " + to + " completed successfully.", session);
+					String senderDescription = inputAmount + " " + inputCurrency + " transfered to " + toNumber;
+					String receiverDescription = inputAmount + " " + inputCurrency + " transfered from " + fromNumber;
+					
+					DB.createTransaction(TransBy.IBAN, fromId, toNumber, senderDescription, receiverDescription, -withdrawn, withdrawnCurrency);
+					ExceptionHandler.success("Transfer to " + toNumber + " completed successfully.", session);
 					if (!message.isEmpty()) {
 						try {
-					        DB.createMessage(message, fromId, to, TransBy.IBAN);
-					        ExceptionHandler.success("Transfer to " + to + " completed successfully and message sent.", session);							
+					        DB.createMessage(message, fromId, toNumber, TransBy.IBAN);
+					        ExceptionHandler.success("Transfer to " + toNumber + " completed successfully and message sent.", session);							
 						} catch (DatabaseException e) {
 							ExceptionHandler.failure(e, "Failed to send the message.", session);							
 						}
@@ -87,19 +100,22 @@ public class TransferController extends HttpServlet {
 			
 		} else {
 			try {
-				AttributeChecks.checkNumber(to);
+				AttributeChecks.checkNumber(toNumber);
 			} catch (InputException e) {
-	        	errors.put("to", e.getMessage());
+	        	errors.put("toNumber", e.getMessage());
 			}
 			
 			if (errors.isEmpty())
 				try {
-					DB.createTransaction(TransBy.NUMBER, fromId, to, "Transfer to " + to, "Transfer from " + from, -amount, currency);
-					ExceptionHandler.success("Transfer to " + to + " completed successfully.", session);
+					String senderDescription = inputAmount + " " + withdrawnCurrency + " transfered to " + toNumber;
+					String receiverDescription = inputAmount + " " + withdrawnCurrency + " transfered from " + fromNumber;
+					
+					DB.createTransaction(TransBy.NUMBER, fromId, toNumber, senderDescription, receiverDescription, -input, withdrawnCurrency);
+					ExceptionHandler.success("Transfer to " + toNumber + " completed successfully.", session);
 					if (!message.isEmpty()) {
 						try {
-					        DB.createMessage(message, fromId, to, TransBy.NUMBER);
-					        ExceptionHandler.success("Transfer to " + to + " completed successfully and message sent.", session);							
+					        DB.createMessage(message, fromId, toNumber, TransBy.NUMBER);
+					        ExceptionHandler.success("Transfer to " + toNumber + " completed successfully and message sent.", session);							
 						} catch (DatabaseException e) {
 							ExceptionHandler.failure(e, "Failed to send the message.", session);
 						}

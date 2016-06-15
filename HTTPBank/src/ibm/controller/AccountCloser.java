@@ -24,13 +24,12 @@ public class AccountCloser extends HttpServlet {
     	boolean transfer = request.getParameter("type").equals("transfer");    	
     	
     	Account account = (Account) request.getSession().getAttribute("account");
-    	int senderId = account.getId();
     	
     	String amountString = request.getParameter("amount");
-    	double amount = 0;
+    	double receiverAmount = 0;
     	
     	try {
-    		amount = Double.parseDouble(amountString);
+    		receiverAmount = Double.parseDouble(amountString);
     	} catch (NumberFormatException e) {
     		ExceptionHandler.failure("Failed to parse the amount.", session, response, "cloesaccount");
     		return;
@@ -45,8 +44,11 @@ public class AccountCloser extends HttpServlet {
     			return;
     		}
     		
+    		String receiverCurrency = request.getParameter("currency");
+    		
     		try {
-				DB.deleteAccountWithTransfer(senderId, receiverId, "Closed account: " + account.getNumber(), amount);
+    			String receiverDescription = account.getBalance() + " " + account.getCurrency() + " transfered from " + account.getNumber() + " before closing the account.";
+				DB.deleteAccountWithTransfer(account.getId(), receiverId, receiverDescription, receiverAmount, receiverCurrency);
 				ExceptionHandler.success("Transfer completed and successfully closed account: " + account.getNumber(), session);
 			} catch (DatabaseException e) {
 				ExceptionHandler.failure(e, "Failed to complete the transfer.", session, response, "cloesaccount");
@@ -54,7 +56,7 @@ public class AccountCloser extends HttpServlet {
 			}
     	} else {
     		try {
-    			DB.deleteAccount(senderId);
+    			DB.deleteAccount(account.getId());
     			ExceptionHandler.success("Successfully closed account: " + account.getNumber(), session);
     		} catch (DatabaseException e) {
     			ExceptionHandler.failure(e, "Failed to close the account.", session, response, "cloesaccount");

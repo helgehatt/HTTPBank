@@ -55,7 +55,7 @@ $(function(){
 				  <div class="form-group">
 				    <label class="control-label col-sm-3" for="from" id="account-label">To:</label>
 				    <div class="col-sm-5">
-				    	<select name="from" class="form-control" id="from">
+				    	<select name="number" class="form-control" id="from">
 				    		<c:forEach var="account" items="${user.accounts}">
 				   				<option value="${account.number}" data-id="${account.id}" data-balance="${account.balance}" data-currency="${account.currency}">${account.number}</option>
 				   			</c:forEach>
@@ -69,11 +69,11 @@ $(function(){
 				  <div class="form-group">
 				    <label class="control-label col-sm-3" for="amount">Amount:</label>
 				    <div class="col-sm-6">          
-				      <input name="amount" type="text" class="form-control" id="amount">
+				      <input name="input-amount" type="text" class="form-control" id="amount">
 							<span class="error">${pageScope.errors.amount}</span>
 				    </div>
 				    <div class="col-sm-3">
-				    	<select name="to-currency" class="form-control" id="to-currency">
+				    	<select name="input-currency" class="form-control" id="to-currency">
 				    		<c:forEach var="currency" items="${currencies}">
 				    			<option value="${currency}">${currency}</option>
 				    		</c:forEach>
@@ -83,10 +83,10 @@ $(function(){
 				  <div class="form-group">
 				    <label class="control-label col-sm-3" for="change" id="change-label">Deposited:</label>
 				    <div class="col-sm-6">          
-				      <input name="change" type="text" class="form-control" id="change" readonly>
+				      <input name="withdrawn-amount" type="text" class="form-control" id="change" readonly>
 				    </div>
 				    <div class="col-sm-3">
-				      <input name="from-currency" type="text" class="form-control" id="from-currency" value="${user.accounts[0].currency}" readonly>	          	
+				      <input name="withdrawn-currency" type="text" class="form-control" id="from-currency" value="${user.accounts[0].currency}" readonly>	          	
 				    </div>
 				  </div>
 			    <button name="type" value="deposit" type="submit" class="btn btn-default btn-submit">Submit</button>
