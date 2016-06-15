@@ -475,17 +475,18 @@ public class DB {
 	 * @return The new transaction as a Transaction object with all fields, excluding 'transaction_id', if successfully created.
 	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static boolean createTransaction(int accountId, String description, double amount) throws DatabaseException {
+	public static boolean createTransaction(int accountId, String description, double amount, String currency) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				Timestamp date = new Timestamp(Calendar.getInstance().getTime().getTime());
 				try {
 					connection.setAutoCommit(false);
-					CallableStatement statement = connection.prepareCall("{call DTUGRP07.createTransactionOne(?,?,?,?)}");
+					CallableStatement statement = connection.prepareCall("{call DTUGRP07.createTransactionOne(?,?,?,?,?)}");
 					statement.setInt(1, accountId);
 					statement.setString(2, description);
 					statement.setDouble(3, amount);
 					statement.setTimestamp(4, date);
+					statement.setString(5, currency);
 					statement.execute();
 					connection.commit();
 					statement.close();
