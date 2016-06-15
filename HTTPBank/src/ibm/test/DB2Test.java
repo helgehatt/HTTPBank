@@ -13,6 +13,7 @@ import ibm.db.DB.USER;
 import ibm.resource.Account;
 import ibm.resource.DatabaseException;
 import ibm.resource.InputException;
+import ibm.resource.Message;
 import ibm.resource.Transaction;
 import ibm.resource.User;
 
@@ -25,14 +26,18 @@ public class DB2Test {
 		//System.out.println();
 		//testCreateTransaction(1, "New Transaction1", -100);
 		//testSearchArchive(1,"2015-04-04 00:00:00","2016-06-14 14:00:01");
-		//testCreateTransaction(1, 28, "Should be goooood","Should be great", 3000, 3);
+		testCreateTransaction(2, "3", "Should be goooood","Should be great", 30, 3, "DKK");
 		//testBatchTimer();
 		//System.out.println();
-		//testCreateMessage("Hej Helge", 1, "DK00002", DB.TransBy.IBAN);
+		//testCreateMessage("Hej Helge", 1, "1", DB.TransBy.ID);
 		//System.out.println();
 		//testGetArchive(1);
+		//testGetReceiverCurrency("0002", DB.TransBy.NUMBER);
+		
 		/*testCheckLogin("Thomas", "1234");
 		System.out.println();
+		
+		
 		
 		testGetUsers();
 		
@@ -71,6 +76,11 @@ public class DB2Test {
 		
 		//testArchive();
 		
+	}
+	
+	private static void testGetReceiverCurrency(String receiverID, DB.TransBy transby) throws DatabaseException {
+		String result = DB.getReceiverCurrency(receiverID, transby);
+		System.out.println(result);
 	}
 	
 	private static void testSearchUsers(String name) throws DatabaseException {
@@ -163,9 +173,9 @@ public class DB2Test {
 		System.out.println("Created Transaction "+transaction+", Query Time: " + (System.currentTimeMillis()-start));
 	}
 	
-	private static void testCreateTransaction(int senderId, int receiverId, String senderDescription, String receiverDescription, double senderAmount, double receiverAmount) throws SQLException {
+	private static void testCreateTransaction(int senderId, String receiverId, String senderDescription, String receiverDescription, double senderAmount, double receiverAmount, String currency) throws SQLException {
 		long start = System.currentTimeMillis();
-		boolean transaction = DB.createTransaction(DB.TransBy.ID, senderId, ""+receiverId, senderDescription, receiverDescription, -senderAmount, receiverAmount);
+		boolean transaction = DB.createTransaction(DB.TransBy.ID, senderId, ""+receiverId, senderDescription, receiverDescription, -senderAmount, receiverAmount, currency);
 		System.out.println("Created Transaction "+transaction+", Query Time: " + (System.currentTimeMillis()-start));
 	}
 

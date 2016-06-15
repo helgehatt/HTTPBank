@@ -430,13 +430,13 @@ public class DB {
 	 * @return The new transaction for the sender as a Transaction object with all fields, excluding 'transaction_id', if successfully created.
 	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static boolean createTransaction(TransBy transBy, int senderId, String receiverId, String senderDescription, String receiverDescription, double senderAmount, double receiverAmount) throws DatabaseException {
+	public static boolean createTransaction(TransBy transBy, int senderId, String receiverId, String senderDescription, String receiverDescription, double senderAmount, double receiverAmount, String currency) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				Timestamp date = new Timestamp(Calendar.getInstance().getTime().getTime());
 				try {
 					connection.setAutoCommit(false);
-					CallableStatement getBalanceStatement = connection.prepareCall("{call DTUGRP07.createTransaction(?,?,?,?,?,?,?,?)}");
+					CallableStatement getBalanceStatement = connection.prepareCall("{call DTUGRP07.createTransaction(?,?,?,?,?,?,?,?,?)}");
 					
 					getBalanceStatement.setInt(1,senderId);
 					getBalanceStatement.setString(2, receiverId);	
@@ -446,6 +446,7 @@ public class DB {
 					getBalanceStatement.setDouble(6, receiverAmount);
 					getBalanceStatement.setTimestamp(7, date);
 					getBalanceStatement.setString(8, transBy.toString());
+					getBalanceStatement.setString(9, currency);
 					getBalanceStatement.execute();
 					getBalanceStatement.close();
 					connection.commit();
@@ -524,10 +525,11 @@ public class DB {
 				CallableStatement statement = connection.prepareCall("{CALL DTUGRP07.getReceiverCurrency(?,?,?)}");
 				statement.setString(1, receiverID);
 				statement.setString(2, transby.toString());
+				statement.registerOutParameter(3, java.sql.Types.VARCHAR);
 				statement.execute();
-				ResultSet result = statement.getResultSet();
+				String result = statement.getString(3);
 				statement.close();
-				return result.toString();
+				return result;
 			} catch (SQLException e) {
 				handleSQLException(e, tries);
 			}
