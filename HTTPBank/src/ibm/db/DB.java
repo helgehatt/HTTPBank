@@ -1,11 +1,5 @@
 package ibm.db;
 
-import ibm.resource.Account;
-import ibm.resource.DatabaseException;
-import ibm.resource.Message;
-import ibm.resource.Transaction;
-import ibm.resource.User;
-
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -15,12 +9,18 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Properties;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
+
+import ibm.db.DB.TransBy;
+import ibm.resource.Account;
+import ibm.resource.CurrencyConverter;
+import ibm.resource.DatabaseException;
+import ibm.resource.Message;
+import ibm.resource.Transaction;
+import ibm.resource.User;
 
 /**
  * A class for handling all Database queries required by the HTTPBank.
@@ -45,21 +45,6 @@ public class DB {
 	//Fields
 	private static Connection connection;
 	private static final String url = "jdbc:db2://192.86.32.54:5040/DALLASB";
-	
-	//Comparators
-	private static final Comparator<Transaction> transactionComparator = new Comparator<Transaction>(){
-		@Override
-		public int compare(Transaction o1, Transaction o2) {
-			return Long.compare(o2.getDateRaw(), o1.getDateRaw());
-		}
-	};
-	
-	private static final Comparator<Message> messageComparator = new Comparator<Message>(){
-		@Override
-		public int compare(Message o1, Message o2) {
-			return Long.compare(o2.getDateRaw(), o1.getDateRaw());
-		}
-	};
 	
 	//Methods
 	// GET Methods
@@ -344,6 +329,7 @@ public class DB {
 		return null;
 	}
 	
+	@Deprecated
 	public static ArrayList<Transaction> getArchive(int account_id) throws DatabaseException {
 		for(int tries = 2; 0 < tries; tries--) {
 			PreparedStatement statement = null;
@@ -360,9 +346,6 @@ public class DB {
 				while(results.next()) {
 					resultList.add(new Transaction(results.getLong(1), results.getInt(2), results.getTimestamp(3), results.getString(4), results.getDouble(5)));
 				}
-				
-				//Sorts all Transactions by Date.
-				Collections.sort(resultList, transactionComparator);
 				
 				return resultList;
 				
@@ -485,36 +468,30 @@ public class DB {
 	 * @return The new transaction for the sender as a Transaction object with all fields, excluding 'transaction_id', if successfully created.
 	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static Account createTransaction(TransBy transBy, int senderId, String receiverId, String senderDescription, String receiverDescription, double senderAmount, double receiverAmount) throws DatabaseException {
+	public static boolean createTransaction(TransBy transBy, int senderId, String receiver, String senderDescription, String receiverDescription, double senderAmount, String senderCurrency) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
-			CallableStatement getBalanceStatement = null;
 			try {
-				Timestamp date = new Timestamp(Calendar.getInstance().getTime().getTime());
 				
-				getBalanceStatement = connection.prepareCall("{call DTUGRP07.createTransaction(?,?,?,?,?,?,?,?)}");
+				// Note: senderAmount is positive!
+				createTransaction(senderId, senderDescription, senderAmount, senderCurrency);
+				
+				Account account = getAccountBy(transBy, receiver);
 
-				getBalanceStatement.setInt(1,senderId);
-				getBalanceStatement.setString(2, receiverId);	
-				getBalanceStatement.setString(3,senderDescription);
-				getBalanceStatement.setString(4, receiverDescription);
-				getBalanceStatement.setDouble(5, senderAmount);
-				getBalanceStatement.setDouble(6, receiverAmount);
-				getBalanceStatement.setTimestamp(7, date);
-				getBalanceStatement.setString(8, transBy.toString());
-				getBalanceStatement.execute();
-
-				return DB.getAccount(senderId);
+				if (account != null) {
+					
+					String receiverCurrency = account.getCurrency();
+					
+					double receiverAmount = CurrencyConverter.convert(senderCurrency, receiverCurrency, senderAmount);
+					
+					createTransaction(account.getId(), receiverDescription, receiverAmount, receiverCurrency);
+				}
+				
+				return true;
 			} catch (SQLException e) {
 				handleSQLException(e, tries);
-			} finally {
-				try {
-					if (getBalanceStatement != null) getBalanceStatement.close();
-				} catch(SQLException e){
-					e.printStackTrace();
-				}
 			}
 		}
-		return null;
+		return false;
 	}
 	
 	/**
@@ -527,20 +504,21 @@ public class DB {
 	 * @return The new transaction as a Transaction object with all fields, excluding 'transaction_id', if successfully created.
 	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static Account createTransaction(int accountId, String description, double amount) throws DatabaseException {
+	public static boolean createTransaction(int accountId, String description, double amount, String currency) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			CallableStatement statement = null;
 			try {
 				Timestamp date = new Timestamp(Calendar.getInstance().getTime().getTime());
 
-				statement = connection.prepareCall("{call DTUGRP07.createTransactionOne(?,?,?,?)}");
+				statement = connection.prepareCall("{call DTUGRP07.createTransactionOne(?,?,?,?,?)}");
 				statement.setInt(1, accountId);
 				statement.setString(2, description);
 				statement.setDouble(3, amount);
 				statement.setTimestamp(4, date);
+				statement.setString(5, currency);
 				statement.execute();
 
-				return DB.getAccount(accountId);
+				return true;
 			} catch (SQLException e) {
 				handleSQLException(e, tries);
 				//if no more tries, throw exception.
@@ -552,7 +530,7 @@ public class DB {
 				}
 			}
 		}
-		return null;
+		return false;
 	}
 	
 	public static void archiveTransactions() throws DatabaseException {
@@ -574,6 +552,25 @@ public class DB {
 				}
 			}
 		}
+	}
+	//change
+	public static String getReceiverCurrency(String receiverID, TransBy transby) throws DatabaseException {
+		for (int tries = 2; 0 < tries; tries--) {
+			try {
+				CallableStatement statement = connection.prepareCall("{CALL DTUGRP07.getReceiverCurrency(?,?,?)}");
+				statement.setString(1, receiverID);
+				statement.setString(2, transby.toString());
+				statement.registerOutParameter(3, java.sql.Types.VARCHAR);
+				statement.execute();
+				String result = statement.getString(3);
+				statement.close();
+				return result;
+			} catch (SQLException e) {
+				handleSQLException(e, tries);
+			}
+			
+		}
+		return null;
 	}
 	
 	public static boolean createMessage(String message, int senderID, String receiver, TransBy transBy) throws DatabaseException {
@@ -701,7 +698,7 @@ public class DB {
 	 * @return The new account as an Account object with all fields, if successfully created.
 	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static Account createAccount(int userId, String name, String type, String number, String iban, String currency, double interest, double balance) throws DatabaseException {
+	public static Account createAccount(int userId, String name, String type, String number, String iban, String currency, double interest) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			PreparedStatement statement = null;
 			try {
@@ -719,7 +716,7 @@ public class DB {
 				statement.setString(4, number);
 				statement.setString(5, iban);
 				statement.setDouble(6, interest);
-				statement.setDouble(7, balance);
+				statement.setDouble(7, 0); //Balance
 				statement.setString(8, currency);
 				
 				statement.execute(); //Attempt to insert new row.
@@ -1013,7 +1010,7 @@ public class DB {
 	 * @return True if operation was successful.
 	 * @throws DatabaseException If a database error occurs.
 	 */
-	public static Account updateAccount(int accountId, String name, String type, String number, String iban, String currency, double interest, double balance) throws DatabaseException {
+	public static Account updateAccount(int accountId, String name, String type, String number, String iban, double interest) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			PreparedStatement statement = null;
 			try {
@@ -1021,7 +1018,7 @@ public class DB {
 						"SELECT USER_ID, ACCOUNT_ID, NAME, TYPE, NUMBER, IBAN, CURRENCY, INTEREST, BALANCE "
 						+ "FROM FINAL TABLE("
 						+ "UPDATE DTUGRP07.ACCOUNTS "
-						+ "SET NAME = ?, TYPE = ?, NUMBER = ?, IBAN = ?, CURRENCY = ?, INTEREST = ?, BALANCE = ? "
+						+ "SET NAME = ?, TYPE = ?, NUMBER = ?, IBAN = ?, INTEREST = ? "
 						+ "WHERE ACCOUNT_ID = ?"
 						+ ");"
 						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
@@ -1029,10 +1026,8 @@ public class DB {
 				statement.setString(2, type);
 				statement.setString(3, number);
 				statement.setString(4, iban);
-				statement.setString(5, currency);
-				statement.setDouble(6, interest);
-				statement.setDouble(7, balance);
-				statement.setInt(8, accountId);
+				statement.setDouble(5, interest);
+				statement.setInt(6, accountId);
 				
 				statement.execute(); //Attempt to insert new row.
 				Account account = null;
@@ -1089,12 +1084,12 @@ public class DB {
 		return false;
 	}
 	
-	public static boolean deleteAccountWithTransfer(int senderId, int receiverId, String receiverDescription, double amount) throws DatabaseException {
+	public static boolean deleteAccountWithTransfer(int senderId, int receiverId, String receiverDescription, double amount, String currency) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				try {
 					connection.setAutoCommit(false);
-					DB.createTransaction(receiverId, receiverDescription, amount);
+					DB.createTransaction(receiverId, receiverDescription, amount, currency);
 					DB.deleteAccount(senderId);
 					return true;
 				} catch (Exception e){
@@ -1187,7 +1182,7 @@ public class DB {
 				resultList = new ArrayList<User>();
 				ResultSet results = statement.getResultSet();
 				while(results.next()) {
-					resultList.add(new User(results.getInt(1), results.getString(2), results.getString(3)));
+					resultList.add(new User(results.getInt(1), results.getString(3), results.getString(2)));
 				}
 				
 				return resultList;
@@ -1432,6 +1427,8 @@ public class DB {
 		case "08007": //transaction resolution unknown
 		case "2D000": //invalid transaction termination
 		case "08008": //insufficient funds
+		case "08009": //Sender does not exist
+		case "08010": //Receiver does not exist
 		default:
 			throw new DatabaseException(e.getMessage(), e.getErrorCode(), e.getSQLState());
 		}

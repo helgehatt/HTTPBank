@@ -48,7 +48,7 @@ $(function(){
 		var selected = $(this).find('option:selected');
 		
 		$('#id').val(selected.data('id'));
-		
+
 		var currency = selected.data('currency');
 		$('#to-currency').val(currency);
 		$('#from-currency').val(currency);

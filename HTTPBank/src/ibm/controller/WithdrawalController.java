@@ -28,6 +28,7 @@ public class WithdrawalController extends HttpServlet{
 		String type = request.getParameter("type");
 		String id = request.getParameter("id");
 	    String from = request.getParameter("from");
+	    String fromCurrency = request.getParameter("from-currency");
 		String amountString = request.getParameter("change");
 		
 		int fromId = 0;
@@ -50,7 +51,7 @@ public class WithdrawalController extends HttpServlet{
 			switch(type) {
 			case "deposit":
 				try {
-					DB.createTransaction(fromId, "Deposited " + amount + " to " + from , amount);
+					DB.createTransaction(fromId, "Deposited " + amount + " to " + from , amount, fromCurrency);
 					ExceptionHandler.success("Deposit completed successfully.", session);
 				} catch (DatabaseException e) {
 					ExceptionHandler.failure(e, "Failed to complete the deposit.", session);
@@ -58,7 +59,7 @@ public class WithdrawalController extends HttpServlet{
 				break;
 			case "withdrawal":
 				try {
-					DB.createTransaction(fromId, "Withdrew " + amount + " from " + from , -amount);
+					DB.createTransaction(fromId, "Withdrew " + amount + " from " + from , -amount, fromCurrency);
 					ExceptionHandler.success("Withdrawal completed successfully.", session);
 				} catch (DatabaseException e) {
 					ExceptionHandler.failure(e, "Failed to complete the withdrawal.", session);

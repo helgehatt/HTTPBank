@@ -43,15 +43,18 @@ public class LoginController extends HttpServlet {
         	int userID = DB.checkLogin(username, password);
 			if (userID > 0) {
 				session.setAttribute("admin", false);
+				
 				session.setAttribute("user", DB.getUser(userID));
+				
 				response.sendRedirect("user/accounts");
 				
 			} else if (username.equals("admin") && password.equals("")) {	
 				session.setAttribute("admin", true);
-				session.setAttribute("users", new ArrayList<User>());
-				session.setAttribute("moreUsers", true);
 				
+				session.setAttribute("users", new ArrayList<User>());
+				session.setAttribute("moreUsers", true);				
 				ObjectGetter.getUsers(session, response, 0);
+				
 	    		response.sendRedirect("admin/users");
 				
 			} else {

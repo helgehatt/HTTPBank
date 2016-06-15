@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 import ibm.db.DB;
 
-public class User implements Serializable {
+public class User implements Serializable, Comparable<User> {
 	private static final long serialVersionUID = 1L;
 
 	/* FIELDS */
@@ -17,9 +17,6 @@ public class User implements Serializable {
 	private String name; // Required
 	private String institute; // Required?
 	private String consultant; // Required?
-	
-	private ArrayList<Account> accounts = null; // Default: None
-	private ArrayList<Message> messages = null; 
 
 	/* CONSTRUCTORS */
 	public User(int userId, String cpr, String name) {
@@ -65,15 +62,11 @@ public class User implements Serializable {
 	 * Should query whenever accounts are updated.
 	 */
 	public ArrayList<Account> getAccounts() throws DatabaseException {
-		if (accounts == null)
-			accounts = DB.getAccounts(userId);
-		return accounts;
+		return DB.getAccounts(userId);
 	}
 	
 	public ArrayList<Message> getMessages() throws DatabaseException {
-		if (messages == null)
-			messages = DB.getMessages(userId);
-		return messages;
+		return DB.getMessages(userId);
 	}
 
 	@Override
@@ -96,5 +89,10 @@ public class User implements Serializable {
 		if (userId != other.userId)
 			return false;
 		return true;
+	}
+
+	@Override
+	public int compareTo(User user) {
+		return name.compareTo(user.getName());
 	}
 }

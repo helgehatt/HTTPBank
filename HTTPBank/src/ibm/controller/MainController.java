@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-@WebServlet(urlPatterns = { "/login", 
+@WebServlet(urlPatterns = { "/logout", 
 		
 		"/user/accounts", "/user/transactions", "/user/accountinfo", 
 		"/user/transfer", "/user/international", "/user/archive", 
@@ -43,7 +43,7 @@ public class MainController extends HttpServlet {
 		}		
 		
 		switch (path) {
-		case "/login":
+		case "/logout":
 			session.invalidate();
 			request.getRequestDispatcher("login.jsp").forward(request, response);
 			break;			
@@ -75,12 +75,14 @@ public class MainController extends HttpServlet {
 			request.getRequestDispatcher("../WEB-INF/jsp/user/inbox.jsp").forward(request, response);
 			break;
 		case "/admin/users":
+			session.setAttribute("user", null);
 			request.getRequestDispatcher("../WEB-INF/jsp/admin/user-list.jsp").forward(request, response);
 			break;
 		case "/admin/newuser":
 			request.getRequestDispatcher("../WEB-INF/jsp/admin/new-user.jsp").forward(request, response);
 			break;
 		case "/admin/accounts":
+			session.setAttribute("account", null);
 			request.getRequestDispatcher("../WEB-INF/jsp/admin/account-list.jsp").forward(request, response);
 			break;
 		case "/admin/newaccount":

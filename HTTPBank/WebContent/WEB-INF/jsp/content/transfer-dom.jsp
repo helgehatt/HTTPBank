@@ -7,7 +7,7 @@
    				<option value="${account.number}" data-id="${account.id}" data-balance="${account.balance}" data-currency="${account.currency}">${account.number}</option>
    			</c:forEach>
   		</select>
-  		<input name="id" type="hidden" value="${user.accounts[0].id}">
+  		<input name="id" type="hidden" value="${user.accounts[0].id}" id="id">
 		</div>
 		<div class="col-sm-4">
 			<input class="form-control" id="balance" value="${user.accounts[0].balance} ${user.accounts[0].currency}" readonly>
@@ -23,11 +23,11 @@
 	<div class="form-group">
   	<label class="control-label col-sm-3" for="amount">Amount:</label>
   	<div class="col-sm-6">          
-    	<input name="amount" type="text" class="form-control" id="amount">
+    	<input name="change" type="text" class="form-control" id="amount">
 			<span class="error">${pageScope.errors.amount}</span>
   	</div>
   	<div class="col-sm-3">
-    	<input name="currency" type="text" class="form-control" id="currency" value="${user.accounts[0].currency}" readonly>	          
+    	<input name="from-currency" type="text" class="form-control" id="currency" value="${user.accounts[0].currency}" readonly>	          
   	</div>
 	</div>
 	<div class="form-group">

@@ -63,23 +63,6 @@ $(function(){
 		        </div>
 		      </div>
 		      <div class="form-group">
-		        <label class="control-label col-sm-3" for="balance">Balance:</label>
-		        <div class="col-sm-9">          
-		          <input name="balance" type="text" class="form-control" id="balance" value="${account.balance}">
-    					<span class="error">${pageScope.errors.balance}</span>
-		        </div>
-		      </div>
-		      <div class="form-group">
-		        <label class="control-label col-sm-3" for="currency">Currency:</label>
-		        <div class="col-sm-9">
-				    	<select name="currency" class="form-control" id="currency">
-				    		<c:forEach var="currency" items="${currencies}">
-				    			<option value="${currency}">${currency}</option>
-				    		</c:forEach>
-				    	</select>	
-		        </div>
-		      </div>
-		      <div class="form-group">
 		        <label class="control-label col-sm-3" for="interest">Interest:</label>
 		        <div class="col-sm-9">          
 		          <input name="interest" type="text" class="form-control" id="interest" value="${account.interest}">

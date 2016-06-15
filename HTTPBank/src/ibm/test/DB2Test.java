@@ -16,6 +16,7 @@ import ibm.db.DB.USER;
 import ibm.resource.Account;
 import ibm.resource.DatabaseException;
 import ibm.resource.InputException;
+import ibm.resource.Message;
 import ibm.resource.Transaction;
 import ibm.resource.User;
 
@@ -48,14 +49,18 @@ public class DB2Test {
 		//System.out.println();
 		//testCreateTransaction(1, "New Transaction1", -100);
 		//testSearchArchive(1,"2015-04-04 00:00:00","2016-06-14 14:00:01");
-		//testCreateTransaction(1, 28, "Should be goooood","Should be great", 3000, 3);
+		testCreateTransaction(2, "3", "Should be goooood","Should be great", 30, 3, "DKK");
 		//testBatchTimer();
 		//System.out.println();
-		//testCreateMessage("Hej Helge", 1, "DK00002", DB.TransBy.IBAN);
+		//testCreateMessage("Hej Helge", 1, "1", DB.TransBy.ID);
 		//System.out.println();
 		//testGetArchive(1);
+		//testGetReceiverCurrency("0002", DB.TransBy.NUMBER);
+		//changes
 		/*testCheckLogin("Thomas", "1234");
 		System.out.println();
+		
+		
 		
 		testGetUsers();
 		
@@ -94,16 +99,12 @@ public class DB2Test {
 		
 		//testArchive();
 		
-//		User user = DB.getUserByCpr("840345-5887");
-//		for (Account account : user.getAccounts())
-//			for (int i = 0; i < 10; i++)
-//				DB.createTransaction(account.getId(), "Opsparing", 5.37);
-//		
-//		DB.archiveTransactions();
-		
-		String string = "Sender lige en laaaaang beskedSender lige en laaaaang beskedSender lige en laaaaang beskedSender lige en laaaaang beskedSender lige en laaaaang beskedSender lige en laaaaang beskedSender lige en laaaaang beskedSender lige en laaaaang beskedSender lige en laaaaang beskedSender lige en laaaaang besked";
-		System.out.println(string.length());
-		
+
+	}
+	
+	private static void testGetReceiverCurrency(String receiverID, DB.TransBy transby) throws DatabaseException {
+		String result = DB.getReceiverCurrency(receiverID, transby);
+		System.out.println(result);
 	}
 	
 	private static void testSearchUsers(String name) throws DatabaseException {
@@ -190,21 +191,22 @@ public class DB2Test {
 		System.out.println("Query Time: " + (System.currentTimeMillis()-start));
 	}
 
-	private static void testCreateTransaction(int senderId, String description, double amount) throws SQLException {
+	private static void testCreateTransaction(int senderId, String description, double amount, String currency) throws SQLException {
 		long start = System.currentTimeMillis();
-		Account account = DB.createTransaction(senderId, description, amount);
-		System.out.println("Created Transaction "+ account.getNumber() +", Query Time: " + (System.currentTimeMillis()-start));
+		boolean account = DB.createTransaction(senderId, description, amount, currency);
+		System.out.println("Created Transaction "+ account +", Query Time: " + (System.currentTimeMillis()-start));
 	}
 	
-	private static void testCreateTransaction(int senderId, int receiverId, String senderDescription, String receiverDescription, double senderAmount, double receiverAmount) throws SQLException {
+	private static void testCreateTransaction(int senderId, String receiverId, String senderDescription, String receiverDescription, double senderAmount, double receiverAmount, String currency) throws SQLException {
 		long start = System.currentTimeMillis();
-		Account account = DB.createTransaction(DB.TransBy.ID, senderId, ""+receiverId, senderDescription, receiverDescription, -senderAmount, receiverAmount);
-		System.out.println("Created Transaction "+account.getNumber()+", Query Time: " + (System.currentTimeMillis()-start));
+
+		boolean transaction = DB.createTransaction(DB.TransBy.ID, senderId, ""+receiverId, senderDescription, receiverDescription, -senderAmount, currency);
+		System.out.println("Created Transaction "+transaction+", Query Time: " + (System.currentTimeMillis()-start));
 	}
 
 	private static void testCreateAccount(int userId, String name, String type, String number, String iban, String currency, double interest, double balance) throws SQLException {
 		long start = System.currentTimeMillis();
-		Account account = DB.createAccount(userId, name, type, number, iban, currency, interest, balance);
+		Account account = DB.createAccount(userId, name, type, number, iban, currency, interest);
 		System.out.println("Created Account "+account.getNumber()+", Query Time: " + (System.currentTimeMillis()-start));
 	}
 
