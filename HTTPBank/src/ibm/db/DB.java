@@ -513,7 +513,7 @@ public class DB {
 					String receiverCurrency = account.getCurrency();
 
 					// Note: senderAmount is negative!
-					double receiverAmount = CurrencyConverter.convert(senderCurrency, receiverCurrency, -senderAmount);
+					Double receiverAmount = CurrencyConverter.convert(senderCurrency, receiverCurrency, -senderAmount);
 					
 					createTransaction(account.getId(), receiverDescription, receiverAmount, receiverCurrency);
 				}
