@@ -11,9 +11,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Properties;
 
-import javax.annotation.Resource;
-import javax.sql.DataSource;
-
 import ibm.resource.Account;
 import ibm.resource.CurrencyConverter;
 import ibm.resource.DatabaseException;
@@ -26,8 +23,8 @@ import ibm.resource.User;
  * Class uses PreparedStatements for easy implementation, greater efficiency and security.
  */
 public class DB {
-	@Resource(name = "jdbc/exampleDS")
-	static DataSource ds1;
+//	@Resource(name = "jdbc/exampleDS")
+//	static DataSource ds1;
 	
 	//Static Constructor
 	static {
@@ -1360,9 +1357,9 @@ public class DB {
 	 * Mostly for testing/experimentation as you need to handle the ResultSet yourself if you want the result.
 	 * @throws SQLException From {@link #checkConnection() checkConnection()}
 	 */
-	public static ResultSet getQuery(String query) throws SQLException {
-		return connection.createStatement().executeQuery(query);
-	}
+	//public static ResultSet getQuery(String query) throws SQLException {
+	//	return connection.createStatement().executeQuery(query);
+	//}
 	
 	/**
 	 * Checks if there is a current connection to the database and if not attempts to connect to it.
@@ -1391,35 +1388,26 @@ public class DB {
 				Runtime.getRuntime().addShutdownHook(new Thread(){ //ShutdownHook for closing resources used by the connection.
 					@Override
 					public void run(){
-						if (connection != null){
-							try {
-								connection.close();
-							} catch (SQLException e) {}
-						}
+						DB.close();
 					}
 				});
 			} else {
-				try {
-					connection.close();
-				} catch (SQLException e){}
+				DB.close();
 			}
 			connection = DriverManager.getConnection(url, getProperties());
 		}
 	}
 	
-	public static void getConnection2() throws SQLException {
-		if (connection != null)
-			try {
-				connection.close();
-			} catch(SQLException e){}
-		connection = ds1.getConnection();
-	}
+//	public static void getConnection2() throws SQLException {
+//		if (connection != null)
+//				try {
+//				connection.close();
+//			} catch(SQLException e){}
+//		connection = ds1.getConnection();
+//	}
 	
 	public static void setConnection(Connection connection){
-		if (DB.connection != null)
-			try {
-				DB.connection.close();
-			} catch(SQLException e){}
+		DB.close();
 		DB.connection = connection;
 	}
 	
