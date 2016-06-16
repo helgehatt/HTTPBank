@@ -20,6 +20,6 @@ public class CurrencyConverter {
 			System.out.println("Error converting.");
 		}
 			
-		return null;
+		return amount;
 	}
 }
