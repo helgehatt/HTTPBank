@@ -25,7 +25,7 @@ public class Transaction implements Serializable {
 	public Transaction(int accountId, Timestamp date, String description, double amount) {
 		this.accountId = accountId;
 		this.date = date.getTime();
-		this.description = description;
+		this.description = description.trim();
 		this.amount = amount;
 	}
 	
