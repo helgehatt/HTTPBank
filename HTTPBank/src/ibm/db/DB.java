@@ -487,6 +487,7 @@ public class DB {
 	}
 	
 	/**
+	 * @throws DatabaseException 
 	 * Queries the database to insert a new transaction into the TRANSACTIONS table.
 	 * No manipulation of the 'amount' parameters is done, meaning the 'amount' should precisely reflect how the account's balance should be changed, negative if subtracting.
 	 * If the 'TransBy.ACCOUNTNUMBER' or 'TransBy.IBAN' method is used, then it is possible that the receiver doesn't exist in the database, if the receiver isn't found, then no transaction is created for the receiver, but the transaction is still completed for the sender.
@@ -498,12 +499,12 @@ public class DB {
 	 * @param senderAmount The amount to enter into the transaction for the sender.
 	 * @param receiverAmount The amount to enter into the transaction for the receiver.
 	 * @return The new transaction for the sender as a Transaction object with all fields, excluding 'transaction_id', if successfully created.
-	 * @throws DatabaseException If a database error occurs.
+	 * @throws 
 	 */
 	public static boolean createTransaction(TransBy transBy, int senderId, String receiver, String senderDescription, String receiverDescription, double senderAmount, String senderCurrency) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
-				
+				connection.setAutoCommit(false);
 				createTransaction(senderId, senderDescription, senderAmount, senderCurrency);
 				
 				Account account = getAccountBy(transBy, receiver);
@@ -516,13 +517,28 @@ public class DB {
 					double receiverAmount = CurrencyConverter.convert(senderCurrency, receiverCurrency, -senderAmount);
 					
 					createTransaction(account.getId(), receiverDescription, receiverAmount, receiverCurrency);
+					
 				}
-				
+				connection.commit();
 				return true;
 			} catch (SQLException e) {
+				try {
+					connection.rollback();
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				handleSQLException(e, tries);
+			} finally {
+				try {
+					connection.setAutoCommit(true);
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
+		
 		return false;
 	}
 	
