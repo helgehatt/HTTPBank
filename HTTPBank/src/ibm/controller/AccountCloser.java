@@ -68,6 +68,6 @@ public class AccountCloser extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	response.sendRedirect(request.getContextPath());
+    	response.sendRedirect(request.getContextPath() + "/logout");
     }
 }
