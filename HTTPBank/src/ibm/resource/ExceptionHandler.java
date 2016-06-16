@@ -23,7 +23,8 @@ public class ExceptionHandler {
 	public static void failure(DatabaseException e, String exception, HttpSession session) {
 		if (e.getSQLState().equals("08008"))
 			exception = "Insufficient funds.";
-		e.printStackTrace();
+		else
+			e.printStackTrace();
 		failure(exception, session);
 	}
 	

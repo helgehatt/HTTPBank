@@ -39,7 +39,17 @@ $(function(){
 		        		<td class="column-hide" style="white-space:nowrap">${message.date}</td>
 		        		<td>
 		        			<p class="column-show">${message.date}</p>
-		        			<a class="message" href="#" data-preview="${message.preview}"data-text="${message.text}" data-expanded="false">${message.preview}</a>
+		        			<c:choose>
+		        				<c:when test="${message.preview != null}">
+		        					<a class="message" href="#" data-preview="${message.preview}"data-text="${message.text}" data-expanded="false">${message.preview}</a>
+		        				</c:when>
+		        				<c:otherwise>
+		        					<p>${message.text}</p>
+		        				</c:otherwise>
+		        			</c:choose>
+		        			<c:if test="${message.preview != null}">
+		        			
+		        			</c:if>
 		        			<p class="column-show">${message.senderName}</p>
 		        		</td>
 		        		<td class="column-hide" style="white-space:nowrap">${message.senderName}</td>

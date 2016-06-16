@@ -61,7 +61,7 @@ public class LoginController extends HttpServlet {
 				response.sendRedirect(" ?s=0");
 			}
 		} catch(DatabaseException e) {
-			ExceptionHandler.failure(e, "Failed to get the user(s).", session, response, "login");			
+			ExceptionHandler.failure(e, "Failed to complete login.", session, response, "");			
 		}
 	}
 
