@@ -141,13 +141,17 @@ public class AttributeChecks {
 	 * @throws InputException
 	 */
 	public static double checkAmount(String amount) throws InputException {
+		double value = 0;
 		if (amount.isEmpty())
 			throw new InputException("Please enter an amount.");
     	try {
-    		return Double.parseDouble(amount.replace(",", "."));
+    		value = Double.parseDouble(amount.replace(",", "."));
     	} catch (NumberFormatException e) {
     		throw new InputException("Please enter a number.");
     	}
+    	if (value <= 0)
+    		throw new InputException("Please enter a positive number.");
+    	return value;
     }
 	
 	private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
