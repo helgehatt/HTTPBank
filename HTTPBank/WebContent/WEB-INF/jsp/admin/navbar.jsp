@@ -23,7 +23,7 @@
       <ul class="nav navbar-nav">
         <li><a role="button" class="btn btn-default" href="users">Users</a></li>
         <c:if test="${sessionScope.user != null}">
-        	<li><a class="btn btn-default" style="pointer-events: none; cursor: default;">Currently viewing ${user.name} - ${user.cpr}</a></li>
+        	<li><a class="btn btn-default" style="pointer-events: none; cursor: default;">Currently viewing ${user.name}</a></li>
         </c:if>
       </ul>
       <ul class="nav navbar-nav navbar-right">
