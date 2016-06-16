@@ -27,12 +27,14 @@ public class WithdrawalController extends HttpServlet{
 		HashMap<String, String> errors = new HashMap<String, String>();		
 		String type = request.getParameter("type");
 		String id = request.getParameter("id");
-	    String from = request.getParameter("from");
-	    String fromCurrency = request.getParameter("from-currency");
-		String amountString = request.getParameter("change");
+	    String number = request.getParameter("number");
+	    String inputAmount = request.getParameter("input-amount");
+	    String inputCurrency = request.getParameter("input-currency");
+		String withdrawnAmount = request.getParameter("withdrawn-amount");
+	    String withdrawnCurrency = request.getParameter("withdrawn-currency");
 		
 		int fromId = 0;
-		double amount = 0;
+		double withdrawn = 0;
 		
 		try {
 			fromId = Integer.parseInt(id);
@@ -42,7 +44,7 @@ public class WithdrawalController extends HttpServlet{
 		}
 		
 		try {
-			amount = AttributeChecks.checkAmount(amountString);
+			withdrawn = AttributeChecks.checkAmount(withdrawnAmount);
 		} catch (InputException e) {
 			errors.put("amount", e.getMessage());
 		}
@@ -51,7 +53,8 @@ public class WithdrawalController extends HttpServlet{
 			switch(type) {
 			case "deposit":
 				try {
-					DB.createTransaction(fromId, "Deposited " + amount + " to " + from , amount, fromCurrency);
+					String description =  inputAmount + " " + inputCurrency + " deposited to " + number;
+					DB.createTransaction(fromId, description, withdrawn, withdrawnCurrency);
 					ExceptionHandler.success("Deposit completed successfully.", session);
 				} catch (DatabaseException e) {
 					ExceptionHandler.failure(e, "Failed to complete the deposit.", session);
@@ -59,7 +62,8 @@ public class WithdrawalController extends HttpServlet{
 				break;
 			case "withdrawal":
 				try {
-					DB.createTransaction(fromId, "Withdrew " + amount + " from " + from , -amount, fromCurrency);
+					String description =  inputAmount + " " + inputCurrency + " withdrawn from " + number;
+					DB.createTransaction(fromId, description, -withdrawn, withdrawnCurrency);
 					ExceptionHandler.success("Withdrawal completed successfully.", session);
 				} catch (DatabaseException e) {
 					ExceptionHandler.failure(e, "Failed to complete the withdrawal.", session);

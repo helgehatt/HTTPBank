@@ -34,7 +34,7 @@ public class UserController extends HttpServlet {
 		case "/admin/deleteUser":
 			try {
 				DB.deleteUser(user.getId());
-				ExceptionHandler.success("Successfully deleted the user: " + user.getUsername(), session);
+				ExceptionHandler.success("Successfully deleted the user: " + user.getName(), session);
 				
 				@SuppressWarnings("unchecked")
 				ArrayList<User> users = (ArrayList<User>) session.getAttribute("users");
@@ -49,7 +49,7 @@ public class UserController extends HttpServlet {
 		case "/admin/resetPassword":
 			try {
 				DB.resetPassword(user.getId());
-				ExceptionHandler.success("Successfully reset " + user.getUsername() + "'s password.", session);
+				ExceptionHandler.success("Successfully reset " + user.getName() + "'s password.", session);
             	response.sendRedirect("userinfo");
 			} catch (DatabaseException e) {
 				ExceptionHandler.failure(e, "Failed to reset the user's password.", session, response, "resetpassword");
@@ -101,7 +101,7 @@ public class UserController extends HttpServlet {
             if (errors.isEmpty()) {
     			try {
 					User newUser = DB.createUser(username, cpr, name, institute, consultant);
-					ExceptionHandler.success("Successfully created new user: " + username, session);
+					ExceptionHandler.success("Successfully created new user: " + name, session);
 					
     				@SuppressWarnings("unchecked")
 					ArrayList<User> users = (ArrayList<User>) session.getAttribute("users");
@@ -123,7 +123,7 @@ public class UserController extends HttpServlet {
             if (errors.isEmpty()) {           	
             	try {
             		User newUser = DB.updateUser(user.getId(), username, cpr, name, institute, consultant);
-            		ExceptionHandler.success("Successfully updated user: " + username, session);
+            		ExceptionHandler.success("Successfully updated user: " + name, session);
 					session.setAttribute("user", newUser);
 	    			response.sendRedirect("userinfo");
 				} catch (DatabaseException e) {

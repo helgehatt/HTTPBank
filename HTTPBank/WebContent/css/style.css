@@ -67,7 +67,7 @@ body {
 }
 
 
-@media (min-width: 300px) {
+@media (min-width: 350px) {
 	.alignleft {
 		float: left;
 		text-align: left;
@@ -94,9 +94,9 @@ body {
 .response-banner {
 	color: white;
 	text-align: center;
-	height: 40px;
 	width: 100%;
 	padding-top: 10px;
+	padding-bottom: 10px;
 }
 
 .error {

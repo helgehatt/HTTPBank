@@ -14,7 +14,6 @@ import java.util.Properties;
 import javax.annotation.Resource;
 import javax.sql.DataSource;
 
-import ibm.db.DB.TransBy;
 import ibm.resource.Account;
 import ibm.resource.CurrencyConverter;
 import ibm.resource.DatabaseException;
@@ -58,7 +57,7 @@ public class DB {
 		for (int tries = 2; 0 < tries; tries--){
 			PreparedStatement statement = null;
 			try {
-				statement = connection.prepareStatement("SELECT TRANSACTION_ID, ACCOUNT_ID, DATE, DESCRIPTION, AMOUNT "
+				statement = connection.prepareStatement("SELECT ACCOUNT_ID, DATE, DESCRIPTION, AMOUNT "
 						+ "FROM DTUGRP07.TRANSACTIONS "
 						+ "WHERE ACCOUNT_ID = ? "
 						+ "ORDER BY DATE DESC;"
@@ -70,7 +69,7 @@ public class DB {
 				resultList = new ArrayList<Transaction>();
 				ResultSet results = statement.getResultSet();
 				while (results.next()){ //Fetch transaction-id from results and add to resultlist.
-					resultList.add(new Transaction(results.getLong(1), results.getInt(2), results.getTimestamp(3), results.getString(4), results.getDouble(5)));
+					resultList.add(new Transaction(results.getInt(1), results.getTimestamp(2), results.getString(3), results.getDouble(4)));
 				}
 				
 				//Sorts all Transactions by Date.
@@ -329,12 +328,45 @@ public class DB {
 		return null;
 	}
 	
+	public static Account getAccountBy(TransBy transBy, String ibanOrNumber) throws DatabaseException {
+		for (int tries = 2; 0 < tries; tries--){
+			PreparedStatement statement = null;
+			try {
+				statement = connection.prepareStatement("SELECT USER_ID, ACCOUNT_ID, NAME, TYPE, NUMBER, IBAN, CURRENCY, INTEREST, BALANCE "
+						+ "FROM DTUGRP07.ACCOUNTS "
+						+ "WHERE " + transBy.toString() + " = ? "
+						+ "FETCH FIRST 1 ROWS ONLY;"
+						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				statement.setString(1, ibanOrNumber);
+				
+				Account account = null;
+				statement.execute(); //If query is successful, attempt to create account object.
+				ResultSet results = statement.getResultSet();
+				if (results.next()){ //Fetch row if able.
+					account = new Account(results.getInt(1), results.getInt(2), results.getString(3), results.getString(4), results.getString(5), results.getString(6), results.getString(7), results.getDouble(8), results.getDouble(9));
+				}
+				
+				return account;
+			} catch (SQLException e) {
+				handleSQLException(e, tries);
+				//if no more tries, throw exception.
+			} finally {
+				try {
+					if (statement != null) statement.close();
+				} catch(SQLException e){
+					e.printStackTrace();
+				}
+			}
+		}
+		return null;
+	}
+	
 	@Deprecated
 	public static ArrayList<Transaction> getArchive(int account_id) throws DatabaseException {
 		for(int tries = 2; 0 < tries; tries--) {
 			PreparedStatement statement = null;
 			try {
-				statement = connection.prepareStatement("SELECT TRANSACTION_ID, ACCOUNT_ID, DATE, DESCRIPTION, AMOUNT FROM DTUGRP07.ARCHIVE "
+				statement = connection.prepareStatement("SELECT ACCOUNT_ID, DATE, DESCRIPTION, AMOUNT FROM DTUGRP07.ARCHIVE "
 						+ "WHERE ACCOUNT_ID = ?;" 
 						, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT);
 				statement.setInt(1, account_id);
@@ -344,7 +376,7 @@ public class DB {
 				resultList = new ArrayList<Transaction>();
 				ResultSet results = statement.getResultSet();
 				while(results.next()) {
-					resultList.add(new Transaction(results.getLong(1), results.getInt(2), results.getTimestamp(3), results.getString(4), results.getDouble(5)));
+					resultList.add(new Transaction(results.getInt(1), results.getTimestamp(2), results.getString(3), results.getDouble(4)));
 				}
 				
 				return resultList;
@@ -472,7 +504,6 @@ public class DB {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				
-				// Note: senderAmount is positive!
 				createTransaction(senderId, senderDescription, senderAmount, senderCurrency);
 				
 				Account account = getAccountBy(transBy, receiver);
@@ -480,8 +511,9 @@ public class DB {
 				if (account != null) {
 					
 					String receiverCurrency = account.getCurrency();
-					
-					double receiverAmount = CurrencyConverter.convert(senderCurrency, receiverCurrency, senderAmount);
+
+					// Note: senderAmount is negative!
+					double receiverAmount = CurrencyConverter.convert(senderCurrency, receiverCurrency, -senderAmount);
 					
 					createTransaction(account.getId(), receiverDescription, receiverAmount, receiverCurrency);
 				}
@@ -633,7 +665,7 @@ public class DB {
 				statement.setString(3, description);
 				statement.setDouble(4, amount);
 				statement.execute(); //Attempt to insert new row.
-				return new Transaction(null, accountId, date, description, amount);
+				return new Transaction(accountId, 0, date, description, amount, description);
 			} catch (SQLException e) {
 				handleSQLException(e, tries);
 				//if no more tries, throw exception.
@@ -678,7 +710,7 @@ public class DB {
 				statement.setDouble(4, -amount);
 				statement.execute(); //Attempt to insert new row.
 				
-				return new Transaction(null, accountId, date, description, -amount);
+				return new Transaction(accountId, date, description, -amount);
 			} catch (SQLException e) {
 				handleSQLException(e, tries);
 				//if no more tries, throw exception.
@@ -1084,13 +1116,16 @@ public class DB {
 		return false;
 	}
 	
-	public static boolean deleteAccountWithTransfer(int senderId, int receiverId, String receiverDescription, double amount, String currency) throws DatabaseException {
+	public static boolean deleteAccountWithTransfer(int senderId, int receiverId, String receiverDescription, double receiverAmount, String receiverCurrency) throws DatabaseException {
 		for (int tries = 2; 0 < tries; tries--){
 			try {
 				try {
 					connection.setAutoCommit(false);
-					DB.createTransaction(receiverId, receiverDescription, amount, currency);
-					DB.deleteAccount(senderId);
+					
+					createTransaction(receiverId, receiverDescription, receiverAmount, receiverCurrency);
+					
+					deleteAccount(senderId);
+					
 					return true;
 				} catch (Exception e){
 					//Error, rollback all changes.
@@ -1207,7 +1242,7 @@ public class DB {
 				Timestamp dateFrom = new Timestamp(from);
 				Timestamp dateTo = new Timestamp(to);
 				statement = connection.prepareStatement(
-						"SELECT TRANSACTION_ID, DTUGRP07.ARCHIVE.ACCOUNT_ID, DESCRIPTION, DATE, AMOUNT "
+						"SELECT DTUGRP07.ARCHIVE.USER_ID, DTUGRP07.ARCHIVE.ACCOUNT_ID, DESCRIPTION, DATE, AMOUNT, DTUGRP07.ARCHIVE.CURRENCY "
 						+ "FROM DTUGRP07.ARCHIVE "
 						+ "LEFT OUTER JOIN DTUGRP07.ACCOUNTS ON DTUGRP07.ARCHIVE.ACCOUNT_ID=DTUGRP07.ACCOUNTS.ACCOUNT_ID "
 						+ "WHERE DTUGRP07.ACCOUNTS.USER_ID = ? AND DATE > ? AND DATE < ? "
@@ -1220,10 +1255,10 @@ public class DB {
 				resultList = new ArrayList<Transaction>();
 				ResultSet results = statement.getResultSet();
 				while(results.next()) {
-					resultList.add(new Transaction(results.getLong(1), results.getInt(2), results.getTimestamp(4), results.getString(3), results.getInt(5)));
+					resultList.add(new Transaction(results.getInt(1), results.getInt(2), results.getTimestamp(4), results.getString(3), results.getDouble(5), results.getString(6)));
 				}
 				
-				//Collections.sort(resultList, transactionComparator);				
+//				Collections.sort(resultList, transactionComparator);				
 				return resultList;
 			} catch (SQLException e) {
 				handleSQLException(e, tries);

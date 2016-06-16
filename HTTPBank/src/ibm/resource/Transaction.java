@@ -9,40 +9,40 @@ public class Transaction implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	/* FIELDS */
-	private Long transaction_id; //Only for identification. Not really required here.
-	private int account_id; //Required
+	private int userId;
+	private int accountId; //Required
 
 	private long date; // Required
 	private String description; // Required
 	private double amount; // Required
+	private String currency; // Required
 	
 	private static final transient SimpleDateFormat FORMAT = new SimpleDateFormat("dd.MM.yyyy");
 	private static final transient DecimalFormat DECIFORMAT = new DecimalFormat("#0.00");
 	
 	/* CONSTRUCTORS */
-	public Transaction(Long transaction_id, int account_id, Timestamp date, String description, double amount) {
-		this.transaction_id = transaction_id;
-		this.account_id = account_id;
+	
+	public Transaction(int accountId, Timestamp date, String description, double amount) {
+		this.accountId = accountId;
 		this.date = date.getTime();
 		this.description = description;
 		this.amount = amount;
 	}
 	
-	// Keep until DB is fully operational
-	// Method made in class DB to replace this for creating new transactions in the database.
-	public Transaction(String description, double amount) {
-		this.date = new java.util.Date().getTime();
-		this.description = description;
-		this.amount = amount;
+	public Transaction(int userId, int accountId, Timestamp date, String description, double amount, String currency) {
+		this(accountId, date, description, amount);
+		this.userId = userId;
+		this.currency = currency;		
 	}
 	
 	/* GETTERS */
-	public Long getId(){
-		return transaction_id;
+
+	public int getUserId() {
+		return userId;
 	}
 	
-	public int getAccountId(){
-		return account_id;
+	public int getAccountId() {
+		return accountId;
 	}
 
 	public long getDateRaw() {
@@ -59,5 +59,9 @@ public class Transaction implements Serializable {
 	
 	public String getAmount() {
 		return DECIFORMAT.format(amount);
+	}
+	
+	public String getCurrency() {
+		return currency;
 	}
 }

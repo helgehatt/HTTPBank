@@ -59,7 +59,7 @@
 				      <input name="amount" type="text" class="form-control" id="change" readonly>
 				    </div>
 				    <div class="col-sm-3">
-				      <input name="deposit-currency" type="text" class="form-control" id="deposit-currency" readonly>	          	
+				      <input name="currency" type="text" class="form-control" id="deposit-currency" readonly>	          	
 				    	<select class="form-control" id="withdrawal-currency">
 				    		<c:forEach var="currency" items="${currencies}">
 				    			<option value="${currency}">${currency}</option>

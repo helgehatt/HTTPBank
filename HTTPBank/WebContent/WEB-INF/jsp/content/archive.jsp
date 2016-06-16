@@ -31,9 +31,9 @@
         		<td>
         			<p class="column-show">${transaction.date}</p>
         			${transaction.description}
-        			<p class="column-show">${transaction.amount}</p>
+        			<p class="column-show">${transaction.amount} ${transaction.currency}</p>
         		</td>
-        		<td class="text-right column-hide" style="white-space:nowrap">${transaction.amount}</td>
+        		<td class="text-right column-hide" style="white-space:nowrap">${transaction.amount} ${transaction.currency}</td>
         	</tr>
         </c:forEach>
       </tbody>
