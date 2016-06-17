@@ -8,8 +8,11 @@ import ibm.db.DB.USER;
 import ibm.resource.DatabaseException;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -44,7 +47,25 @@ public class TestDBException extends Mockito {
 	String receiver = ""+1;
 	TransBy transBy = TransBy.ID;
 	
-	//Tests
+	@AfterClass
+	public static void cleanUp() throws SQLException{
+		Properties properties = new Properties();
+		properties.put("user", "DTU18");
+		properties.put("password", "FAGP2016");
+		properties.put("retreiveMessagesFromServerOnGetMessage", "true");
+		properties.put("emulateParameterMetaDataForZCalls", "1");
+		try {
+			Class.forName("com.ibm.db2.jcc.DB2Driver");
+		} catch (ClassNotFoundException e) {
+			throw new SQLException(e);
+		}
+		try {
+			DB.setConnection(DriverManager.getConnection("jdbc:db2://192.86.32.54:5040/DALLASB", properties));
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	@Before
 	public void testSetup() throws SQLException{
 		connection = mock(Connection.class);
@@ -61,6 +82,7 @@ public class TestDBException extends Mockito {
 		DB.setConnection(connection);
 	}
 	
+	//Tests
 	@Test
 	public void testCheckLoginException() throws SQLException {
 		try {
