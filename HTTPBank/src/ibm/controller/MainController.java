@@ -76,6 +76,7 @@ public class MainController extends HttpServlet {
 			break;
 		case "/admin/users":
 			session.setAttribute("user", null);
+			session.setAttribute("archive", null);
 			request.getRequestDispatcher("../WEB-INF/jsp/admin/user-list.jsp").forward(request, response);
 			break;
 		case "/admin/newuser":
